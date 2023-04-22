@@ -1,0 +1,64 @@
+image: docker:20.10.16
+
+variables:
+  VERSION: "1.0"
+  REPOSITORY: "valuenaire/valuenaire_backend"
+
+services:
+  - docker:20.10.16-dind
+
+before_script:
+  - "which ssh-agent || ( apk add openssh-client )"
+  - eval $(ssh-agent -s)
+  - ssh-add <(echo "$PRIVATE_KEY")
+  - mkdir -p ~/.ssh
+  - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  - docker info
+  - docker login -u "$CI_DEPLOY_USER" -p "$CI_DEPLOY_PASSWORD" registry.gitlab.com
+  - echo "docker registry login successfully"
+
+stages:
+  - deploy
+  - production
+  - qa
+
+deploy_qa:
+  stage: qa
+  script: 
+    - docker build -t registry.gitlab.com/"${REPOSITORY}"/"${VERSION}":QA .
+    - echo "build image successfully"
+    - docker push registry.gitlab.com/"${REPOSITORY}"/"${VERSION}":QA
+    - echo "docker image pushed to docker registry successfully"
+    - chmod +x ./deploy/deploy.sh
+    - ./deploy/deploy.sh QA "$QA_SERVER" "$REPOSITORY" "$VERSION" "$QA_DB_USERNAME" "$QA_DB_PASS" "$QA_DB_URL" "$QA_DB_NAME" "$LINKEDIN_CLIENT_ID" "$LINKEDIN_CLIENT_SECRET" "$LINKEDIN_REDIRECT_URI"
+    - echo "end of script"
+  only:
+    - qa
+
+
+
+deploy_production:
+  stage: production
+  script: 
+    - docker build -t registry.gitlab.com/"${REPOSITORY}"/"${VERSION}":PRODUCTION .
+    - echo "build image successfully"
+    - docker push registry.gitlab.com/"${REPOSITORY}"/"${VERSION}":PRODUCTION
+    - echo "docker image pushed to docker registry successfully"
+    - chmod +x ./deploy/deploy.sh
+    - ./deploy/deploy.sh PRODUCTION "$PROD_SERVER" "$REPOSITORY" "$VERSION" "$PROD_DB_USERNAME" "$PROD_DB_PASS" "$PROD_DB_URL" "$PROD_DB_NAME" "$LINKEDIN_CLIENT_ID" "$LINKEDIN_CLIENT_SECRET" "$LINKEDIN_REDIRECT_URI"
+    - echo "end of script"
+  only:
+    - production
+
+deploy_dev:
+  stage: deploy
+  script:
+    - docker build -t registry.gitlab.com/"${REPOSITORY}"/"${VERSION}":DEV .
+    - echo "build image successfully"
+    - docker push registry.gitlab.com/"${REPOSITORY}"/"${VERSION}":DEV
+    - echo "docker image pushed to docker registry successfully"
+    - chmod +x ./deploy/deploy.sh
+    - ./deploy/deploy.sh DEV "$DEV_SERVER" "$REPOSITORY" "$VERSION" "$DEV_DB_USERNAME" "$DEV_DB_PASS" "$DEV_DB_URL" "$DEV_DB_NAME" "$LINKEDIN_CLIENT_ID" "$LINKEDIN_CLIENT_SECRET" "$LINKEDIN_REDIRECT_URI"
+    - echo "end of script"
+  only:
+    - dev
