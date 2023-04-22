@@ -4,9 +4,9 @@ const mainRouter = Router()
 
 mainRouter.get('/test', (req, res) => {
     return res.json({
-        name: 'valuenaire backend',
+        name: 'svm backend',
         version: '1.0.0',
-        message: 'Welcome to the valuenaire backend',
+        message: 'Welcome to the svm backend',
         // server: APP_ENV,
     })
 })
