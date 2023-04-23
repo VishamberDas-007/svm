@@ -5,4 +5,6 @@ const projectRouter = express.Router()
 
 projectRouter.post('/create', projectController.newProject)
 
+projectRouter.get('/list', projectController.getAllProjects)
+
 export { projectRouter }

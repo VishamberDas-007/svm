@@ -3,7 +3,8 @@ import catchAsync from '../utils/catchAsync'
 import { TCreateProject } from './types/project'
 import prisma from '../db'
 import responseHandler from '../utils/responseHandler'
-import { PROJECT_S_0001 } from '../config/responseCodes/project'
+import { PROJECT_S_0001, PROJECT_S_0002 } from '../config/responseCodes/project'
+import { Project } from '@prisma/client'
 
 export const newProject = catchAsync(async (req: Request, res: Response) => {
     const {
@@ -34,3 +35,85 @@ export const newProject = catchAsync(async (req: Request, res: Response) => {
 
     return responseHandler(res, PROJECT_S_0001, newProject)
 })
+
+export const getAllProjects = catchAsync(
+    async (req: Request, res: Response) => {
+        const { page = 1, pageSize = 20 } = req.query
+
+        const filterString = req.query.filterString as string
+
+        const skip = (+page - 1) * +pageSize
+
+        let projectList: Project[] = [],
+            projectCount = 0
+
+        if (!filterString) {
+            await prisma.$transaction(async (prisma) => {
+                projectList = await prisma.project.findMany({
+                    take: +pageSize,
+                    skip: skip,
+                })
+                projectCount = await prisma.project.count()
+            })
+        } else {
+            projectList = await prisma.project.findMany({
+                take: +pageSize,
+                skip: skip,
+                where: {
+                    OR: [
+                        {
+                            name: {
+                                startsWith: filterString,
+                                mode: 'insensitive',
+                            },
+                        },
+                        {
+                            name: {
+                                contains: filterString,
+                                mode: 'insensitive',
+                            },
+                        },
+
+                        {
+                            address1: {
+                                startsWith: filterString,
+                                mode: 'insensitive',
+                            },
+                        },
+                        {
+                            address1: {
+                                contains: filterString,
+                                mode: 'insensitive',
+                            },
+                        },
+
+                        {
+                            address2: {
+                                startsWith: filterString,
+                                mode: 'insensitive',
+                            },
+                        },
+                        {
+                            address2: {
+                                contains: filterString,
+                                mode: 'insensitive',
+                            },
+                        },
+                    ],
+                },
+            })
+            projectCount = await prisma.project.count()
+        }
+
+        const result = {
+            projectList,
+            meta: {
+                totalCount: projectCount,
+                page: +page,
+                pageSize: +pageSize,
+            },
+        }
+
+        return responseHandler(res, PROJECT_S_0002, result)
+    }
+)
