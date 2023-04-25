@@ -7,6 +7,9 @@ generator client {
 	provider = "prisma-client-js"
 	previewFeatures = ["fullTextIndex"]
 }
+model Booking {
+	bookingId String @id @default(uuid())
+}
 model Project {
 	projectId String @id @default(uuid())
 	name String 
@@ -20,4 +23,7 @@ model Project {
 	pincode String 
 	createdAt DateTime @default(now())
 	updatedAt DateTime @updatedAt
+	parentId String? 
+	parentProject Project? @relation(name: "ParentProject", fields: [parentId], references: [projectId])
+	childProject Project[] @relation(name: "ParentProject")
 }

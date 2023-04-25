@@ -17,10 +17,12 @@ export const newProject = catchAsync(async (req: Request, res: Response) => {
         status,
         unit,
         address2,
+        parentId,
     }: TCreateProject = req.body
 
     const newProject = await prisma.project.create({
         data: {
+            parentId: parentId,
             address1,
             address2,
             area,

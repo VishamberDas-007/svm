@@ -5,6 +5,7 @@ export type TCreateProject = {
     area: number
     unit: string
     status: string
+    parentId: string
     // logoUrl:string
     address1: string
     address2?: string
