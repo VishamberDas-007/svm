@@ -24,6 +24,8 @@ export default (
     res: Response,
     next: NextFunction
 ) => {
+    console.log({ err })
+
     if (err instanceof PrismaClientKnownRequestError) {
         switch (err.code) {
             case 'P2002': {

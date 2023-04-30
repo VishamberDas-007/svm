@@ -1,17 +1,23 @@
 model Project {
-    projectId     String    @id @default(uuid())
+    projectId     String        @id @default(uuid())
     name          String
     description   String?
     ownerName     String
     area          Int
     unit          String
-    status        String
+    status        ProjectStatus @default(UPCOMING)
     address1      String
     address2      String?
     pincode       String
-    createdAt     DateTime  @default(now())
-    updatedAt     DateTime  @updatedAt
+    createdAt     DateTime      @default(now())
+    updatedAt     DateTime      @updatedAt
     parentId      String?
-    parentProject Project?  @relation("ParentProject", fields: [parentId], references: [projectId])
-    childProject  Project[] @relation("ParentProject")
+    parentProject Project?      @relation("ParentProject", fields: [parentId], references: [projectId])
+    childProject  Project[]     @relation("ParentProject")
+}
+
+enum ProjectStatus {
+    ACTIVE
+    COMPLETED
+    UPCOMING
 }

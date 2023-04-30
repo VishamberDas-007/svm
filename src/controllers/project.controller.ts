@@ -1,31 +1,50 @@
 import { Request, Response } from 'express'
 import catchAsync from '../utils/catchAsync'
-import { TCreateProject } from './types/project'
+import { TCreateProject, TUpdateProject } from './types/project'
 import prisma from '../db'
 import responseHandler from '../utils/responseHandler'
-import { PROJECT_S_0001, PROJECT_S_0002 } from '../config/responseCodes/project'
+import {
+    PROJECT_E_0001,
+    PROJECT_E_0002,
+    PROJECT_S_0001,
+    PROJECT_S_0002,
+    PROJECT_S_0003,
+} from '../config/responseCodes/project'
 import { Project } from '@prisma/client'
+import AppError from '../utils/AppError'
+import validator from '../validations'
+import * as validation from '../validations/project.validator'
+import * as generalValidation from '../validations/_general.validator'
+import { projectExists } from '../services/project.service'
 
 export const newProject = catchAsync(async (req: Request, res: Response) => {
+    await validator(validation.createProjectValidator, req.body)
+
     const {
+        parentId,
         address1,
+        address2,
         area,
-        name,
         description,
+        name,
         ownerName,
         pincode,
         status,
         unit,
-        address2,
-        parentId,
     }: TCreateProject = req.body
+
+    if (parentId) {
+        const project = await projectExists(parentId)
+
+        if (!project) throw new AppError(PROJECT_E_0002)
+    }
 
     const newProject = await prisma.project.create({
         data: {
-            parentId: parentId,
+            parentId,
             address1,
             address2,
-            area,
+            area: +area,
             description,
             name,
             ownerName,
@@ -119,3 +138,57 @@ export const getAllProjects = catchAsync(
         return responseHandler(res, PROJECT_S_0002, result)
     }
 )
+
+export const updateProject = catchAsync(async (req: Request, res: Response) => {
+    await validator(generalValidation.projectIdValidator, req.params)
+
+    await validator(validation.updateProjectValidator, req.params)
+
+    const projectId = req.params.projectId
+
+    const {
+        address1,
+        area,
+        name,
+        description,
+        ownerName,
+        pincode,
+        status,
+        unit,
+        address2,
+    }: TUpdateProject = req.body
+
+    const updateProject = await prisma.project.update({
+        where: {
+            projectId,
+        },
+        data: {
+            address1,
+            address2,
+            area,
+            description,
+            name,
+            ownerName,
+            pincode,
+            status,
+            unit,
+        },
+    })
+
+    return responseHandler(res, PROJECT_S_0001, updateProject)
+})
+
+export const getProject = catchAsync(async (req: Request, res: Response) => {
+    await validator(generalValidation.projectIdValidator, req.params)
+
+    const projectId = req.params.projectId
+
+    const fetchProject = await prisma.project.findFirst({
+        where: {
+            projectId,
+        },
+    })
+
+    if (!fetchProject) throw new AppError(PROJECT_E_0001)
+    else return responseHandler(res, PROJECT_S_0003, fetchProject)
+})

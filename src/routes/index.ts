@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { projectRouter } from './project.toutes'
+import { projectRouter } from './project.routes'
 const mainRouter = Router()
 
 mainRouter.get('/test', (req, res) => {

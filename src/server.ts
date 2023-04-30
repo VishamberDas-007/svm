@@ -1,4 +1,4 @@
-import { Application, json, urlencoded } from 'express'
+import { Application, Request, Response, json, urlencoded } from 'express'
 import cors from 'cors'
 import { mainRouter } from './routes'
 import morgan from 'morgan'
@@ -19,6 +19,11 @@ export default class Server {
         // test()
 
         app.use('/api', mainRouter)
+        app.use('/*', (req: Request, res: Response) => {
+            return res.status(404).send({
+                message: 'Route not found',
+            })
+        })
 
         app.use(errorHandler)
     }
