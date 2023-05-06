@@ -16,6 +16,7 @@ import validator from '../validations'
 import * as validation from '../validations/project.validator'
 import * as generalValidation from '../validations/_general.validator'
 import { projectExists } from '../services/project.service'
+import { TListData } from '../types/global.types'
 
 export const newProject = catchAsync(async (req: Request, res: Response) => {
     await validator(validation.createProjectValidator, req.body)
@@ -126,8 +127,8 @@ export const getAllProjects = catchAsync(
             projectCount = await prisma.project.count()
         }
 
-        const result = {
-            projectList,
+        const result: TListData<Project> = {
+            list: projectList,
             meta: {
                 totalCount: projectCount,
                 page: +page,
@@ -142,7 +143,7 @@ export const getAllProjects = catchAsync(
 export const updateProject = catchAsync(async (req: Request, res: Response) => {
     await validator(generalValidation.projectIdValidator, req.params)
 
-    await validator(validation.updateProjectValidator, req.params)
+    await validator(validation.updateProjectValidator, req.body)
 
     const projectId = req.params.projectId
 

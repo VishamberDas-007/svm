@@ -2,15 +2,16 @@ FROM node:lts
 ARG DATABASE_URL
 # Set the working directory
 WORKDIR /app
-# COPY package.json .
-# COPY tsconfig.json .
-# COPY src ./src
-COPY . .
 
+# COPY package.json .
+# COPY yarn.lock .
+COPY . .
+RUN yarn install
 RUN echo "file copying completed..."
 
-RUN echo "$mode" "mode"
-RUN if [ "$mode" = "production" ] ; then yarn install --production ; else yarn install ; fi
+EXPOSE 3030
+
+RUN yarn install --verbose
 
 RUN yarn build
 

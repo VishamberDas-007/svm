@@ -12,7 +12,7 @@ projectRouter.post(
 
 projectRouter.get('/list', projectController.getAllProjects)
 
-projectRouter.patch('/update/:projectId', projectController.updateProject)
+projectRouter.put('/update/:projectId', projectController.updateProject)
 
 projectRouter.get('/get/:projectId', projectController.getProject)
 

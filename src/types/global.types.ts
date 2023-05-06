@@ -11,3 +11,12 @@ export type TResponseCode = {
     type: RESPONSE_TYPE
     statusCode: number
 }
+
+export type TListData<TList> = {
+    list: TList[]
+    meta: {
+        totalCount: number
+        page: number
+        pageSize: number
+    }
+}
