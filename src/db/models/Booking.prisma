@@ -1,3 +1,47 @@
 model Booking {
-    bookingId String @id @default(uuid())
+    bookingId      String        @id @default(uuid())
+    projectId      String
+    project        Project       @relation(fields: [projectId], references: [projectId])
+    address1       String
+    address2       String?
+    pincode        String
+    area           Float
+    totalAmt       Float
+    paidAmt        Float
+    remainAmt      Float
+    installmentAmt Float
+    paymentType    PaymentType   @default(CASH)
+    paymentStatus  PaymentStatus @default(PARTIAL)
+    customerId     String
+    customer       Customer      @relation(fields: [customerId], references: [customerId])
+    adminAccountId Int
+    adminAccount   AdminAccount  @relation(fields: [adminAccountId], references: [adminAccountId])
+    accountId      String
+}
+
+model Project {
+    projectId String    @id
+    booking   Booking[]
+}
+
+model Customer {
+    customerId String    @id
+    booking    Booking[]
+}
+
+model AdminAccount {
+    adminAccountId Int       @id
+    booking        Booking[]
+}
+
+enum PaymentStatus {
+    PARTIAL
+    COMPLETED
+}
+
+enum PaymentType {
+    CHEQUE
+    UPI
+    CASH
+    BANK_TRANSFER
 }
