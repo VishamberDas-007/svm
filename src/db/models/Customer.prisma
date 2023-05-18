@@ -1,7 +1,7 @@
 model Customer {
     customerId String   @id
     name       String
-    aadharNo   String
+    aadharNo   String   @unique
     createdAt  DateTime @default(now())
     updatedAt  DateTime @updatedAt
 }

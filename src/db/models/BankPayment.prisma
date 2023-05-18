@@ -1,0 +1,15 @@
+model BankPayment {
+    paymentId     String   @id @default(uuid())
+    bookingId     String
+    booking       Booking  @relation(fields: [bookingId], references: [bookingId])
+    bankName      String
+    accountNumber String
+    amount        Float
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+}
+
+model Booking {
+    bookingId   String        @id
+    bankPayment BankPayment[]
+}
