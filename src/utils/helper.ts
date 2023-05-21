@@ -19,6 +19,13 @@ const panNumber = Joi.string()
         'string.pattern.base': 'Please enter valid pan number type.',
     })
 
+const aadharValidator = Joi.string()
+    // .regex(/^[0-]{5}[0-9]{4}[A-Z]{1}$/)
+    .regex(/^[2-9]{1}[0-9]{3}\s[0-9]{4}\s[0-9]{4}$/)
+    .messages({
+        'string.pattern.base': 'Please enter valid aadhar number type.',
+    })
+
 const passwordValidator = Joi.string()
     .regex(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,24}$/
@@ -66,6 +73,7 @@ export default {
     otpGenerator,
     emailValidator,
     otpValidator,
+    aadharValidator,
     uuid,
     panNumber,
     passwordValidator,
