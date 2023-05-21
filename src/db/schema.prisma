@@ -77,10 +77,13 @@ model Project {
 }
 
 model Customer {
-    customerId    String          @id
+    customerId    String          @id @default(uuid())
     booking       Booking[]       @relation(name: "BookingToCustomer")
-    name          String
+    firstName     String
+    lastName      String
     aadharNo      String          @unique
+    phone         String
+    email         String?
     createdAt     DateTime        @default(now())
     updatedAt     DateTime        @updatedAt
     customerImage CustomerImage[] @relation(name: "CustomerToCustomerImage")

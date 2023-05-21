@@ -1,7 +1,10 @@
 model Customer {
-    customerId String   @id
-    name       String
+    customerId String   @id @default(uuid())
+    firstName  String
+    lastName   String
     aadharNo   String   @unique
+    phone      String
+    email      String?
     createdAt  DateTime @default(now())
     updatedAt  DateTime @updatedAt
 }
