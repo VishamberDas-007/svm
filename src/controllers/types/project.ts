@@ -1,25 +1,13 @@
-type TProjectDetails = {
-    name: string
-    description?: string
-    ownerName: string
-    area: number
-    unit: string
-    status: string
-    parentId?: string
-    // logoUrl:string
-    address1: string
-    address2?: string
-    pincode: string
-}
+import { ProjectStatus } from '@prisma/client'
+
 export type TCreateProject = {
-    // details: TProjectDetails
     name: string
     description?: string
     parentId?: string
     ownerName: string
     area: number
     unit: string
-    status: string
+    status: ProjectStatus
     address1: string
     address2?: string
     pincode: string
@@ -33,7 +21,7 @@ export type TUpdateProject = {
     ownerName: string
     area: number
     unit: string
-    status: string
+    status: ProjectStatus
     address1: string
     address2?: string
     pincode: string
