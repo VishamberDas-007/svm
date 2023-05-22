@@ -1,6 +1,6 @@
 # SVM Backend System
 
-A backend repository of Valuenaire system.
+A backend repository of SVM system.
 
 ## Quick start
 
