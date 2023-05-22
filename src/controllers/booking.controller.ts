@@ -13,19 +13,11 @@
 //         status,
 //         unit,
 //         address2,
-//     } = req.body
+//     }: = req.body
 
-//     const newProject = await prisma..create({
+//     const newProject = await prisma.booking.create({
 //         data: {
-//             address1,
-//             address2,
-//             area,
-//             description,
-//             name,
-//             ownerName,
-//             pincode,
-//             status,
-//             unit,
+
 //         },
 //     })
 

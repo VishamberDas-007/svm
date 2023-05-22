@@ -84,6 +84,7 @@ model Customer {
     aadharNo      String          @unique
     phone         String
     email         String?
+    address       String?
     createdAt     DateTime        @default(now())
     updatedAt     DateTime        @updatedAt
     customerImage CustomerImage[] @relation(name: "CustomerToCustomerImage")
@@ -118,6 +119,17 @@ model CustomerImage {
     booking         Booking  @relation(name: "BookingToCustomerImage", fields: [bookingId], references: [bookingId])
     createdAt       DateTime @default(now())
     updatedAt       DateTime @updatedAt
+}
+
+model Referral {
+    referralId String   @id @default(uuid())
+    firstName  String
+    lastName   String
+    phone      String
+    email      String?
+    address    String?
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
 }
 
 model UpiPayment {
