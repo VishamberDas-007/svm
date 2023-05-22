@@ -125,7 +125,7 @@ model Referral {
     referralId String   @id @default(uuid())
     firstName  String
     lastName   String
-    phone      String
+    phone      String   @unique
     email      String?
     address    String?
     createdAt  DateTime @default(now())

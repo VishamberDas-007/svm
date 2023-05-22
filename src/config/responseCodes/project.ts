@@ -1,7 +1,7 @@
 import { RESPONSE_TYPE } from '../../types/global.types'
 
 export const PROJECT_E_0001 = {
-    type: RESPONSE_TYPE.SUCCESS,
+    type: RESPONSE_TYPE.ERROR,
     code: 'PROJECT_E_0001',
     isNotify: false,
     message: 'Failed to fetch project details',
@@ -9,7 +9,7 @@ export const PROJECT_E_0001 = {
 }
 
 export const PROJECT_E_0002 = {
-    type: RESPONSE_TYPE.SUCCESS,
+    type: RESPONSE_TYPE.ERROR,
     code: 'PROJECT_E_0002',
     isNotify: false,
     message: 'No such parent project exists',
