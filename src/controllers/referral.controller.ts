@@ -13,12 +13,10 @@ import {
     REFERRAL_S_0003,
     REFERRAL_S_0004,
 } from '../config/responseCodes/referral'
-// import * as validation from '../validations/project.validator'
-// import * as generalValidation from '../validations/_general.validator'
-// import { TListData } from '../types/global.types'
+import * as validation from '../validations/referral.validator'
 
 export const newReferral = catchAsync(async (req: Request, res: Response) => {
-    // await validator(validation.createProjectValidator, req.body)
+    await validator(validation.createReferralValidator, req.body)
 
     const { address, email, firstName, lastName, phone }: TReferral = req.body
 
@@ -54,6 +52,8 @@ export const getAllReferral = catchAsync(
 )
 
 export const getReferral = catchAsync(async (req: Request, res: Response) => {
+    await validator(validation.referralIdValidator, req.params)
+
     const referralId = req.params.referralId
 
     const fetchReferral = await prisma.referral.findFirst({
@@ -71,6 +71,8 @@ export const getReferral = catchAsync(async (req: Request, res: Response) => {
 
 export const updateReferral = catchAsync(
     async (req: Request, res: Response) => {
+        await validator(validation.updateReferralValidator, req.body)
+
         const referralId = req.params.referralId
 
         const { address, email, firstName, lastName, phone }: TReferral =
@@ -94,23 +96,24 @@ export const updateReferral = catchAsync(
                         },
                     },
                 })
-                if (phoneExists) throw new AppError(REFERRAL_E_0001)
-            } else {
-                const updateReferral = await prisma.referral.update({
-                    where: {
-                        referralId,
-                    },
-                    data: {
-                        address,
-                        email,
-                        firstName,
-                        lastName,
-                        phone,
-                    },
-                })
 
-                return responseHandler(res, REFERRAL_S_0004, updateReferral)
+                if (phoneExists) throw new AppError(REFERRAL_E_0001)
             }
+
+            const updateReferral = await prisma.referral.update({
+                where: {
+                    referralId,
+                },
+                data: {
+                    address,
+                    email,
+                    firstName,
+                    lastName,
+                    phone,
+                },
+            })
+
+            return responseHandler(res, REFERRAL_S_0004, updateReferral)
         }
     }
 )

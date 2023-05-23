@@ -7,7 +7,7 @@ referralRouter.post('/create', referralController.newReferral)
 
 referralRouter.get('/list', referralController.getAllReferral)
 
-referralRouter.put('/update/:referral', referralController.updateReferral)
+referralRouter.put('/update/:referralId', referralController.updateReferral)
 
 referralRouter.get('/get/:referralId', referralController.getReferral)
 
