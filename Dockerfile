@@ -16,6 +16,9 @@ RUN yarn install --verbose
 RUN yarn build
 
 RUN echo "build completed..."
+
+RUN npx prisma migrate deploy
+
 RUN npx prisma generate
 
 

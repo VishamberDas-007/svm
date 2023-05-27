@@ -10,10 +10,11 @@ generator client {
 }
 
 model AdminAccount {
-    adminAccountId Int       @id
+    adminAccountId Int       @id @default(autoincrement())
     name           String
     bankName       String
     balance        Float
+    accNo          String    @unique
     createdAt      DateTime  @default(now())
     updatedAt      DateTime  @updatedAt
     booking        Booking[] @relation(name: "AdminAccountToBooking")
