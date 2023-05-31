@@ -143,6 +143,18 @@ model UpiPayment {
     updatedAt DateTime @updatedAt
 }
 
+model User {
+    userId    String   @id @default(uuid())
+    name      String
+    email     String   @unique
+    phone     String
+    password  String
+    address   String?
+    isAdmin   Boolean  @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
 enum PaymentStatus {
     PENDING
     PARTIAL
