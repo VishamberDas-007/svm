@@ -6,3 +6,5 @@ export const PORT = process.env.PORT || ''
 export const JWT = {
     SECRET_KEY: 'Das',
 }
+
+export const SALT_ROUND = process.env.SALT_ROUND || 10
