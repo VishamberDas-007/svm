@@ -20,6 +20,14 @@ export const AUTH_S_0001: TResponseCode = {
     type: RESPONSE_TYPE.SUCCESS,
     code: 'AUTH_S_0001',
     isNotify: true,
+    message: 'Registered successfully',
+    statusCode: 200,
+}
+
+export const AUTH_S_0002: TResponseCode = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'AUTH_S_0002',
+    isNotify: true,
     message: 'Logged-in successfully',
     statusCode: 200,
 }

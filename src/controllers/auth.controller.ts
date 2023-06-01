@@ -8,12 +8,17 @@ import {
     AUTH_E_0001,
     AUTH_E_0002,
     AUTH_S_0001,
+    AUTH_S_0002,
 } from '../config/responseCodes/auth'
 import bcrypt from 'bcrypt'
-import { JWT } from '../config/const'
+import { SALT_ROUND } from '../config/const'
+import validator from '../validations'
+import * as validation from '../validations/auth.validator'
 
 export const register = catchAsync(async (req: Request, res: Response) => {
-    const { email, password, phone, address }: TRegister = req.body
+    await validator(validation.registerValidator, req.body)
+
+    const { email, password, phone, address, name }: TRegister = req.body
 
     const emailExists = await prisma.user.findFirst({
         where: {
@@ -24,13 +29,11 @@ export const register = catchAsync(async (req: Request, res: Response) => {
     if (emailExists) {
         throw new AppError(AUTH_E_0002)
     } else {
-        const encryptedPassword = bcrypt.hashSync(password, JWT.SECRET_KEY)
+        const encryptedPassword = bcrypt.hashSync(password, SALT_ROUND)
 
-        const newUser = await prisma.user.update({
-            where: {
-                email,
-            },
+        const newUser = await prisma.user.create({
             data: {
+                name,
                 email,
                 password: encryptedPassword,
                 phone,
@@ -46,7 +49,7 @@ export const register = catchAsync(async (req: Request, res: Response) => {
 })
 
 export const login = catchAsync(async (req: Request, res: Response) => {
-    // await validator(validation.createProjectValidator, req.body)
+    await validator(validation.loginValidator, req.body)
 
     const { email, password }: TLogin = req.body
 
@@ -67,7 +70,7 @@ export const login = catchAsync(async (req: Request, res: Response) => {
         if (!passwordIsValid) {
             throw new AppError(AUTH_E_0001)
         } else {
-            return responseHandler(res, AUTH_S_0001, emailExists)
+            return responseHandler(res, AUTH_S_0002, emailExists)
         }
     }
 })
