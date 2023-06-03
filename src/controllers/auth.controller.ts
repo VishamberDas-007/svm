@@ -14,6 +14,7 @@ import bcrypt from 'bcrypt'
 import { SALT_ROUND } from '../config/const'
 import validator from '../validations'
 import * as validation from '../validations/auth.validator'
+import util from '../utils/helper'
 
 export const register = catchAsync(async (req: Request, res: Response) => {
     await validator(validation.registerValidator, req.body)
@@ -41,9 +42,18 @@ export const register = catchAsync(async (req: Request, res: Response) => {
             },
         })
 
+        const tokenObj = {
+            email,
+        }
+
+        const accessToken = util.accessToken(tokenObj)
+        const refreshToken = util.refreshToken(tokenObj)
+
         return responseHandler(res, AUTH_S_0001, {
             ...newUser,
             password: undefined,
+            accessToken,
+            refreshToken,
         })
     }
 })
@@ -70,7 +80,19 @@ export const login = catchAsync(async (req: Request, res: Response) => {
         if (!passwordIsValid) {
             throw new AppError(AUTH_E_0001)
         } else {
-            return responseHandler(res, AUTH_S_0002, emailExists)
+            const tokenObj = {
+                email,
+            }
+
+            const accessToken = util.accessToken(tokenObj)
+            const refreshToken = util.refreshToken(tokenObj)
+
+            return responseHandler(res, AUTH_S_0002, {
+                ...emailExists,
+                password: undefined,
+                accessToken,
+                refreshToken,
+            })
         }
     }
 })

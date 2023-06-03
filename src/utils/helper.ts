@@ -1,4 +1,6 @@
 import Joi from 'joi'
+import jwt from 'jsonwebtoken'
+import { jwtAccessToken, jwtRefreshToken } from '../config/const'
 
 const otpGenerator = () => {
     return Math.floor(100000 + Math.random() * 900000)
@@ -69,6 +71,16 @@ const passwordGenerator = () => {
     return password
 }
 
+const accessToken = (userDetails: object, expiresIn: string | null = null) =>
+    jwt.sign(userDetails, jwtAccessToken.SECRET_KEY, {
+        expiresIn: expiresIn || jwtAccessToken.EXPIRE,
+    })
+
+const refreshToken = (userDetails: object, expiresIn?: string) =>
+    jwt.sign(userDetails, jwtRefreshToken.SECRET_KEY, {
+        expiresIn: expiresIn || jwtRefreshToken.EXPIRE,
+    })
+
 export default {
     otpGenerator,
     emailValidator,
@@ -81,4 +93,6 @@ export default {
     calculateTotalPages,
     formatLabelName,
     passwordGenerator,
+    accessToken,
+    refreshToken,
 }

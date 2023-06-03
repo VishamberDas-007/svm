@@ -3,8 +3,14 @@ dotenv.config()
 
 export const PORT = process.env.PORT || ''
 
-export const JWT = {
-    SECRET_KEY: 'Das',
+export const jwtAccessToken = {
+    SECRET_KEY: process.env.AT_SECRET_KEY || 'Das@123',
+    EXPIRE: process.env.AT_EXPIRE || '1d',
+}
+
+export const jwtRefreshToken = {
+    SECRET_KEY: process.env.RT_SECRET_KEY || 'Das@132!3(7',
+    EXPIRE: process.env.RT_EXPIRE || '10d',
 }
 
 export const SALT_ROUND = process.env.SALT_ROUND || 10
