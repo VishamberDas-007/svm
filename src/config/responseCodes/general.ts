@@ -28,8 +28,8 @@ export const GENERAL_E_0004 = {
     type: RESPONSE_TYPE.ERROR,
     code: 'GENERAL_E_0004',
     isNotify: false,
-    message: 'File Size exceed, Max 20mb supported',
-    statusCode: 500,
+    message: 'Token not found',
+    statusCode: 404,
 }
 
 export const GENERAL_E_0005 = {

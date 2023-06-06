@@ -47,13 +47,17 @@ export const register = catchAsync(async (req: Request, res: Response) => {
         }
 
         const accessToken = util.accessToken(tokenObj)
-        const refreshToken = util.refreshToken(tokenObj)
+        // const refreshToken = util.refreshToken(tokenObj)
+
+        res.cookie('token', accessToken, {
+            expires: new Date(Date.now() + 5000),
+            httpOnly: true,
+            secure: true,
+        })
 
         return responseHandler(res, AUTH_S_0001, {
             ...newUser,
             password: undefined,
-            accessToken,
-            refreshToken,
         })
     }
 })
@@ -85,13 +89,19 @@ export const login = catchAsync(async (req: Request, res: Response) => {
             }
 
             const accessToken = util.accessToken(tokenObj)
-            const refreshToken = util.refreshToken(tokenObj)
+            // const refreshToken = util.refreshToken(tokenObj)
+
+            res.cookie('token', accessToken, {
+                expires: new Date(Date.now() + 5000),
+                httpOnly: true,
+                secure: true,
+            })
 
             return responseHandler(res, AUTH_S_0002, {
                 ...emailExists,
                 password: undefined,
                 accessToken,
-                refreshToken,
+                // refreshToken,
             })
         }
     }

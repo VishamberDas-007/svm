@@ -4,6 +4,7 @@ import { customerRouter } from './customer.routes'
 import { referralRouter } from './referral.routes'
 import { accountRouter } from './adminAccount.routes'
 import { authRouter } from './authRouter.routes'
+import { adminMiddleware } from '../middlewares/auth.middleware'
 const mainRouter = Router()
 
 mainRouter.get('/test', (req, res) => {
@@ -21,7 +22,7 @@ mainRouter.use('/customer', customerRouter)
 
 mainRouter.use('/referral', referralRouter)
 
-mainRouter.use('/account', accountRouter)
+mainRouter.use('/account', adminMiddleware, accountRouter)
 
 mainRouter.use('/auth', authRouter)
 
