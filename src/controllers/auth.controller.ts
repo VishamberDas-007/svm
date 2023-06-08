@@ -94,7 +94,8 @@ export const login = catchAsync(async (req: Request, res: Response) => {
             res.cookie('token', accessToken, {
                 expires: new Date(Date.now() + 5000),
                 httpOnly: true,
-                secure: true,
+                // secure: true,
+                sameSite: 'none',
             })
 
             return responseHandler(res, AUTH_S_0002, {
