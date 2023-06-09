@@ -16,11 +16,11 @@ mainRouter.get('/test', (req, res) => {
     })
 })
 
-mainRouter.use('/project', adminMiddleware, projectRouter)
+mainRouter.use('/project', projectRouter)
 
-mainRouter.use('/customer', adminMiddleware, customerRouter)
+mainRouter.use('/customer', customerRouter)
 
-mainRouter.use('/referral', adminMiddleware, referralRouter)
+mainRouter.use('/referral', referralRouter)
 
 mainRouter.use('/account', adminMiddleware, accountRouter)
 
