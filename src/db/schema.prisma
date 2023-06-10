@@ -32,30 +32,31 @@ model BankPayment {
 }
 
 model Booking {
-    bookingId      String          @id @default(uuid())
-    bankPayment    BankPayment[]   @relation(name: "BankPaymentToBooking")
-    projectId      String
-    project        Project         @relation(name: "BookingToProject", fields: [projectId], references: [projectId])
-    address1       String
-    address2       String?
-    pincode        String
-    area           Float
-    totalAmt       Float
-    paidAmt        Float
-    remainAmt      Float
-    installmentAmt Float
-    paymentType    PaymentType     @default(CASH)
-    paymentStatus  PaymentStatus   @default(PARTIAL)
-    customerId     String
-    customer       Customer        @relation(name: "BookingToCustomer", fields: [customerId], references: [customerId])
-    adminAccountId Int
-    adminAccount   AdminAccount    @relation(name: "AdminAccountToBooking", fields: [adminAccountId], references: [adminAccountId])
-    createdAt      DateTime        @default(now())
-    updatedAt      DateTime        @updatedAt
-    cashPayment    CashPayment[]   @relation(name: "BookingToCashPayment")
-    chequePayment  ChequePayment[] @relation(name: "BookingToChequePayment")
-    customerImage  CustomerImage[] @relation(name: "BookingToCustomerImage")
-    upiPayment     UpiPayment[]    @relation(name: "BookingToUpiPayment")
+    bookingId        String          @id @default(uuid())
+    bankPayment      BankPayment[]   @relation(name: "BankPaymentToBooking")
+    projectId        String
+    project          Project         @relation(name: "BookingToProject", fields: [projectId], references: [projectId])
+    address1         String
+    address2         String?
+    pincode          String
+    area             Float
+    totalAmt         Float
+    paidAmt          Float
+    remainAmt        Float
+    installmentAmt   Float
+    paymentType      PaymentType     @default(CASH)
+    paymentStatus    PaymentStatus   @default(PARTIAL)
+    customerId       String
+    customer         Customer        @relation(name: "BookingToCustomer", fields: [customerId], references: [customerId])
+    adminAccountId   Int
+    adminAccount     AdminAccount    @relation(name: "AdminAccountToBooking", fields: [adminAccountId], references: [adminAccountId])
+    installmentCount Int
+    createdAt        DateTime        @default(now())
+    updatedAt        DateTime        @updatedAt
+    cashPayment      CashPayment[]   @relation(name: "BookingToCashPayment")
+    chequePayment    ChequePayment[] @relation(name: "BookingToChequePayment")
+    customerImage    CustomerImage[] @relation(name: "BookingToCustomerImage")
+    upiPayment       UpiPayment[]    @relation(name: "BookingToUpiPayment")
 }
 
 model Project {

@@ -1,10 +1,12 @@
-// import express from 'express'
-// import * as bookingController from '../controllers/booking.controller'
+import express from 'express'
+import * as bookingController from '../controllers/booking.controller'
 
-// const bookingRouter = express.Router()
+const bookingRouter = express.Router()
 
-// bookingRouter.post('/create', bookingController.newBooking)
+bookingRouter.post('/create', bookingController.newBooking)
 
-// // bookingRouter.get('/list', bookingController.getAllProjects)
+bookingRouter.get('/list', bookingController.getAllBookings)
 
-// export { bookingRouter }
+bookingRouter.get('/get/:bookingId', bookingController.getBooking)
+
+export { bookingRouter }

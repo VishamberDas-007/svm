@@ -10,6 +10,8 @@ export const adminMiddleware = catchAsync(
     async (req: Request, res: Response, next: NextFunction) => {
         const token: string = req.cookies.token
 
+        console.log({ req })
+
         console.dir(req.cookies, { depth: null })
 
         if (!token) throw new AppError(GENERAL_E_0004)

@@ -1,23 +1,24 @@
 model Booking {
-    bookingId      String        @id @default(uuid())
-    projectId      String
-    project        Project       @relation(fields: [projectId], references: [projectId])
-    address1       String
-    address2       String?
-    pincode        String
-    area           Float
-    totalAmt       Float
-    paidAmt        Float
-    remainAmt      Float
-    installmentAmt Float
-    paymentType    PaymentType   @default(CASH)
-    paymentStatus  PaymentStatus @default(PARTIAL)
-    customerId     String
-    customer       Customer      @relation(fields: [customerId], references: [customerId])
-    adminAccountId Int
-    adminAccount   AdminAccount  @relation(fields: [adminAccountId], references: [adminAccountId])
-    createdAt      DateTime      @default(now())
-    updatedAt      DateTime      @updatedAt
+    bookingId        String        @id @default(uuid())
+    projectId        String
+    project          Project       @relation(fields: [projectId], references: [projectId])
+    address1         String
+    address2         String?
+    pincode          String
+    area             Float
+    totalAmt         Float
+    paidAmt          Float
+    remainAmt        Float
+    installmentAmt   Float
+    paymentType      PaymentType   @default(CASH)
+    paymentStatus    PaymentStatus @default(PARTIAL)
+    customerId       String
+    customer         Customer      @relation(fields: [customerId], references: [customerId])
+    adminAccountId   Int
+    adminAccount     AdminAccount  @relation(fields: [adminAccountId], references: [adminAccountId])
+    installmentCount Int
+    createdAt        DateTime      @default(now())
+    updatedAt        DateTime      @updatedAt
 }
 
 model Project {
