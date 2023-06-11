@@ -5,6 +5,8 @@ import { referralRouter } from './referral.routes'
 import { accountRouter } from './adminAccount.routes'
 import { authRouter } from './authRouter.routes'
 import { adminMiddleware } from '../middlewares/auth.middleware'
+import { bookingRouter } from './booking.routes'
+import { appConfigRouter } from './appConfig.routes'
 const mainRouter = Router()
 
 mainRouter.get('/test', (req, res) => {
@@ -15,6 +17,10 @@ mainRouter.get('/test', (req, res) => {
         // server: APP_ENV,
     })
 })
+
+mainRouter.use('/appConfig', appConfigRouter)
+
+mainRouter.use('/booking', bookingRouter)
 
 mainRouter.use('/project', projectRouter)
 
