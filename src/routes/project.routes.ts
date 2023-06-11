@@ -16,4 +16,6 @@ projectRouter.put('/update/:projectId', projectController.updateProject)
 
 projectRouter.get('/get/:projectId', projectController.getProject)
 
+projectRouter.get('/basic-list', projectController.getProjectBasicList)
+
 export { projectRouter }

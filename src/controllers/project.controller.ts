@@ -193,3 +193,17 @@ export const getProject = catchAsync(async (req: Request, res: Response) => {
     if (!fetchProject) throw new AppError(PROJECT_E_0001)
     else return responseHandler(res, PROJECT_S_0003, fetchProject)
 })
+
+export const getProjectBasicList = catchAsync(
+    async (req: Request, res: Response) => {
+        const fetchProjects = await prisma.project.findMany({
+            select: {
+                projectId: true,
+                name: true,
+                description: true,
+            },
+        })
+
+        return responseHandler(res, PROJECT_S_0002, fetchProjects)
+    }
+)
