@@ -11,6 +11,7 @@ import {
     AD_ACCOUNT_S_0001,
     AD_ACCOUNT_S_0002,
     AD_ACCOUNT_S_0003,
+    AD_ACCOUNT_S_0004,
 } from '../config/responseCodes/adminAccount'
 import AppError from '../utils/AppError'
 
@@ -60,7 +61,7 @@ export const getAdvanceAccountList = catchAsync(
     async (req: Request, res: Response) => {
         const fetchAccountList = await prisma.adminAccount.findMany()
 
-        return responseHandler(res, AD_ACCOUNT_S_0002, fetchAccountList)
+        return responseHandler(res, AD_ACCOUNT_S_0003, fetchAccountList)
     }
 )
 
@@ -88,7 +89,7 @@ export const updateAccountDetails = catchAsync(
                 },
             })
 
-            return responseHandler(res, AD_ACCOUNT_S_0003, updateDetails)
+            return responseHandler(res, AD_ACCOUNT_S_0004, updateDetails)
         }
     }
 )

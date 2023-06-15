@@ -28,7 +28,7 @@ mainRouter.use('/customer', customerRouter)
 
 mainRouter.use('/referral', referralRouter)
 
-mainRouter.use('/account', adminMiddleware, accountRouter)
+mainRouter.use('/account', accountRouter)
 
 mainRouter.use('/auth', authRouter)
 

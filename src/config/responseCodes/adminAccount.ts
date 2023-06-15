@@ -39,3 +39,11 @@ export const AD_ACCOUNT_S_0003: TResponseCode = {
     message: 'Bank account list fetched successfully',
     statusCode: 200,
 }
+
+export const AD_ACCOUNT_S_0004: TResponseCode = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'AD_ACCOUNT_S_0004',
+    isNotify: true,
+    message: 'Bank account updated successfully',
+    statusCode: 200,
+}
