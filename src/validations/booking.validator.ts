@@ -1,6 +1,8 @@
 import Joi from 'joi'
 import { TCreateBooking, TUpdateBooking } from '../controllers/types/booking'
-const paymentStatus = ['CHEQUE', 'UPI', 'CASH', 'BANK_TRANSFER']
+const paymentStatus = ['PENDING', 'PARTIAL', 'COMPLETED']
+
+const paymentType = ['CHEQUE', 'UPI', 'CASH', 'BANK_TRANSFER']
 
 export const createBookingValidator = Joi.object<TCreateBooking>({
     address1: Joi.string().required(),
@@ -12,7 +14,7 @@ export const createBookingValidator = Joi.object<TCreateBooking>({
     installmentCount: Joi.number().required(),
     paidAmt: Joi.number().required(),
     paymentStatus: Joi.valid(...paymentStatus).required(),
-    paymentType: Joi.string().required(),
+    paymentType: Joi.valid(...paymentType).required(),
     pincode: Joi.string().required(),
     projectId: Joi.string().required(),
     remainAmt: Joi.string().required(),
