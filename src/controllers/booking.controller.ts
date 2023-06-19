@@ -58,9 +58,25 @@ export const newBooking = catchAsync(async (req: Request, res: Response) => {
 
 export const getAllBookings = catchAsync(
     async (req: Request, res: Response) => {
-        const bookingList = await prisma.booking.findMany()
+        const bookingList = await prisma.booking.findMany({
+            include: {
+                project: true,
+                customer: true,
+            },
+        })
 
-        return responseHandler(res, BOOKING_S_0002, bookingList)
+        const result = bookingList.map((booking) => ({
+            ...booking,
+            projectName: booking.project.name,
+            customerName: booking.customer.firstName.concat(
+                ' ',
+                booking.customer.lastName
+            ),
+            project: undefined,
+            customer: undefined,
+        }))
+
+        return responseHandler(res, BOOKING_S_0002, result)
     }
 )
 
