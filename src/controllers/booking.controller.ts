@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import prisma from '../db'
 import catchAsync from '../utils/catchAsync'
 import responseHandler from '../utils/responseHandler'
-import { TCreateBooking, TUpdateBooking } from './types/booking'
+import { TBooking } from './types/booking'
 import validator from '../validations'
 import * as validation from '../validations/booking.validator'
 import {
@@ -13,8 +13,9 @@ import {
     BOOKING_S_0004,
 } from '../config/responseCodes/booking'
 import AppError from '../utils/AppError'
+import { Booking } from '@prisma/client'
 
-export const newBooking = catchAsync(async (req: Request, res: Response) => {
+export const createBooking = catchAsync(async (req: Request, res: Response) => {
     await validator(validation.createBookingValidator, req.body)
 
     const {
@@ -32,28 +33,80 @@ export const newBooking = catchAsync(async (req: Request, res: Response) => {
         projectId,
         remainAmt,
         totalAmt,
-    }: TCreateBooking = req.body
+        accountNo,
+        bankName,
+        chequeNo,
+        upiId,
+    }: TBooking = req.body
 
-    const newBooking = await prisma.booking.create({
-        data: {
-            projectId,
-            address1,
-            address2,
-            pincode,
-            area: +area,
-            totalAmt: +totalAmt,
-            paidAmt: +paidAmt,
-            remainAmt: +remainAmt,
-            installmentAmt: +installmentAmt,
-            paymentType,
-            paymentStatus,
-            customerId,
-            adminAccountId,
-            installmentCount: +installmentCount,
-        },
+    let data: any, newBooking: Booking | undefined
+
+    await prisma.$transaction(async (prisma) => {
+        newBooking = await prisma.booking.create({
+            data: {
+                projectId,
+                address1,
+                address2,
+                pincode,
+                area: +area,
+                totalAmt: +totalAmt,
+                paidAmt: +paidAmt,
+                remainAmt: +remainAmt,
+                installmentAmt: +installmentAmt,
+                paymentType,
+                paymentStatus,
+                customerId,
+                adminAccountId,
+                installmentCount: +installmentCount,
+            },
+        })
+
+        data = {
+            amount: paidAmt,
+            bookingId: newBooking.bookingId,
+        }
+
+        if (paymentType === 'CHEQUE') {
+            data = {
+                ...data,
+                bankName,
+                chequeNumber: chequeNo,
+            }
+
+            const checque = await prisma.chequePayment.create({
+                data,
+            })
+            console.log({ checque })
+        } else if (paymentType === 'UPI') {
+            data = {
+                ...data,
+                upiId,
+            }
+            await prisma.upiPayment.create({
+                data,
+            })
+        } else if (paymentType === 'BANK_TRANSFER') {
+            data = {
+                ...data,
+                accountNumber: accountNo,
+                bankName,
+            }
+            await prisma.bankPayment.create({
+                data,
+            })
+        } else {
+            await prisma.cashPayment.create({
+                data,
+            })
+        }
     })
-
-    return responseHandler(res, BOOKING_S_0001, newBooking)
+    return responseHandler(res, BOOKING_S_0001, {
+        ...newBooking,
+        accountNo,
+        bankName,
+        chequeNo,
+        upiId,
+    })
 })
 
 export const getAllBookings = catchAsync(
@@ -114,7 +167,7 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
         projectId,
         remainAmt,
         totalAmt,
-    }: TUpdateBooking = req.body
+    }: TBooking = req.body
 
     const bookingExists = await prisma.booking.findFirst({
         where: {

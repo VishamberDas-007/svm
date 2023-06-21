@@ -3,7 +3,7 @@ import * as bookingController from '../controllers/booking.controller'
 
 const bookingRouter = express.Router()
 
-bookingRouter.post('/create', bookingController.newBooking)
+bookingRouter.post('/create', bookingController.createBooking)
 
 bookingRouter.get('/list', bookingController.getAllBookings)
 

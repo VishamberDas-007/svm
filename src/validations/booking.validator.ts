@@ -1,10 +1,10 @@
 import Joi from 'joi'
-import { TCreateBooking, TUpdateBooking } from '../controllers/types/booking'
+import { TBooking } from '../controllers/types/booking'
 const paymentStatus = ['PENDING', 'PARTIAL', 'COMPLETED']
 
 const paymentType = ['CHEQUE', 'UPI', 'CASH', 'BANK_TRANSFER']
 
-export const createBookingValidator = Joi.object<TCreateBooking>({
+export const createBookingValidator = Joi.object<TBooking>({
     address1: Joi.string().required(),
     address2: Joi.string().allow('', null).optional(),
     adminAccountId: Joi.number().required(),
@@ -17,15 +17,35 @@ export const createBookingValidator = Joi.object<TCreateBooking>({
     paymentType: Joi.valid(...paymentType).required(),
     pincode: Joi.string().required(),
     projectId: Joi.string().required(),
-    remainAmt: Joi.string().required(),
-    totalAmt: Joi.string().required(),
+    remainAmt: Joi.number().required(),
+    totalAmt: Joi.number().required(),
+    accountNo: Joi.string().when('paymentType', {
+        is: 'CHEQUE',
+        then: Joi.required(),
+        otherwise: Joi.allow('', null).optional(),
+    }),
+    bankName: Joi.string().when('paymentType', {
+        is: 'BANK_TRANSFER' || 'CHEQUE',
+        then: Joi.required(),
+        otherwise: Joi.allow('', null).optional(),
+    }),
+    chequeNo: Joi.string().when('paymentType', {
+        is: 'CHEQUE',
+        then: Joi.required(),
+        otherwise: Joi.allow('', null).optional(),
+    }),
+    upiId: Joi.string().when('paymentType', {
+        is: 'UPI',
+        then: Joi.required(),
+        otherwise: Joi.allow('', null).optional(),
+    }),
 })
 
 export const bookingIdValidator = Joi.object<{ bookingId: string }>({
     bookingId: Joi.string().required(),
 })
 
-export const updateBookingValidator = Joi.object<TUpdateBooking>({
+export const updateBookingValidator = Joi.object<TBooking>({
     address1: Joi.string().optional(),
     address2: Joi.string().optional(),
     adminAccountId: Joi.number().optional(),
