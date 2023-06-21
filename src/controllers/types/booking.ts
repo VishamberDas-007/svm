@@ -20,3 +20,7 @@ export type TBooking = {
     chequeNo: string
     upiId: string
 }
+
+export type TBookingUpdate = TBooking & {
+    paymentId: string
+}
