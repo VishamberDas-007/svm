@@ -120,23 +120,78 @@ export const createBooking = catchAsync(async (req: Request, res: Response) => {
 
 export const getAllBookings = catchAsync(
     async (req: Request, res: Response) => {
+        const result: any[] = []
+
         const bookingList = await prisma.booking.findMany({
             include: {
                 project: true,
                 customer: true,
+                adminAccount: true,
             },
         })
 
-        const result = bookingList.map((booking) => ({
-            ...booking,
-            projectName: booking.project.name,
-            customerName: booking.customer.firstName.concat(
-                ' ',
-                booking.customer.lastName
-            ),
-            project: undefined,
-            customer: undefined,
-        }))
+        for await (const booking of bookingList) {
+            let paymentDetails:
+                | ChequePayment
+                | UpiPayment
+                | BankPayment
+                | CashPayment
+                | null
+                | undefined
+
+            if (booking.paymentType === 'BANK_TRANSFER')
+                paymentDetails = await prisma.bankPayment.findFirst({
+                    where: {
+                        bookingId: booking.bookingId,
+                    },
+                })
+            else if (booking.paymentType === 'CASH')
+                paymentDetails = await prisma.cashPayment.findFirst({
+                    where: {
+                        bookingId: booking.bookingId,
+                    },
+                })
+            else if (booking.paymentType === 'UPI')
+                paymentDetails = await prisma.upiPayment.findFirst({
+                    where: {
+                        bookingId: booking.bookingId,
+                    },
+                })
+            else if (booking.paymentType === 'CHEQUE')
+                paymentDetails = await prisma.chequePayment.findFirst({
+                    where: {
+                        bookingId: booking.bookingId,
+                    },
+                })
+
+            result.push({
+                ...booking,
+                projectName: booking.project.name,
+                customerName: booking.customer.firstName.concat(
+                    ' ',
+                    booking.customer.lastName
+                ),
+                adminBankName: booking.adminAccount.bankName,
+                ...paymentDetails,
+                adminAccount: undefined,
+                project: undefined,
+                customer: undefined,
+                amount: undefined,
+            })
+        }
+
+        // const result = bookingList.map((booking) => ({
+        //     ...booking,
+        //     projectName: booking.project.name,
+        //     customerName: booking.customer.firstName.concat(
+        //         ' ',
+        //         booking.customer.lastName
+        //     ),
+        //     adminBankName: booking.adminAccount.bankName,
+        //     adminAccount: undefined,
+        //     project: undefined,
+        //     customer: undefined,
+        // }))
 
         return responseHandler(res, BOOKING_S_0002, result)
     }
@@ -151,9 +206,27 @@ export const getBooking = catchAsync(async (req: Request, res: Response) => {
         where: {
             bookingId,
         },
+        include: {
+            adminAccount: true,
+            project: true,
+            customer: true,
+        },
     })
 
-    return responseHandler(res, BOOKING_S_0003, fetchBooking)
+    if (!fetchBooking) throw new AppError(BOOKING_E_0001)
+
+    return responseHandler(res, BOOKING_S_0003, {
+        ...fetchBooking,
+        adminBankName: fetchBooking.adminAccount.bankName,
+        projectName: fetchBooking.project.name,
+        customerName: fetchBooking.customer.firstName.concat(
+            ' ',
+            fetchBooking.customer.lastName
+        ),
+        adminAccount: undefined,
+        project: undefined,
+        customer: undefined,
+    })
 })
 
 export const updateBooking = catchAsync(async (req: Request, res: Response) => {

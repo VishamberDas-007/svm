@@ -20,7 +20,7 @@ export const createBookingValidator = Joi.object<TBooking>({
     remainAmt: Joi.number().required(),
     totalAmt: Joi.number().required(),
     accountNo: Joi.string().when('paymentType', {
-        is: 'CHEQUE',
+        is: 'BANK_TRANSFER',
         then: Joi.required(),
         otherwise: Joi.allow('', null).optional(),
     }),
@@ -61,7 +61,7 @@ export const updateBookingValidator = Joi.object<TBookingUpdate>({
     remainAmt: Joi.string().optional(),
     totalAmt: Joi.string().optional(),
     accountNo: Joi.string().when('paymentType', {
-        is: 'CHEQUE',
+        is: 'BANK_TRANSFER',
         then: Joi.required(),
         otherwise: Joi.allow('', null).optional(),
     }),

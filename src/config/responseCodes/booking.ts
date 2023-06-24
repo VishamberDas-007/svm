@@ -4,7 +4,7 @@ export const BOOKING_E_0001: TResponseCode = {
     type: RESPONSE_TYPE.ERROR,
     code: 'BOOKING_E_0001',
     isNotify: true,
-    message: 'Booking not found',
+    message: 'Failed to fetch Booking',
     statusCode: 404,
 }
 
