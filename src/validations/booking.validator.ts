@@ -1,4 +1,5 @@
 import Joi from 'joi'
+import util from '../utils/helper'
 import { TBooking, TBookingUpdate } from '../controllers/types/booking'
 const paymentStatus = ['PENDING', 'PARTIAL', 'COMPLETED']
 
@@ -42,7 +43,7 @@ export const createBookingValidator = Joi.object<TBooking>({
 })
 
 export const bookingIdValidator = Joi.object<{ bookingId: string }>({
-    bookingId: Joi.string().required(),
+    bookingId: util.uuid.required(),
 })
 
 export const updateBookingValidator = Joi.object<TBookingUpdate>({

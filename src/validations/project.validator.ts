@@ -20,7 +20,7 @@ export const updateProjectValidator = Joi.object({
     address1: Joi.string().optional(),
     area: Joi.number().optional(),
     name: Joi.string().optional(),
-    description: Joi.string().optional(),
+    description: Joi.string().allow('', null).optional(),
     ownerName: Joi.string().optional(),
     pincode: Joi.string().optional(),
     status: Joi.valid(...projectStatus).optional(),

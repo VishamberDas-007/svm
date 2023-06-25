@@ -232,7 +232,7 @@ export const getBooking = catchAsync(async (req: Request, res: Response) => {
 export const updateBooking = catchAsync(async (req: Request, res: Response) => {
     await validator(validation.bookingIdValidator, req.params)
     await validator(validation.updateBookingValidator, req.body)
-    const bookingId = req.params.booking
+    const { bookingId } = req.params
 
     const {
         address1,
@@ -275,17 +275,17 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
                     address1,
                     address2,
                     adminAccountId,
-                    area,
+                    area: +area,
                     customerId,
-                    installmentAmt,
-                    installmentCount,
-                    paidAmt,
+                    installmentAmt: +installmentAmt,
+                    installmentCount: +installmentCount,
+                    paidAmt: +paidAmt,
                     paymentStatus,
                     paymentType,
                     pincode,
                     projectId,
-                    remainAmt,
-                    totalAmt,
+                    remainAmt: +remainAmt,
+                    totalAmt: +totalAmt,
                 },
             })
 
@@ -296,7 +296,7 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
                             paymentId,
                         },
                         data: {
-                            amount: paidAmt,
+                            amount: +paidAmt,
                             bankName,
                             chequeNumber: chequeNo,
                         },
@@ -307,7 +307,7 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
                             paymentId,
                         },
                         data: {
-                            amount: paidAmt,
+                            amount: +paidAmt,
                             upiId,
                         },
                     })
@@ -318,7 +318,7 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
                         },
                         data: {
                             accountNumber: accountNo,
-                            amount: paidAmt,
+                            amount: +paidAmt,
                             bankName,
                         },
                     })
@@ -328,7 +328,7 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
                             paymentId,
                         },
                         data: {
-                            amount: paidAmt,
+                            amount: +paidAmt,
                         },
                     })
                 }
