@@ -84,7 +84,11 @@ export const getBasicCustomerList = catchAsync(
 
 export const getAdvanceCustomerList = catchAsync(
     async (req: Request, res: Response) => {
-        const fetchCustomerList = await prisma.customer.findMany()
+        const fetchCustomerList = await prisma.customer.findMany({
+            orderBy: {
+                createdAt: 'desc',
+            },
+        })
 
         return responseHandler(res, CUSTOMER_S_0001, fetchCustomerList)
     }

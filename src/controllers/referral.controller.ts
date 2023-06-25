@@ -45,7 +45,11 @@ export const newReferral = catchAsync(async (req: Request, res: Response) => {
 
 export const getAllReferral = catchAsync(
     async (req: Request, res: Response) => {
-        const fetchAllReferral = await prisma.referral.findMany()
+        const fetchAllReferral = await prisma.referral.findMany({
+            orderBy: {
+                createdAt: 'desc',
+            },
+        })
 
         return responseHandler(res, REFERRAL_S_0002, fetchAllReferral)
     }

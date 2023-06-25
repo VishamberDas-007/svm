@@ -59,7 +59,11 @@ export const getAccountDetails = catchAsync(
 
 export const getAdvanceAccountList = catchAsync(
     async (req: Request, res: Response) => {
-        const fetchAccountList = await prisma.adminAccount.findMany()
+        const fetchAccountList = await prisma.adminAccount.findMany({
+            orderBy: {
+                createdAt: 'desc',
+            },
+        })
 
         return responseHandler(res, AD_ACCOUNT_S_0003, fetchAccountList)
     }

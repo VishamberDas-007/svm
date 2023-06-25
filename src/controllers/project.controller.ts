@@ -123,6 +123,9 @@ export const getAllProjects = catchAsync(
                         },
                     ],
                 },
+                orderBy: {
+                    createdAt: 'desc',
+                },
             })
             projectCount = await prisma.project.count()
         }

@@ -128,6 +128,9 @@ export const getAllBookings = catchAsync(
                 customer: true,
                 adminAccount: true,
             },
+            orderBy: {
+                createdAt: 'desc',
+            },
         })
 
         for await (const booking of bookingList) {
