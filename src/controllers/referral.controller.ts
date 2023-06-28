@@ -4,7 +4,7 @@ import prisma from '../db'
 import responseHandler from '../utils/responseHandler'
 import AppError from '../utils/AppError'
 import validator from '../validations'
-import { TReferral } from './types/referral'
+import { TReferral, TReferralList } from './types/referral'
 import {
     REFERRAL_E_0001,
     REFERRAL_E_0002,
@@ -14,6 +14,8 @@ import {
     REFERRAL_S_0004,
 } from '../config/responseCodes/referral'
 import * as validation from '../validations/referral.validator'
+import { Referral } from '@prisma/client'
+import { TListData } from '../types/global.types'
 
 export const newReferral = catchAsync(async (req: Request, res: Response) => {
     await validator(validation.createReferralValidator, req.body)
@@ -44,14 +46,37 @@ export const newReferral = catchAsync(async (req: Request, res: Response) => {
 })
 
 export const getAllReferral = catchAsync(
-    async (req: Request, res: Response) => {
-        const fetchAllReferral = await prisma.referral.findMany({
-            orderBy: {
-                createdAt: 'desc',
-            },
+    async (req: TReferralList, res: Response) => {
+        const { page = 1, pageSize = 20 } = req.query
+
+        const skip = (+page - 1) * +pageSize
+
+        let fetchAllReferral: Referral[] = [],
+            totalCount = 0
+
+        await prisma.$transaction(async (prisma) => {
+            fetchAllReferral = await prisma.referral.findMany({
+                take: +pageSize,
+                skip,
+                orderBy: {
+                    createdAt: 'desc',
+                },
+            })
+
+            totalCount = await prisma.referral.count()
         })
 
-        return responseHandler(res, REFERRAL_S_0002, fetchAllReferral)
+        const result: TListData<Referral> = {
+            list: fetchAllReferral,
+            meta: {
+                totalCount,
+                page: +page,
+                pageSize: +pageSize,
+                totalQueryCount: 0,
+            },
+        }
+
+        return responseHandler(res, REFERRAL_S_0002, result)
     }
 )
 

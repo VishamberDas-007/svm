@@ -1,3 +1,5 @@
+import { TQueryRequest } from '../../types/global.types'
+
 export type TReferral = {
     firstName: string
     lastName: string
@@ -5,3 +7,5 @@ export type TReferral = {
     phone: string
     address: string
 }
+
+export type TReferralList = TQueryRequest

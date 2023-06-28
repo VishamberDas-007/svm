@@ -1,3 +1,5 @@
+import { TQueryRequest } from '../../types/global.types'
+
 export type TCustomer = {
     firstName: string
     lastName: string
@@ -24,3 +26,5 @@ export type TBasicListWhereClause = {
           }
     )[]
 }
+
+export type TCustomerList = TQueryRequest

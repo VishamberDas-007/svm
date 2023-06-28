@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import prisma from '../db'
 import catchAsync from '../utils/catchAsync'
 import responseHandler from '../utils/responseHandler'
-import { TAccountDetails } from './types/adminAccount'
+import { TAccountDetails, TAdminAccountList } from './types/adminAccount'
 import validator from '../validations'
 import * as validation from '../validations/adminAccount.validator'
 import {
@@ -14,6 +14,8 @@ import {
     AD_ACCOUNT_S_0004,
 } from '../config/responseCodes/adminAccount'
 import AppError from '../utils/AppError'
+import { AdminAccount } from '@prisma/client'
+import { TListData } from '../types/global.types'
 
 export const newAccount = catchAsync(async (req: Request, res: Response) => {
     await validator(validation.createAccountValidator, req.body)
@@ -58,14 +60,37 @@ export const getAccountDetails = catchAsync(
 )
 
 export const getAdvanceAccountList = catchAsync(
-    async (req: Request, res: Response) => {
-        const fetchAccountList = await prisma.adminAccount.findMany({
-            orderBy: {
-                createdAt: 'desc',
-            },
+    async (req: TAdminAccountList, res: Response) => {
+        const { page = 1, pageSize = 20 } = req.query
+
+        const skip = (+page - 1) * +pageSize
+
+        let fetchAccountList: AdminAccount[] = [],
+            totalCount = 0
+
+        await prisma.$transaction(async (prisma) => {
+            fetchAccountList = await prisma.adminAccount.findMany({
+                take: +pageSize,
+                skip,
+                orderBy: {
+                    createdAt: 'desc',
+                },
+            })
+
+            totalCount = await prisma.customer.count()
         })
 
-        return responseHandler(res, AD_ACCOUNT_S_0003, fetchAccountList)
+        const result: TListData<AdminAccount> = {
+            list: fetchAccountList,
+            meta: {
+                totalCount,
+                page: +page,
+                pageSize: +pageSize,
+                totalQueryCount: 0,
+            },
+        }
+
+        return responseHandler(res, AD_ACCOUNT_S_0003, result)
     }
 )
 

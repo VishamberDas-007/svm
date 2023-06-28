@@ -5,13 +5,19 @@ import responseHandler from '../utils/responseHandler'
 import AppError from '../utils/AppError'
 import validator from '../validations'
 import * as validation from '../validations/customer.validator'
-import { TBasicListWhereClause, TCustomer } from './types/customer'
+import {
+    TBasicListWhereClause,
+    TCustomer,
+    TCustomerList,
+} from './types/customer'
 import {
     CUSTOMER_E_0001,
     CUSTOMER_E_0002,
     CUSTOMER_S_0001,
     CUSTOMER_S_0002,
 } from '../config/responseCodes/customer'
+import { Customer } from '@prisma/client'
+import { TListData } from '../types/global.types'
 
 export const newCustomer = catchAsync(async (req: Request, res: Response) => {
     await validator(validation.createCustomerValidator, req.body)
@@ -83,14 +89,36 @@ export const getBasicCustomerList = catchAsync(
 )
 
 export const getAdvanceCustomerList = catchAsync(
-    async (req: Request, res: Response) => {
-        const fetchCustomerList = await prisma.customer.findMany({
-            orderBy: {
-                createdAt: 'desc',
-            },
+    async (req: TCustomerList, res: Response) => {
+        const { page = 1, pageSize = 20 } = req.query
+
+        const skip = (+page - 1) * +pageSize
+
+        let fetchCustomerList: Customer[] = [],
+            totalCount = 0
+
+        await prisma.$transaction(async (prisma) => {
+            fetchCustomerList = await prisma.customer.findMany({
+                take: +pageSize,
+                skip,
+                orderBy: {
+                    createdAt: 'desc',
+                },
+            })
+
+            totalCount = await prisma.customer.count()
         })
 
-        return responseHandler(res, CUSTOMER_S_0001, fetchCustomerList)
+        const result: TListData<Customer> = {
+            list: fetchCustomerList,
+            meta: {
+                totalCount,
+                page: +page,
+                pageSize: +pageSize,
+                totalQueryCount: 0,
+            },
+        }
+        return responseHandler(res, CUSTOMER_S_0001, result)
     }
 )
 
