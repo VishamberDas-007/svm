@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import prisma from '../db'
 import catchAsync from '../utils/catchAsync'
 import responseHandler from '../utils/responseHandler'
-import { TBooking, TBookingUpdate } from './types/booking'
+import { TBooking, TBookingList, TBookingUpdate } from './types/booking'
 import validator from '../validations'
 import * as validation from '../validations/booking.validator'
 import {
@@ -14,12 +14,16 @@ import {
 } from '../config/responseCodes/booking'
 import AppError from '../utils/AppError'
 import {
+    AdminAccount,
     BankPayment,
     Booking,
     CashPayment,
     ChequePayment,
+    Customer,
+    Project,
     UpiPayment,
 } from '@prisma/client'
+import { TListData } from '../types/global.types'
 
 export const createBooking = catchAsync(async (req: Request, res: Response) => {
     await validator(validation.createBookingValidator, req.body)
@@ -119,18 +123,38 @@ export const createBooking = catchAsync(async (req: Request, res: Response) => {
 })
 
 export const getAllBookings = catchAsync(
-    async (req: Request, res: Response) => {
+    async (req: TBookingList, res: Response) => {
+        const { page = 1, pageSize = 20 } = req.query
+
         const result: any[] = []
 
-        const bookingList = await prisma.booking.findMany({
-            include: {
-                project: true,
-                customer: true,
-                adminAccount: true,
-            },
-            orderBy: {
-                createdAt: 'desc',
-            },
+        const skip = (+page - 1) * +pageSize
+        let totalCount = 0,
+            // totalQueryCount = 0,
+            bookingList: (Booking & {
+                project: Project
+                customer: Customer
+                adminAccount: AdminAccount
+            })[] = []
+
+        await prisma.$transaction(async (prisma) => {
+            bookingList = await prisma.booking.findMany({
+                take: +pageSize,
+                skip,
+                include: {
+                    project: true,
+                    customer: true,
+                    adminAccount: true,
+                },
+                orderBy: {
+                    createdAt: 'desc',
+                },
+            })
+
+            totalCount = await prisma.booking.count()
+
+            // TODO: pass where clause in the below query
+            // totalQueryCount = await prisma.booking.count()
         })
 
         for await (const booking of bookingList) {
@@ -183,20 +207,17 @@ export const getAllBookings = catchAsync(
             })
         }
 
-        // const result = bookingList.map((booking) => ({
-        //     ...booking,
-        //     projectName: booking.project.name,
-        //     customerName: booking.customer.firstName.concat(
-        //         ' ',
-        //         booking.customer.lastName
-        //     ),
-        //     adminBankName: booking.adminAccount.bankName,
-        //     adminAccount: undefined,
-        //     project: undefined,
-        //     customer: undefined,
-        // }))
+        const response: TListData<any> = {
+            list: result,
+            meta: {
+                page: +page,
+                pageSize: +pageSize,
+                totalCount,
+                totalQueryCount: 0,
+            },
+        }
 
-        return responseHandler(res, BOOKING_S_0002, result)
+        return responseHandler(res, BOOKING_S_0002, response)
     }
 )
 

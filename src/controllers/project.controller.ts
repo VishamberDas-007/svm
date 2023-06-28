@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import catchAsync from '../utils/catchAsync'
-import { TCreateProject, TUpdateProject } from './types/project'
+import { TCreateProject, TProjectList, TUpdateProject } from './types/project'
 import prisma from '../db'
 import responseHandler from '../utils/responseHandler'
 import {
@@ -59,7 +59,7 @@ export const newProject = catchAsync(async (req: Request, res: Response) => {
 })
 
 export const getAllProjects = catchAsync(
-    async (req: Request, res: Response) => {
+    async (req: TProjectList, res: Response) => {
         const { page = 1, pageSize = 20 } = req.query
 
         const filterString = req.query.filterString as string
@@ -68,6 +68,7 @@ export const getAllProjects = catchAsync(
 
         let projectList: Project[] = [],
             projectCount = 0
+        // totalQueryCount = 0
 
         if (!filterString) {
             await prisma.$transaction(async (prisma) => {
@@ -128,6 +129,7 @@ export const getAllProjects = catchAsync(
                 },
             })
             projectCount = await prisma.project.count()
+            // totalQueryCount = await prisma.project.count()
         }
 
         const result: TListData<Project> = {
@@ -136,6 +138,7 @@ export const getAllProjects = catchAsync(
                 totalCount: projectCount,
                 page: +page,
                 pageSize: +pageSize,
+                totalQueryCount: 0,
             },
         }
 

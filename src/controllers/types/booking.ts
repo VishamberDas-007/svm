@@ -1,4 +1,5 @@
 import { PaymentStatus, PaymentType } from '@prisma/client'
+import { TQueryRequest } from '../../types/global.types'
 
 export type TBooking = {
     projectId: string
@@ -24,3 +25,5 @@ export type TBooking = {
 export type TBookingUpdate = TBooking & {
     paymentId: string
 }
+
+export type TBookingList = TQueryRequest

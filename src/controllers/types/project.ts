@@ -1,4 +1,5 @@
 import { ProjectStatus } from '@prisma/client'
+import { TQueryRequest } from '../../types/global.types'
 
 export type TCreateProject = {
     name: string
@@ -26,3 +27,5 @@ export type TUpdateProject = {
     address2?: string
     pincode: string
 }
+
+export type TProjectList = TQueryRequest
