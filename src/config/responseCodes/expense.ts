@@ -1,0 +1,17 @@
+import { RESPONSE_TYPE } from '../../types/global.types'
+
+export const EXPENSE_S_0001 = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'EXPENSE_S_0001',
+    isNotify: false,
+    message: 'Expense added successfully',
+    statusCode: 200,
+}
+
+export const EXPENSE_S_0002 = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'EXPENSE_S_0002',
+    isNotify: false,
+    message: 'Expense fetched successfully',
+    statusCode: 200,
+}
