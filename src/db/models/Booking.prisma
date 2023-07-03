@@ -17,6 +17,8 @@ model Booking {
     adminAccountId   Int
     adminAccount     AdminAccount  @relation(fields: [adminAccountId], references: [adminAccountId])
     installmentCount Int
+    referralId       String?
+    referral         Referral?     @relation(fields: [referralId], references: [referralId])
     createdAt        DateTime      @default(now())
     updatedAt        DateTime      @updatedAt
 }
@@ -34,6 +36,11 @@ model Customer {
 model AdminAccount {
     adminAccountId Int       @id
     booking        Booking[]
+}
+
+model Referral {
+    referralId String    @id
+    booking    Booking[]
 }
 
 enum PaymentStatus {

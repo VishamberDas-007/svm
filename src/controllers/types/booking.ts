@@ -20,6 +20,7 @@ export type TBooking = {
     bankName: string
     chequeNo: string
     upiId: string
+    referralId: string
 }
 
 export type TBookingUpdate = TBooking & {

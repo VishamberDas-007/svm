@@ -47,6 +47,7 @@ export const createBooking = catchAsync(async (req: Request, res: Response) => {
         bankName,
         chequeNo,
         upiId,
+        referralId,
     }: TBooking = req.body
 
     let newBooking: Booking | undefined,
@@ -74,6 +75,7 @@ export const createBooking = catchAsync(async (req: Request, res: Response) => {
                 customerId,
                 adminAccountId,
                 installmentCount: +installmentCount,
+                referralId,
             },
         })
 
@@ -278,6 +280,7 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
         chequeNo,
         upiId,
         paymentId,
+        referralId,
     }: TBookingUpdate = req.body
 
     let updatedBookingDetails: Booking | undefined
@@ -310,6 +313,7 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
                     projectId,
                     remainAmt: +remainAmt,
                     totalAmt: +totalAmt,
+                    referralId,
                 },
             })
 

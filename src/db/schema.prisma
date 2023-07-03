@@ -51,6 +51,8 @@ model Booking {
     adminAccountId   Int
     adminAccount     AdminAccount    @relation(name: "AdminAccountToBooking", fields: [adminAccountId], references: [adminAccountId])
     installmentCount Int
+    referralId       String?
+    referral         Referral?       @relation(name: "BookingToReferral", fields: [referralId], references: [referralId])
     createdAt        DateTime        @default(now())
     updatedAt        DateTime        @updatedAt
     cashPayment      CashPayment[]   @relation(name: "BookingToCashPayment")
@@ -92,6 +94,18 @@ model Customer {
     createdAt     DateTime        @default(now())
     updatedAt     DateTime        @updatedAt
     customerImage CustomerImage[] @relation(name: "CustomerToCustomerImage")
+}
+
+model Referral {
+    referralId String    @id @default(uuid())
+    booking    Booking[] @relation(name: "BookingToReferral")
+    firstName  String
+    lastName   String
+    phone      String    @unique
+    email      String?
+    address    String?
+    createdAt  DateTime  @default(now())
+    updatedAt  DateTime  @updatedAt
 }
 
 model CashPayment {
@@ -147,17 +161,6 @@ model MiscExpense {
     project       Project  @relation(name: "MiscExpenseToProject", fields: [projectId], references: [projectId])
     createdAt     DateTime @default(now())
     updatedAt     DateTime @updatedAt
-}
-
-model Referral {
-    referralId String   @id @default(uuid())
-    firstName  String
-    lastName   String
-    phone      String   @unique
-    email      String?
-    address    String?
-    createdAt  DateTime @default(now())
-    updatedAt  DateTime @updatedAt
 }
 
 model UpiPayment {
