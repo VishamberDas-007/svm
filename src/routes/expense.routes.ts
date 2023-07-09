@@ -7,6 +7,8 @@ expenseRouter.post('/create', expenseController.addExpense)
 
 expenseRouter.get('/get/:projectId', expenseController.getProjectExpense)
 
-// expenseRouter.put('/update/:projectId', expenseController.updateProjectExpense)
+expenseRouter.get('/list', expenseController.getAllProjectExpense)
+
+expenseRouter.put('/update/:projectId', expenseController.updateProjectExpense)
 
 export { expenseRouter }
