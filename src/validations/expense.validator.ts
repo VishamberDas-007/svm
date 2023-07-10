@@ -11,8 +11,8 @@ export const createExpenseValidator = Joi.object<TCreateExpense>({
     projectId: Joi.string().required(),
     miscExpense: Joi.array()
         .items({
-            name: Joi.string().required(),
-            value: Joi.number().required(),
+            expenseName: Joi.string().required(),
+            cost: Joi.number().required(),
         })
         .optional(),
 })
@@ -31,8 +31,8 @@ export const updateExpenseValidator = Joi.object<TUpdateExpense>({
     projectId: Joi.string().optional(),
     miscExpense: Joi.array()
         .items({
-            name: Joi.string().required(),
-            value: Joi.number().required(),
+            expenseName: Joi.string().required(),
+            cost: Joi.number().required(),
         })
         .optional(),
 })

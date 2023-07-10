@@ -7,6 +7,7 @@ import { authRouter } from './authRouter.routes'
 // import { adminMiddleware } from '../middlewares/auth.middleware'
 import { bookingRouter } from './booking.routes'
 import { appConfigRouter } from './appConfig.routes'
+import { expenseRouter } from './expense.routes'
 const mainRouter = Router()
 
 mainRouter.get('/test', (req, res) => {
@@ -23,6 +24,8 @@ mainRouter.use('/appConfig', appConfigRouter)
 mainRouter.use('/booking', bookingRouter)
 
 mainRouter.use('/project', projectRouter)
+
+mainRouter.use('/expense', expenseRouter)
 
 mainRouter.use('/customer', customerRouter)
 
