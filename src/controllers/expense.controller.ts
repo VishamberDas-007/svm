@@ -140,6 +140,12 @@ export const updateProjectExpense = catchAsync(
         return responseHandler(res, EXPENSE_S_0004, {
             ...fetchProjectExpense,
             miscExpense,
+            brokerage,
+            landDevelopment,
+            landPurchase,
+            landVisitCharge,
+            nonAgricultural,
+            planningAndLayout,
         })
     }
 )
