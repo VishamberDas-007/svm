@@ -9,6 +9,6 @@ expenseRouter.get('/get/:projectId', expenseController.getProjectExpense)
 
 expenseRouter.get('/list', expenseController.getAllProjectExpense)
 
-expenseRouter.put('/update/:projectId', expenseController.updateProjectExpense)
+expenseRouter.put('/update/:expenseId', expenseController.updateProjectExpense)
 
 export { expenseRouter }
