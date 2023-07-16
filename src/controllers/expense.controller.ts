@@ -80,6 +80,7 @@ export const getProjectExpense = catchAsync(
         })
 
         return responseHandler(res, EXPENSE_S_0002, {
+            projectName: fetchProjectExpense?.name || null,
             expense: fetchProjectExpense?.expense || null,
             miscExpense: fetchProjectExpense?.miscExpense || [],
         })
