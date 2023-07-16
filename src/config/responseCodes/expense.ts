@@ -39,3 +39,11 @@ export const EXPENSE_E_0001 = {
     message: 'Failed to fetch expense',
     statusCode: 404,
 }
+
+export const EXPENSE_E_0002 = {
+    type: RESPONSE_TYPE.ERROR,
+    code: 'EXPENSE_E_0002',
+    isNotify: false,
+    message: 'Expense already exists',
+    statusCode: 409,
+}

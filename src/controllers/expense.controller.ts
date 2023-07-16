@@ -5,6 +5,7 @@ import prisma from '../db'
 import responseHandler from '../utils/responseHandler'
 import {
     EXPENSE_E_0001,
+    EXPENSE_E_0002,
     EXPENSE_S_0001,
     EXPENSE_S_0002,
     EXPENSE_S_0003,
@@ -27,6 +28,14 @@ export const addExpense = catchAsync(async (req: Request, res: Response) => {
         projectId,
         miscExpense,
     }: TCreateExpense = req.body
+
+    const expenseExists = await prisma.expense.findFirst({
+        where: {
+            projectId,
+        },
+    })
+
+    if (expenseExists) throw new AppError(EXPENSE_E_0002)
 
     const createExpense = await prisma.project.update({
         where: {
@@ -70,12 +79,25 @@ export const getProjectExpense = catchAsync(
             },
         })
 
-        return responseHandler(res, EXPENSE_S_0002, fetchProjectExpense)
+        return responseHandler(res, EXPENSE_S_0002, {
+            expense: fetchProjectExpense?.expense || null,
+            miscExpense: fetchProjectExpense?.miscExpense || [],
+        })
     }
 )
 export const getAllProjectExpense = catchAsync(
     async (req: Request, res: Response) => {
-        const expenseList = await prisma.expense.findMany()
+        const expenseList = (
+            await prisma.expense.findMany({
+                include: {
+                    project: true,
+                },
+            })
+        )?.map((obj) => ({
+            ...obj,
+            projectName: obj.project.name,
+            project: undefined,
+        }))
         return responseHandler(res, EXPENSE_S_0003, expenseList)
     }
 )

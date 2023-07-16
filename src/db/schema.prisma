@@ -64,7 +64,7 @@ model Booking {
 model Project {
     projectId     String        @id @default(uuid())
     booking       Booking[]     @relation(name: "BookingToProject")
-    expense       Expense[]     @relation(name: "ExpenseToProject")
+    expense       Expense?      @relation(name: "ExpenseToProject")
     miscExpense   MiscExpense[] @relation(name: "MiscExpenseToProject")
     name          String
     description   String?
@@ -147,7 +147,7 @@ model Expense {
     landDevelopment   Int
     brokerage         Int
     landVisitCharge   Int
-    projectId         String
+    projectId         String   @unique
     project           Project  @relation(name: "ExpenseToProject", fields: [projectId], references: [projectId])
     createdAt         DateTime @default(now())
     updatedAt         DateTime @updatedAt
