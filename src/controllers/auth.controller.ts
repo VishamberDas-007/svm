@@ -11,7 +11,7 @@ import {
     AUTH_S_0002,
 } from '../config/responseCodes/auth'
 import bcrypt from 'bcrypt'
-import { SALT_ROUND } from '../config/const'
+import { ADMIN, SALT_ROUND } from '../config/const'
 import validator from '../validations'
 import * as validation from '../validations/auth.validator'
 import util from '../utils/helper'
@@ -32,12 +32,25 @@ export const register = catchAsync(async (req: Request, res: Response) => {
     } else {
         const encryptedPassword = bcrypt.hashSync(password, SALT_ROUND)
 
+        const allPermission = (await prisma.permission.findMany())?.map(
+            (permission) => ({
+                permissionId: permission.permissionId,
+            })
+        )
+
         const newUser = await prisma.user.create({
             data: {
                 name,
                 email,
                 password: encryptedPassword,
                 phone,
+                role: {
+                    create: {
+                        label: ADMIN,
+                        value: ADMIN.toUpperCase(),
+                        permission: { connect: allPermission },
+                    },
+                },
                 address,
             },
         })

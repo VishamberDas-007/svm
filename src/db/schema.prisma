@@ -163,6 +163,25 @@ model MiscExpense {
     updatedAt     DateTime @updatedAt
 }
 
+model Permission {
+    permissionId Int      @id @default(autoincrement())
+    label        String
+    value        String
+    role         Role[]   @relation(name: "PermissionToRole")
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+}
+
+model Role {
+    roleId     Int          @id @default(autoincrement())
+    permission Permission[] @relation(name: "PermissionToRole")
+    label      String
+    value      String
+    createdAt  DateTime     @default(now())
+    updatedAt  DateTime     @updatedAt
+    user       User[]       @relation(name: "RoleToUser")
+}
+
 model UpiPayment {
     paymentId String   @id @default(uuid())
     bookingId String
@@ -181,6 +200,8 @@ model User {
     password  String
     address   String?
     isAdmin   Boolean  @default(false)
+    roleId    Int
+    role      Role     @relation(name: "RoleToUser", fields: [roleId], references: [roleId])
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }

@@ -13,4 +13,6 @@ export const jwtRefreshToken = {
     EXPIRE: process.env.RT_EXPIRE || '10d',
 }
 
+export const ADMIN = 'Admin'
+
 export const SALT_ROUND = process.env.SALT_ROUND || 10
