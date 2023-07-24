@@ -8,6 +8,7 @@ import { authRouter } from './authRouter.routes'
 import { bookingRouter } from './booking.routes'
 import { appConfigRouter } from './appConfig.routes'
 import { expenseRouter } from './expense.routes'
+import { userRouter } from './user.routes'
 const mainRouter = Router()
 
 mainRouter.get('/test', (req, res) => {
@@ -18,6 +19,8 @@ mainRouter.get('/test', (req, res) => {
         // server: APP_ENV,
     })
 })
+
+mainRouter.use('/user', userRouter)
 
 mainRouter.use('/appConfig', appConfigRouter)
 
