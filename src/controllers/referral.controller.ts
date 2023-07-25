@@ -47,23 +47,87 @@ export const newReferral = catchAsync(async (req: Request, res: Response) => {
 
 export const getAllReferral = catchAsync(
     async (req: TReferralList, res: Response) => {
-        const { page = 1, pageSize = 20 } = req.query
+        const {
+            page = 1,
+            pageSize = 20,
+            searchString,
+        } = req.query as Record<string, string>
 
         const skip = (+page - 1) * +pageSize
 
         let fetchAllReferral: Referral[] = [],
-            totalCount = 0
+            totalCount = 0,
+            whereClause = {},
+            totalQueryCount = 0
+
+        if (searchString) {
+            whereClause = {
+                OR: [
+                    {
+                        address: {
+                            startsWith: searchString,
+                            mode: 'insensitive',
+                        },
+                    },
+                    {
+                        address: {
+                            contains: searchString,
+                            mode: 'insensitive',
+                        },
+                    },
+                    {
+                        email: {
+                            startsWith: searchString,
+                            mode: 'insensitive',
+                        },
+                    },
+                    {
+                        email: {
+                            contains: searchString,
+                            mode: 'insensitive',
+                        },
+                    },
+                    {
+                        firstName: {
+                            startsWith: searchString,
+                            mode: 'insensitive',
+                        },
+                    },
+                    {
+                        firstName: {
+                            contains: searchString,
+                            mode: 'insensitive',
+                        },
+                    },
+                    {
+                        lastName: {
+                            startsWith: searchString,
+                            mode: 'insensitive',
+                        },
+                    },
+                    {
+                        phone: {
+                            contains: searchString,
+                            mode: 'insensitive',
+                        },
+                    },
+                ],
+            }
+        }
 
         await prisma.$transaction(async (prisma) => {
             fetchAllReferral = await prisma.referral.findMany({
                 take: +pageSize,
                 skip,
+                where: whereClause,
                 orderBy: {
                     createdAt: 'desc',
                 },
             })
 
-            totalCount = await prisma.referral.count()
+            totalCount = await prisma.referral.count({ where: whereClause })
+
+            totalQueryCount = await prisma.referral.count()
         })
 
         const result: TListData<Referral> = {
@@ -72,7 +136,7 @@ export const getAllReferral = catchAsync(
                 totalCount,
                 page: +page,
                 pageSize: +pageSize,
-                totalQueryCount: 0,
+                totalQueryCount,
             },
         }
 
