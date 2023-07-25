@@ -90,23 +90,93 @@ export const getBasicCustomerList = catchAsync(
 
 export const getAdvanceCustomerList = catchAsync(
     async (req: TCustomerList, res: Response) => {
-        const { page = 1, pageSize = 20 } = req.query
+        const {
+            page = 1,
+            pageSize = 20,
+            searchString,
+        } = req.query as Record<string, string>
 
         const skip = (+page - 1) * +pageSize
 
         let fetchCustomerList: Customer[] = [],
-            totalCount = 0
+            totalCount = 0,
+            whereClause = {},
+            totalQueryCount = 0
+
+        if (searchString) {
+            whereClause = {
+                OR: [
+                    {
+                        aadharNo: {
+                            startsWith: searchString,
+                            mode: 'insensitive',
+                        },
+                    },
+                    {
+                        aadharNo: {
+                            contains: searchString,
+                            mode: 'insensitive',
+                        },
+                    },
+                    {
+                        email: {
+                            startsWith: searchString,
+                            mode: 'insensitive',
+                        },
+                    },
+                    {
+                        email: {
+                            contains: searchString,
+                            mode: 'insensitive',
+                        },
+                    },
+                    {
+                        firstName: {
+                            startsWith: searchString,
+                            mode: 'insensitive',
+                        },
+                    },
+                    {
+                        firstName: {
+                            contains: searchString,
+                            mode: 'insensitive',
+                        },
+                    },
+                    {
+                        lastName: {
+                            contains: searchString,
+                            mode: 'insensitive',
+                        },
+                    },
+                    {
+                        phone: {
+                            startsWith: searchString,
+                            mode: 'insensitive',
+                        },
+                    },
+                    {
+                        phone: {
+                            contains: searchString,
+                            mode: 'insensitive',
+                        },
+                    },
+                ],
+            }
+        }
 
         await prisma.$transaction(async (prisma) => {
             fetchCustomerList = await prisma.customer.findMany({
                 take: +pageSize,
                 skip,
+                where: whereClause,
                 orderBy: {
                     createdAt: 'desc',
                 },
             })
 
-            totalCount = await prisma.customer.count()
+            totalCount = await prisma.customer.count({ where: whereClause })
+
+            totalQueryCount = await prisma.customer.count()
         })
 
         const result: TListData<Customer> = {
@@ -115,7 +185,7 @@ export const getAdvanceCustomerList = catchAsync(
                 totalCount,
                 page: +page,
                 pageSize: +pageSize,
-                totalQueryCount: 0,
+                totalQueryCount,
             },
         }
         return responseHandler(res, CUSTOMER_S_0001, result)
