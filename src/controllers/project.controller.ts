@@ -62,75 +62,72 @@ export const getAllProjects = catchAsync(
     async (req: TProjectList, res: Response) => {
         const { page = 1, pageSize = 20 } = req.query
 
-        const filterString = req.query.filterString as string
+        const searchString = req.query.searchString as string
 
         const skip = (+page - 1) * +pageSize
 
         let projectList: Project[] = [],
-            projectCount = 0
-        // totalQueryCount = 0
+            projectCount = 0,
+            totalQueryCount = 0,
+            whereClause = {}
 
-        if (!filterString) {
-            await prisma.$transaction(async (prisma) => {
-                projectList = await prisma.project.findMany({
-                    take: +pageSize,
-                    skip: skip,
-                })
-                projectCount = await prisma.project.count()
-            })
-        } else {
-            projectList = await prisma.project.findMany({
-                take: +pageSize,
-                skip: skip,
-                where: {
-                    OR: [
-                        {
-                            name: {
-                                startsWith: filterString,
-                                mode: 'insensitive',
-                            },
+        if (!searchString) {
+            whereClause = {
+                OR: [
+                    {
+                        name: {
+                            startsWith: searchString,
+                            mode: 'insensitive',
                         },
-                        {
-                            name: {
-                                contains: filterString,
-                                mode: 'insensitive',
-                            },
+                    },
+                    {
+                        name: {
+                            contains: searchString,
+                            mode: 'insensitive',
                         },
+                    },
 
-                        {
-                            address1: {
-                                startsWith: filterString,
-                                mode: 'insensitive',
-                            },
+                    {
+                        address1: {
+                            startsWith: searchString,
+                            mode: 'insensitive',
                         },
-                        {
-                            address1: {
-                                contains: filterString,
-                                mode: 'insensitive',
-                            },
+                    },
+                    {
+                        address1: {
+                            contains: searchString,
+                            mode: 'insensitive',
                         },
+                    },
 
-                        {
-                            address2: {
-                                startsWith: filterString,
-                                mode: 'insensitive',
-                            },
+                    {
+                        address2: {
+                            startsWith: searchString,
+                            mode: 'insensitive',
                         },
-                        {
-                            address2: {
-                                contains: filterString,
-                                mode: 'insensitive',
-                            },
+                    },
+                    {
+                        address2: {
+                            contains: searchString,
+                            mode: 'insensitive',
                         },
-                    ],
-                },
-                orderBy: {
-                    createdAt: 'desc',
-                },
-            })
-            projectCount = await prisma.project.count()
-            // totalQueryCount = await prisma.project.count()
+                    },
+                ],
+            }
         }
+
+        projectList = await prisma.project.findMany({
+            take: +pageSize,
+            skip: skip,
+            where: whereClause,
+            orderBy: {
+                createdAt: 'desc',
+            },
+        })
+
+        projectCount = await prisma.project.count({ where: whereClause })
+
+        totalQueryCount = await prisma.project.count()
 
         const result: TListData<Project> = {
             list: projectList,
@@ -138,7 +135,7 @@ export const getAllProjects = catchAsync(
                 totalCount: projectCount,
                 page: +page,
                 pageSize: +pageSize,
-                totalQueryCount: 0,
+                totalQueryCount,
             },
         }
 
