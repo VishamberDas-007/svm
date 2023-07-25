@@ -61,23 +61,64 @@ export const getAccountDetails = catchAsync(
 
 export const getAdvanceAccountList = catchAsync(
     async (req: TAdminAccountList, res: Response) => {
-        const { page = 1, pageSize = 20 } = req.query
+        const {
+            page = 1,
+            pageSize = 20,
+            searchString,
+        } = req.query as Record<string, string>
 
         const skip = (+page - 1) * +pageSize
 
         let fetchAccountList: AdminAccount[] = [],
-            totalCount = 0
+            totalCount = 0,
+            whereClause = {},
+            totalQueryCount = 0
+
+        if (searchString) {
+            whereClause = {
+                OR: [
+                    {
+                        bankName: {
+                            startsWith: searchString,
+                            mode: 'insensitive',
+                        },
+                    },
+                    {
+                        bankName: {
+                            contains: searchString,
+                            mode: 'insensitive',
+                        },
+                    },
+
+                    {
+                        name: {
+                            startsWith: searchString,
+                            mode: 'insensitive',
+                        },
+                    },
+                    {
+                        name: {
+                            contains: searchString,
+                            mode: 'insensitive',
+                        },
+                    },
+                ],
+            }
+        }
 
         await prisma.$transaction(async (prisma) => {
             fetchAccountList = await prisma.adminAccount.findMany({
                 take: +pageSize,
                 skip,
+                where: whereClause,
                 orderBy: {
                     createdAt: 'desc',
                 },
             })
 
-            totalCount = await prisma.customer.count()
+            totalCount = await prisma.customer.count({ where: whereClause })
+
+            totalQueryCount = await prisma.customer.count()
         })
 
         const result: TListData<AdminAccount> = {
@@ -86,7 +127,7 @@ export const getAdvanceAccountList = catchAsync(
                 totalCount,
                 page: +page,
                 pageSize: +pageSize,
-                totalQueryCount: 0,
+                totalQueryCount,
             },
         }
 
