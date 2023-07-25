@@ -15,6 +15,8 @@ import validator from '../validations'
 import * as validation from '../validations/expense.validator'
 import * as generalValidation from '../validations/_general.validator'
 import AppError from '../utils/AppError'
+import { TListData } from '../types/global.types'
+import { Expense } from '@prisma/client'
 
 export const addExpense = catchAsync(async (req: Request, res: Response) => {
     await validator(validation.createExpenseValidator, req.body)
@@ -88,8 +90,16 @@ export const getProjectExpense = catchAsync(
 )
 export const getAllProjectExpense = catchAsync(
     async (req: Request, res: Response) => {
+        const { page = 1, pageSize = 20 } = req.query
+
+        const skip = (+page - 1) * +pageSize
+
+        let expenseCount = 0
+
         const expenseList = (
             await prisma.expense.findMany({
+                take: +pageSize,
+                skip,
                 include: {
                     project: true,
                 },
@@ -99,7 +109,22 @@ export const getAllProjectExpense = catchAsync(
             projectName: obj.project.name,
             project: undefined,
         }))
-        return responseHandler(res, EXPENSE_S_0003, expenseList)
+
+        expenseCount = await prisma.expense.count()
+
+        // totalQueryCount = await prisma.project.count()
+
+        const result: TListData<Expense> = {
+            list: expenseList,
+            meta: {
+                page: +page,
+                pageSize: +pageSize,
+                totalCount: expenseCount,
+                totalQueryCount: 0,
+            },
+        }
+
+        return responseHandler(res, EXPENSE_S_0003, result)
     }
 )
 
