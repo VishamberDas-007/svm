@@ -12,6 +12,8 @@ import {
     USER_S_0002,
 } from '../config/responseCodes/user'
 import AppError from '../utils/AppError'
+import { User } from '@prisma/client'
+import { TListData } from '../types/global.types'
 
 export const createUser = catchAsync(async (req: Request, res: Response) => {
     const { address, email, name, phone, roleId }: TCreateUser = req.body
@@ -51,13 +53,71 @@ export const getUser = catchAsync(async (req: Request, res: Response) => {
 })
 
 export const getAllUsers = catchAsync(async (req: Request, res: Response) => {
+    const {
+        page = 1,
+        pageSize = 20,
+        searchString,
+    } = req.query as Record<string, string>
+
+    let whereClause = {}
+
+    if (searchString) {
+        whereClause = {
+            OR: [
+                {
+                    name: {
+                        startsWith: searchString,
+                        mode: 'insensitive',
+                    },
+                },
+                {
+                    name: {
+                        contains: searchString,
+                        mode: 'insensitive',
+                    },
+                },
+                {
+                    email: {
+                        startsWith: searchString,
+                        mode: 'insensitive',
+                    },
+                },
+                {
+                    email: {
+                        contains: searchString,
+                        mode: 'insensitive',
+                    },
+                },
+            ],
+        }
+    }
+
+    const skip = (+page - 1) * +pageSize
+
     const userList = await prisma.user.findMany({
+        take: +pageSize,
+        skip,
         where: {
             isAdmin: false,
+            ...whereClause,
         },
     })
 
-    return responseHandler(res, USER_S_0002, userList)
+    const userCount = await prisma.user.count({ where: whereClause })
+
+    const totalQueryCount = await prisma.user.count()
+
+    const result: TListData<User> = {
+        list: userList,
+        meta: {
+            totalCount: userCount,
+            page: +page,
+            pageSize: +pageSize,
+            totalQueryCount,
+        },
+    }
+
+    return responseHandler(res, USER_S_0002, result)
 })
 
 export const updateUser = catchAsync(async (req: Request, res: Response) => {
