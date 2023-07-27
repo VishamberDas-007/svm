@@ -60,7 +60,7 @@ export const newProject = catchAsync(async (req: Request, res: Response) => {
 
 export const getAllProjects = catchAsync(
     async (req: TProjectList, res: Response) => {
-        const { page = 1, pageSize = 20 } = req.query
+        const { page = 1, pageSize = 20, area, status } = req.query
 
         const searchString = req.query.searchString as string
 
@@ -71,8 +71,25 @@ export const getAllProjects = catchAsync(
             totalQueryCount = 0,
             whereClause = {}
 
+        if (area && !isNaN(+area)) {
+            whereClause = {
+                area: {
+                    gte: +area,
+                    lt: +area,
+                },
+            }
+        }
+
+        if (status) {
+            whereClause = {
+                ...whereClause,
+                status,
+            }
+        }
+
         if (searchString) {
             whereClause = {
+                ...whereClause,
                 OR: [
                     {
                         name: {
@@ -88,26 +105,13 @@ export const getAllProjects = catchAsync(
                     },
 
                     {
-                        address1: {
+                        ownerName: {
                             startsWith: searchString,
                             mode: 'insensitive',
                         },
                     },
                     {
-                        address1: {
-                            contains: searchString,
-                            mode: 'insensitive',
-                        },
-                    },
-
-                    {
-                        address2: {
-                            startsWith: searchString,
-                            mode: 'insensitive',
-                        },
-                    },
-                    {
-                        address2: {
+                        ownerName: {
                             contains: searchString,
                             mode: 'insensitive',
                         },
@@ -125,9 +129,9 @@ export const getAllProjects = catchAsync(
             },
         })
 
-        projectCount = await prisma.project.count({ where: whereClause })
+        projectCount = await prisma.project.count()
 
-        totalQueryCount = await prisma.project.count()
+        totalQueryCount = await prisma.project.count({ where: whereClause })
 
         const result: TListData<Project> = {
             list: projectList,

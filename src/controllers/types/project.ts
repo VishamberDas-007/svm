@@ -28,4 +28,7 @@ export type TUpdateProject = {
     pincode: string
 }
 
-export type TProjectList = TQueryRequest
+export type TProjectList = TQueryRequest & {
+    area?: number
+    status?: ProjectStatus
+}
