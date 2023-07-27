@@ -174,9 +174,11 @@ export const getAdvanceCustomerList = catchAsync(
                 },
             })
 
-            totalCount = await prisma.customer.count({ where: whereClause })
+            totalCount = await prisma.customer.count()
 
-            totalQueryCount = await prisma.customer.count()
+            totalQueryCount = await prisma.customer.count({
+                where: whereClause,
+            })
         })
 
         const result: TListData<Customer> = {
