@@ -71,7 +71,7 @@ export const getAllProjects = catchAsync(
             totalQueryCount = 0,
             whereClause = {}
 
-        if (!searchString) {
+        if (searchString) {
             whereClause = {
                 OR: [
                     {
