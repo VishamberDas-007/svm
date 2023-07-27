@@ -125,9 +125,11 @@ export const getAllReferral = catchAsync(
                 },
             })
 
-            totalCount = await prisma.referral.count({ where: whereClause })
+            totalCount = await prisma.referral.count()
 
-            totalQueryCount = await prisma.referral.count()
+            totalQueryCount = await prisma.referral.count({
+                where: whereClause,
+            })
         })
 
         const result: TListData<Referral> = {
