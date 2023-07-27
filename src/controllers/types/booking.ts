@@ -27,4 +27,11 @@ export type TBookingUpdate = TBooking & {
     paymentId: string
 }
 
-export type TBookingList = TQueryRequest
+export type TBookingList = TQueryRequest & {
+    query: {
+        searchString: string
+        projectIds: string
+        paymentStatus: string
+        paymentType: string
+    }
+}

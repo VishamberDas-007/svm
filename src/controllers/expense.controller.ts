@@ -120,7 +120,7 @@ export const getAllProjectExpense = catchAsync(
                 page: +page,
                 pageSize: +pageSize,
                 totalCount: expenseCount,
-                totalQueryCount: 0,
+                // totalQueryCount: 0,
             },
         }
 

@@ -126,13 +126,88 @@ export const createBooking = catchAsync(async (req: Request, res: Response) => {
 
 export const getAllBookings = catchAsync(
     async (req: TBookingList, res: Response) => {
-        const { page = 1, pageSize = 20 } = req.query
+        const {
+            page = 1,
+            pageSize = 20,
+            searchString,
+            paymentStatus,
+            paymentType,
+            projectIds,
+        } = req.query
 
         const result: any[] = []
+        let whereClause = {}
+
+        if (searchString) {
+            whereClause = {
+                OR: [
+                    {
+                        customer: {
+                            firstName: {
+                                startsWith: searchString,
+                                mode: 'insensitive',
+                            },
+                        },
+                    },
+                    {
+                        customer: {
+                            firstName: {
+                                contains: searchString,
+                                mode: 'insensitive',
+                            },
+                        },
+                    },
+                    {
+                        customer: {
+                            lastName: {
+                                contains: searchString,
+                                mode: 'insensitive',
+                            },
+                        },
+                    },
+                    {
+                        address2: {
+                            contains: searchString,
+                            mode: 'insensitive',
+                        },
+                    },
+                ],
+            }
+        }
+
+        if (paymentStatus) {
+            const array = paymentStatus.split(',')
+            whereClause = {
+                ...whereClause,
+                paymentStatus: {
+                    in: array,
+                },
+            }
+        }
+
+        if (paymentType) {
+            const array = paymentStatus.split(',')
+            whereClause = {
+                ...whereClause,
+                paymentType: {
+                    in: array,
+                },
+            }
+        }
+
+        if (projectIds) {
+            const array = projectIds.split(',')
+            whereClause = {
+                ...whereClause,
+                projectId: {
+                    in: array,
+                },
+            }
+        }
 
         const skip = (+page - 1) * +pageSize
         let totalCount = 0,
-            // totalQueryCount = 0,
+            totalQueryCount = 0,
             bookingList: (Booking & {
                 project: Project
                 customer: Customer
@@ -143,11 +218,14 @@ export const getAllBookings = catchAsync(
             bookingList = await prisma.booking.findMany({
                 take: +pageSize,
                 skip,
+                where: whereClause,
                 include: {
                     project: true,
                     customer: true,
                     adminAccount: true,
                 },
+                // TODO: pass where clause in the below query
+                // where:,
                 orderBy: {
                     createdAt: 'desc',
                 },
@@ -155,8 +233,9 @@ export const getAllBookings = catchAsync(
 
             totalCount = await prisma.booking.count()
 
-            // TODO: pass where clause in the below query
-            // totalQueryCount = await prisma.booking.count()
+            totalQueryCount = await prisma.booking.count({
+                where: whereClause,
+            })
         })
 
         for await (const booking of bookingList) {
@@ -215,7 +294,7 @@ export const getAllBookings = catchAsync(
                 page: +page,
                 pageSize: +pageSize,
                 totalCount,
-                totalQueryCount: 0,
+                totalQueryCount,
             },
         }
 
