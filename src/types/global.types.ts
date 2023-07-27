@@ -20,7 +20,7 @@ export type TListData<TList> = {
         totalCount: number
         page: number
         pageSize: number
-        totalQueryCount: number
+        totalQueryCount?: number
     }
 }
 
