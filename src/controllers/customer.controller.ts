@@ -15,6 +15,8 @@ import {
     CUSTOMER_E_0002,
     CUSTOMER_S_0001,
     CUSTOMER_S_0002,
+    CUSTOMER_S_0003,
+    CUSTOMER_S_0004,
 } from '../config/responseCodes/customer'
 import { Customer } from '@prisma/client'
 import { TListData } from '../types/global.types'
@@ -190,7 +192,7 @@ export const getAdvanceCustomerList = catchAsync(
                 totalQueryCount,
             },
         }
-        return responseHandler(res, CUSTOMER_S_0001, result)
+        return responseHandler(res, CUSTOMER_S_0003, result)
     }
 )
 
@@ -251,7 +253,7 @@ export const updateCustomer = catchAsync(
                         phone,
                     },
                 })
-                return responseHandler(res, CUSTOMER_S_0002, updatedCustomer)
+                return responseHandler(res, CUSTOMER_S_0004, updatedCustomer)
             }
         }
     }

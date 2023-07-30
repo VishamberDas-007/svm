@@ -31,3 +31,19 @@ export const CUSTOMER_S_0002 = {
     message: 'Customer fetched successfully',
     statusCode: 200,
 }
+
+export const CUSTOMER_S_0003 = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'CUSTOMER_S_0003',
+    isNotify: false,
+    message: 'Customer list fetched successfully',
+    statusCode: 200,
+}
+
+export const CUSTOMER_S_0004 = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'CUSTOMER_S_0004',
+    isNotify: false,
+    message: 'Customer updated successfully',
+    statusCode: 200,
+}
