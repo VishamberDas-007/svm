@@ -7,4 +7,8 @@ roleRouter.post('/create', roleController.newRole)
 
 roleRouter.get('/list', roleController.roleList)
 
+roleRouter.get('/get/:roleId', roleController.fetchRoleDetails)
+
+roleRouter.get('/update/:roleId', roleController.updateRoleDetails)
+
 export { roleRouter }
