@@ -5,7 +5,9 @@ const roleRouter = express.Router()
 
 roleRouter.post('/create', roleController.newRole)
 
-roleRouter.get('/list', roleController.roleList)
+roleRouter.get('/advance-list', roleController.roleAdvanceList)
+
+roleRouter.get('/basic-list', roleController.roleBasicList)
 
 roleRouter.get('/get/:roleId', roleController.fetchRoleDetails)
 

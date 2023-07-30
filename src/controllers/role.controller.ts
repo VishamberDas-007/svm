@@ -35,14 +35,25 @@ export const newRole = catchAsync(async (req: Request, res: Response) => {
     return responseHandler(res, ROLE_S_0001, newRole)
 })
 
-export const roleList = catchAsync(async (req: Request, res: Response) => {
-    const fetchRoleList = await prisma.role.findMany({
-        include: {
-            permission: true,
-        },
-    })
+export const roleAdvanceList = catchAsync(
+    async (req: Request, res: Response) => {
+        const fetchRoleList = await prisma.role.findMany({
+            include: {
+                permission: true,
+            },
+        })
 
-    return responseHandler(res, ROLE_S_0002, fetchRoleList)
+        return responseHandler(res, ROLE_S_0002, fetchRoleList)
+    }
+)
+
+export const roleBasicList = catchAsync(async (req: Request, res: Response) => {
+    const result = (await prisma.role.findMany()).map((role) => ({
+        roleId: role.roleId,
+        label: role.label,
+    }))
+
+    return responseHandler(res, ROLE_S_0002, result)
 })
 
 export const fetchRoleDetails = catchAsync(
