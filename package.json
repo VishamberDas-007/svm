@@ -23,14 +23,12 @@
         "build": "tsc",
         "serve": "node ./dist/index.js",
         "lint": "eslint . --ext .ts",
-        "watch": "tsc -w",
-        "prepare": "husky install"
+        "watch": "tsc -w"
     },
     "dependencies": {
         "@prisma/client": "^4.7.1",
         "@types/express-list-endpoints": "^6.0.0",
         "@types/nodemailer": "^6.4.7",
-        "aws-sdk": "^2.1272.0",
         "axios": "^1.2.6",
         "bcrypt": "^5.1.0",
         "cookie-parser": "^1.4.6",
@@ -38,7 +36,6 @@
         "dotenv": "^16.0.3",
         "express": "^4.18.2",
         "express-list-endpoints": "^6.0.0",
-        "google-auth-library": "^8.7.0",
         "http-status": "^1.5.3",
         "joi": "^17.7.0",
         "jsonwebtoken": "^9.0.0",
@@ -48,8 +45,7 @@
         "nodemailer": "^6.8.0",
         "path": "^0.12.7",
         "prismix": "^1.0.22",
-        "typescript": "^4.5.2",
-        "xlsx": "^0.18.5"
+        "typescript": "^4.5.2"
     },
     "devDependencies": {
         "@types/bcrypt": "^5.0.0",
@@ -67,10 +63,8 @@
         "dotenv-cli": "^6.0.0",
         "eslint": "^8.24.0",
         "eslint-config-prettier": "^8.5.0",
-        "husky": "^8.0.0",
         "nodemon": "^2.0.15",
         "prettier": "^2.8.1",
-        "prettier-plugin-prisma": "^4.8.0",
         "prisma": "^4.7.1",
         "ts-node": "^10.9.1"
     }
