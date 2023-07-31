@@ -35,3 +35,7 @@ yarn migrate:deploy
 ### for generate prisma client
 
 yarn prisma generate
+
+### for all (prismix & create & deploy & generate) in one migration
+
+yarn  migration
