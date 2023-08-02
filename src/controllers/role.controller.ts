@@ -95,7 +95,7 @@ export const updateRoleDetails = catchAsync(
         const {
             label,
             permissionIds,
-        }: { label: string; permissionIds: number[] } = req.body
+        }: { label?: string; permissionIds?: number[] } = req.body
 
         let data = {}
 
@@ -109,7 +109,7 @@ export const updateRoleDetails = catchAsync(
         })
 
         if (!roleExists) throw new AppError(ROLE_E_0001)
-        else if (permissionIds.length) {
+        else if (permissionIds?.length) {
             data = {
                 permission: {
                     disconnect: roleExists.permission?.map((permission) => {
@@ -124,19 +124,23 @@ export const updateRoleDetails = catchAsync(
             }
         }
 
-        const roleAlreadyExists = await prisma.role.findFirst({
-            where: {
-                value: util.formatLabelName(label),
-                roleId: +roleId,
-            },
-        })
+        if (label) {
+            const roleAlreadyExists = await prisma.role.findFirst({
+                where: {
+                    value: label && util.formatLabelName(label),
+                    roleId: {
+                        not: +roleId,
+                    },
+                },
+            })
 
-        if (roleAlreadyExists) throw new AppError(ROLE_E_0002)
+            if (roleAlreadyExists) throw new AppError(ROLE_E_0002)
+        }
 
         data = {
             ...data,
             label,
-            value: util.formatLabelName(label),
+            value: label && util.formatLabelName(label),
         }
 
         const updateRole = await prisma.role.update({

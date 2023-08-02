@@ -11,6 +11,6 @@ roleRouter.get('/basic-list', roleController.roleBasicList)
 
 roleRouter.get('/get/:roleId', roleController.fetchRoleDetails)
 
-roleRouter.get('/update/:roleId', roleController.updateRoleDetails)
+roleRouter.put('/update/:roleId', roleController.updateRoleDetails)
 
 export { roleRouter }
