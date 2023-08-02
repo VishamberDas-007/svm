@@ -7,6 +7,14 @@ export const ROLE_E_0001 = {
     statusCode: 404,
 }
 
+export const ROLE_E_0002 = {
+    type: RESPONSE_TYPE.ERROR,
+    code: 'ROLE_E_0002',
+    isNotify: false,
+    message: 'Role already exists',
+    statusCode: 409,
+}
+
 export const ROLE_S_0001 = {
     type: RESPONSE_TYPE.SUCCESS,
     code: 'ROLE_S_0001',

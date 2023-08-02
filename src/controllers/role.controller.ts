@@ -8,6 +8,7 @@ import * as validation from '../validations/role.validator'
 import util from '../utils/helper'
 import {
     ROLE_E_0001,
+    ROLE_E_0002,
     ROLE_S_0001,
     ROLE_S_0002,
     ROLE_S_0003,
@@ -19,6 +20,14 @@ export const newRole = catchAsync(async (req: Request, res: Response) => {
 
     const { label, permissionIds }: { label: string; permissionIds: number[] } =
         req.body
+
+    const roleExists = await prisma.role.findFirst({
+        where: {
+            value: util.formatLabelName(label),
+        },
+    })
+
+    if (roleExists) throw new AppError(ROLE_E_0002)
 
     const newRole = await prisma.role.create({
         data: {
@@ -114,6 +123,15 @@ export const updateRoleDetails = catchAsync(
                 },
             }
         }
+
+        const roleAlreadyExists = await prisma.role.findFirst({
+            where: {
+                value: util.formatLabelName(label),
+                roleId: +roleId,
+            },
+        })
+
+        if (roleAlreadyExists) throw new AppError(ROLE_E_0002)
 
         data = {
             ...data,
