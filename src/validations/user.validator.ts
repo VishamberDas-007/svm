@@ -7,11 +7,11 @@ export const userCreateValidator = Joi.object<TCreateUser>({
     phone: util.phoneValidator.required(),
     address: Joi.string().optional(),
     name: Joi.string().required(),
-    roleId: Joi.string().optional(),
+    roleId: Joi.number().required(),
 })
 
 export const userIdValidator = Joi.object({
-    userId: Joi.string().optional(),
+    userId: util.uuid.optional(),
 })
 
 export const userUpdateValidator = Joi.object<TUpdateUser>({

@@ -8,6 +8,14 @@ export const USER_E_0001: TResponseCode = {
     statusCode: 404,
 }
 
+export const USER_E_0002: TResponseCode = {
+    type: RESPONSE_TYPE.ERROR,
+    code: 'USER_E_0002',
+    isNotify: true,
+    message: 'This Email is associated with other account',
+    statusCode: 409,
+}
+
 export const USER_S_0001: TResponseCode = {
     type: RESPONSE_TYPE.SUCCESS,
     code: 'USER_S_0001',

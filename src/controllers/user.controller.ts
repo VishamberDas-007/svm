@@ -8,6 +8,7 @@ import bcrypt from 'bcrypt'
 import { SALT_ROUND } from '../config/const'
 import {
     USER_E_0001,
+    USER_E_0002,
     USER_S_0001,
     USER_S_0002,
 } from '../config/responseCodes/user'
@@ -26,9 +27,17 @@ export const createUser = catchAsync(async (req: Request, res: Response) => {
 
     const encryptPassword = bcrypt.hashSync(password, SALT_ROUND)
 
+    const emailExists = await prisma.user.findFirst({
+        where: {
+            email: email.toLowerCase(),
+        },
+    })
+
+    if (emailExists) throw new AppError(USER_E_0002, undefined, null, true)
+
     const newUser = await prisma.user.create({
         data: {
-            email,
+            email: email.toLowerCase(),
             name,
             password: encryptPassword,
             phone,
@@ -37,7 +46,10 @@ export const createUser = catchAsync(async (req: Request, res: Response) => {
         },
     })
 
-    return responseHandler(res, USER_S_0001, newUser)
+    return responseHandler(res, USER_S_0001, {
+        ...newUser,
+        password: undefined,
+    })
 })
 
 export const getUser = catchAsync(async (req: Request, res: Response) => {
@@ -55,7 +67,10 @@ export const getUser = catchAsync(async (req: Request, res: Response) => {
         throw new AppError(USER_E_0001)
     }
 
-    return responseHandler(res, USER_S_0002, userDetails)
+    return responseHandler(res, USER_S_0002, {
+        ...userDetails,
+        password: undefined,
+    })
 })
 
 export const getAllUsers = catchAsync(async (req: Request, res: Response) => {
@@ -144,18 +159,34 @@ export const updateUser = catchAsync(async (req: Request, res: Response) => {
         throw new AppError(USER_E_0001)
     }
 
+    if (email) {
+        const emailExists = await prisma.user.findFirst({
+            where: {
+                email: email.toLowerCase(),
+                userId: {
+                    not: userId,
+                },
+            },
+        })
+
+        if (emailExists) throw new AppError(USER_E_0002, undefined, null, true)
+    }
+
     const updateUser = await prisma.user.update({
         where: {
             userId,
         },
         data: {
             address,
-            email,
+            email: email?.toLowerCase(),
             name,
             phone,
             roleId,
         },
     })
 
-    return responseHandler(res, USER_S_0002, updateUser)
+    return responseHandler(res, USER_S_0002, {
+        ...updateUser,
+        password: undefined,
+    })
 })
