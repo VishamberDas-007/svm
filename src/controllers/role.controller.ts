@@ -58,6 +58,8 @@ export const roleBasicList = catchAsync(async (req: Request, res: Response) => {
 
 export const fetchRoleDetails = catchAsync(
     async (req: Request, res: Response) => {
+        await validator(validation.roleIdValidator, req.params)
+
         const { roleId } = req.params
 
         const roleExists = await prisma.role.findFirst({
@@ -76,6 +78,9 @@ export const fetchRoleDetails = catchAsync(
 
 export const updateRoleDetails = catchAsync(
     async (req: Request, res: Response) => {
+        await validator(validation.roleIdValidator, req.params)
+        await validator(validation.updateRoleValidator, req.body)
+
         const { roleId } = req.params
 
         const {
