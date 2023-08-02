@@ -14,8 +14,12 @@ import {
 import AppError from '../utils/AppError'
 import { User } from '@prisma/client'
 import { TListData } from '../types/global.types'
+import validator from '../validations'
+import * as validation from '../validations/user.validator'
 
 export const createUser = catchAsync(async (req: Request, res: Response) => {
+    await validator(validation.userCreateValidator, req.body)
+
     const { address, email, name, phone, roleId }: TCreateUser = req.body
 
     const password = util.passwordGenerator()
@@ -37,6 +41,8 @@ export const createUser = catchAsync(async (req: Request, res: Response) => {
 })
 
 export const getUser = catchAsync(async (req: Request, res: Response) => {
+    await validator(validation.userIdValidator, req.params)
+
     const { userId } = req.params
 
     const userDetails = await prisma.user.findFirst({
@@ -121,6 +127,9 @@ export const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 })
 
 export const updateUser = catchAsync(async (req: Request, res: Response) => {
+    await validator(validation.userIdValidator, req.params)
+    await validator(validation.userUpdateValidator, req.body)
+
     const { userId } = req.params
 
     const { address, email, name, phone, roleId }: TUpdateUser = req.body
