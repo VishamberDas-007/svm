@@ -46,3 +46,11 @@ export const ROLE_S_0004 = {
     message: 'Role updated successfully',
     statusCode: 200,
 }
+
+export const ROLE_S_0005 = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'ROLE_S_0005',
+    isNotify: false,
+    message: 'All permissions fetched successfully',
+    statusCode: 200,
+}

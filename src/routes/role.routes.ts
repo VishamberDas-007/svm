@@ -13,4 +13,6 @@ roleRouter.get('/get/:roleId', roleController.fetchRoleDetails)
 
 roleRouter.put('/update/:roleId', roleController.updateRoleDetails)
 
+roleRouter.get('/permissions', roleController.fetchAllPermissions)
+
 export { roleRouter }

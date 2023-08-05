@@ -13,6 +13,7 @@ import {
     ROLE_S_0002,
     ROLE_S_0003,
     ROLE_S_0004,
+    ROLE_S_0005,
 } from '../config/responseCodes/role'
 
 export const newRole = catchAsync(async (req: Request, res: Response) => {
@@ -154,5 +155,13 @@ export const updateRoleDetails = catchAsync(
         })
 
         return responseHandler(res, ROLE_S_0004, updateRole)
+    }
+)
+
+export const fetchAllPermissions = catchAsync(
+    async (req: Request, res: Response) => {
+        const permissionList = await prisma.permission.findMany({})
+
+        return responseHandler(res, ROLE_S_0005, permissionList)
     }
 )
