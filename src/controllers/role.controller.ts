@@ -169,6 +169,8 @@ export const fetchAllPermissions = catchAsync(
         })
 
         permissionList.forEach((element) => {
+            const keyName = element.value.includes('READ') ? 'read' : 'write'
+
             const groupExists = result.findIndex(
                 (obj) => element.group === obj.group
             )
@@ -176,11 +178,11 @@ export const fetchAllPermissions = catchAsync(
             if (groupExists !== -1) {
                 result[groupExists] = {
                     ...result?.[groupExists],
-                    [element.value]: element.permissionId,
+                    [keyName]: element.permissionId,
                 }
             } else {
                 result.push({
-                    [element.value]: element.permissionId,
+                    [keyName]: element.permissionId,
                     group: element.group,
                 })
             }
