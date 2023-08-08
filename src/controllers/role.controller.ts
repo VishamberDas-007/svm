@@ -160,8 +160,32 @@ export const updateRoleDetails = catchAsync(
 
 export const fetchAllPermissions = catchAsync(
     async (req: Request, res: Response) => {
-        const permissionList = await prisma.permission.findMany({})
+        const result: any[] = []
 
-        return responseHandler(res, ROLE_S_0005, permissionList)
+        const permissionList = await prisma.permission.findMany({
+            orderBy: {
+                permissionId: 'asc',
+            },
+        })
+
+        permissionList.forEach((element) => {
+            const groupExists = result.findIndex(
+                (obj) => element.group === obj.group
+            )
+
+            if (groupExists !== -1) {
+                result[groupExists] = {
+                    ...result?.[groupExists],
+                    [element.value]: element.permissionId,
+                }
+            } else {
+                result.push({
+                    [element.value]: element.permissionId,
+                    group: element.group,
+                })
+            }
+        })
+
+        return responseHandler(res, ROLE_S_0005, result)
     }
 )
