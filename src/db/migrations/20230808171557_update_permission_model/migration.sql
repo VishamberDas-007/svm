@@ -1,0 +1,5 @@
+-- CreateEnum
+CREATE TYPE "GroupType" AS ENUM ('ADMIN_ACCOUNT', 'BOOKING', 'PROJECT', 'CUSTOMER', 'EXPENSE', 'ROLE', 'USER', 'INSTALLMENT', 'REFERRAL');
+
+-- AlterTable
+ALTER TABLE "Permission" ADD COLUMN     "group" "GroupType" NOT NULL DEFAULT 'PROJECT';

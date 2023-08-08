@@ -164,12 +164,13 @@ model MiscExpense {
 }
 
 model Permission {
-    permissionId Int      @id @default(autoincrement())
+    permissionId Int       @id @default(autoincrement())
     label        String
     value        String
-    role         Role[]   @relation(name: "PermissionToRole")
-    createdAt    DateTime @default(now())
-    updatedAt    DateTime @updatedAt
+    role         Role[]    @relation(name: "PermissionToRole")
+    group        GroupType @default(PROJECT)
+    createdAt    DateTime  @default(now())
+    updatedAt    DateTime  @updatedAt
 }
 
 model Role {
@@ -217,6 +218,18 @@ enum PaymentType {
     UPI
     CASH
     BANK_TRANSFER
+}
+
+enum GroupType {
+    ADMIN_ACCOUNT
+    BOOKING
+    PROJECT
+    CUSTOMER
+    EXPENSE
+    ROLE
+    USER
+    INSTALLMENT
+    REFERRAL
 }
 
 enum ProjectStatus {
