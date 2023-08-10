@@ -81,8 +81,37 @@ export const fetchRoleDetails = catchAsync(
             },
         })
 
+        const result: any[] = []
+
         if (!roleExists) throw new AppError(ROLE_E_0001)
-        else return responseHandler(res, ROLE_S_0003, roleExists)
+        else {
+            roleExists.permission.forEach((element) => {
+                const keyName = element.value.includes('READ')
+                    ? 'read'
+                    : 'write'
+
+                const groupExists = result.findIndex(
+                    (obj) => element.group === obj.group
+                )
+
+                if (groupExists !== -1) {
+                    result[groupExists] = {
+                        ...result?.[groupExists],
+                        [keyName]: element.permissionId,
+                    }
+                } else {
+                    result.push({
+                        [keyName]: element.permissionId,
+                        group: element.group,
+                    })
+                }
+            })
+
+            return responseHandler(res, ROLE_S_0003, {
+                ...roleExists,
+                permission: result,
+            })
+        }
     }
 )
 
