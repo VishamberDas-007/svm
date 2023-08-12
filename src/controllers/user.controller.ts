@@ -61,6 +61,9 @@ export const getUser = catchAsync(async (req: Request, res: Response) => {
         where: {
             userId,
         },
+        include: {
+            role: true,
+        },
     })
 
     if (!userDetails) {
@@ -70,6 +73,7 @@ export const getUser = catchAsync(async (req: Request, res: Response) => {
     return responseHandler(res, USER_S_0002, {
         ...userDetails,
         password: undefined,
+        role: userDetails.role.label,
     })
 })
 
@@ -115,14 +119,22 @@ export const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 
     const skip = (+page - 1) * +pageSize
 
-    const userList = await prisma.user.findMany({
-        take: +pageSize,
-        skip,
-        where: {
-            isAdmin: false,
-            ...whereClause,
-        },
-    })
+    const userList = (
+        await prisma.user.findMany({
+            take: +pageSize,
+            skip,
+            where: {
+                isAdmin: false,
+                ...whereClause,
+            },
+            include: {
+                role: true,
+            },
+        })
+    ).map((obj) => ({
+        ...obj,
+        role: obj.role.label,
+    }))
 
     const userCount = await prisma.user.count({ where: whereClause })
 
