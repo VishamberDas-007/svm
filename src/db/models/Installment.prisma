@@ -4,7 +4,6 @@ model Installment {
     bookingId     String
     booking       Booking      @relation(fields: [bookingId], references: [bookingId])
     amount        Int
-    isCheck       Boolean
     paymentType   IPaymentType
     installmentNo Int
     createdAt     DateTime     @default(now())

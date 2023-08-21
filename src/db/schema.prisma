@@ -53,11 +53,13 @@ model Booking {
     installmentCount Int
     referralId       String?
     referral         Referral?       @relation(name: "BookingToReferral", fields: [referralId], references: [referralId])
+    penalty          Int?
     createdAt        DateTime        @default(now())
     updatedAt        DateTime        @updatedAt
     cashPayment      CashPayment[]   @relation(name: "BookingToCashPayment")
     chequePayment    ChequePayment[] @relation(name: "BookingToChequePayment")
     customerImage    CustomerImage[] @relation(name: "BookingToCustomerImage")
+    installment      Installment[]   @relation(name: "BookingToInstallment")
     upiPayment       UpiPayment[]    @relation(name: "BookingToUpiPayment")
 }
 
@@ -153,6 +155,65 @@ model Expense {
     updatedAt         DateTime @updatedAt
 }
 
+model IBankPayment {
+    paymentId     String      @id @default(uuid())
+    installmentId String
+    installment   Installment @relation(name: "IBankPaymentToInstallment", fields: [installmentId], references: [installmentId])
+    bankName      String
+    accountNumber String
+    amount        Float
+    createdAt     DateTime    @default(now())
+    updatedAt     DateTime    @updatedAt
+}
+
+model Installment {
+    installmentId String           @id @default(uuid())
+    bankPayment   IBankPayment[]   @relation(name: "IBankPaymentToInstallment")
+    cashPayment   ICashPayment[]   @relation(name: "ICashPaymentToInstallment")
+    chequePayment IChequePayment[] @relation(name: "IChequePaymentToInstallment")
+    name          String
+    bookingId     String
+    booking       Booking          @relation(name: "BookingToInstallment", fields: [bookingId], references: [bookingId])
+    amount        Int
+    paymentType   IPaymentType
+    installmentNo Int
+    createdAt     DateTime         @default(now())
+    updatedAt     DateTime         @updatedAt
+    upiPayment    IUpiPayment[]    @relation(name: "IUpiPaymentToInstallment")
+
+    @@unique([bookingId, installmentNo])
+}
+
+model ICashPayment {
+    paymentId     String      @id @default(uuid())
+    installmentId String
+    installment   Installment @relation(name: "ICashPaymentToInstallment", fields: [installmentId], references: [installmentId])
+    amount        Float
+    createdAt     DateTime    @default(now())
+    updatedAt     DateTime    @updatedAt
+}
+
+model IChequePayment {
+    paymentId     String      @id @default(uuid())
+    installmentId String
+    installment   Installment @relation(name: "IChequePaymentToInstallment", fields: [installmentId], references: [installmentId])
+    chequeNumber  String
+    bankName      String
+    amount        Float
+    createdAt     DateTime    @default(now())
+    updatedAt     DateTime    @updatedAt
+}
+
+model IUpiPayment {
+    paymentId     String      @id @default(uuid())
+    installmentId String
+    installment   Installment @relation(name: "IUpiPaymentToInstallment", fields: [installmentId], references: [installmentId])
+    upiId         String
+    amount        Float
+    createdAt     DateTime    @default(now())
+    updatedAt     DateTime    @updatedAt
+}
+
 model MiscExpense {
     miscExpenseId String   @id @default(uuid())
     expenseName   String
@@ -214,6 +275,13 @@ enum PaymentStatus {
 }
 
 enum PaymentType {
+    CHEQUE
+    UPI
+    CASH
+    BANK_TRANSFER
+}
+
+enum IPaymentType {
     CHEQUE
     UPI
     CASH

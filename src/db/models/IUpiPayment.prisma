@@ -1,14 +1,14 @@
 model IUpiPayment {
-    paymentId     String   @id @default(uuid())
+    paymentId     String      @id @default(uuid())
     installmentId String
-    installment   Booking  @relation(fields: [installmentId], references: [installmentId])
+    installment   Installment @relation(fields: [installmentId], references: [installmentId])
     upiId         String
     amount        Float
-    createdAt     DateTime @default(now())
-    updatedAt     DateTime @updatedAt
+    createdAt     DateTime    @default(now())
+    updatedAt     DateTime    @updatedAt
 }
 
-model Booking {
+model Installment {
     installmentId String        @id
     upiPayment    IUpiPayment[]
 }
