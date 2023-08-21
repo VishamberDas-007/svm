@@ -6,7 +6,9 @@ import { getBookingDetails } from '../services/booking.service'
 import AppError from '../utils/AppError'
 import {
     INSTALLMENT_E_0001,
+    INSTALLMENT_E_0002,
     INSTALLMENT_S_0001,
+    INSTALLMENT_S_0002,
 } from '../config/responseCodes/installment'
 import { TCreateInstallment } from './types/installment'
 import responseHandler from '../utils/responseHandler'
@@ -106,5 +108,29 @@ export const createInstallment = catchAsync(
             ...newInstallment,
             ...paymentDetails,
         })
+    }
+)
+
+export const fetchInstallmentDetails = catchAsync(
+    async (req: Request, res: Response) => {
+        const { installmentId } = req.params
+
+        const getInstallmentDetails = await prisma.installment.findFirst({
+            where: { installmentId },
+            include: {
+                bankPayment: true,
+                cashPayment: true,
+                chequePayment: true,
+                upiPayment: true,
+            },
+        })
+
+        if (!getInstallmentDetails) throw new AppError(INSTALLMENT_E_0002)
+        else
+            return responseHandler(
+                res,
+                INSTALLMENT_S_0002,
+                getInstallmentDetails
+            )
     }
 )

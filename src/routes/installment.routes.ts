@@ -5,4 +5,9 @@ const installmentRouter = express.Router()
 
 installmentRouter.post('/create', installmentController.createInstallment)
 
+installmentRouter.get(
+    '/get/:installmentId',
+    installmentController.fetchInstallmentDetails
+)
+
 export { installmentRouter }
