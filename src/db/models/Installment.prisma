@@ -1,0 +1,26 @@
+model Installment {
+    installmentId String       @id @default(uuid())
+    name          String
+    bookingId     String
+    booking       Booking      @relation(fields: [bookingId], references: [bookingId])
+    amount        Int
+    isCheck       Boolean
+    paymentType   IPaymentType
+    installmentNo Int
+    createdAt     DateTime     @default(now())
+    updatedAt     DateTime     @updatedAt
+
+    @@unique([bookingId, installmentNo])
+}
+
+model Booking {
+    bookingId   String        @id
+    installment Installment[]
+}
+
+enum IPaymentType {
+    CHEQUE
+    UPI
+    CASH
+    BANK_TRANSFER
+}

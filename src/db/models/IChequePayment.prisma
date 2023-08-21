@@ -1,0 +1,15 @@
+model IChequePayment {
+    paymentId     String      @id @default(uuid())
+    installmentId String
+    installment   Installment @relation(fields: [installmentId], references: [installmentId])
+    chequeNumber  String
+    bankName      String
+    amount        Float
+    createdAt     DateTime    @default(now())
+    updatedAt     DateTime    @updatedAt
+}
+
+model Installment {
+    installmentId String           @id
+    chequePayment IChequePayment[]
+}
