@@ -10,6 +10,7 @@ import { appConfigRouter } from './appConfig.routes'
 import { expenseRouter } from './expense.routes'
 import { userRouter } from './user.routes'
 import { roleRouter } from './role.routes'
+import { installmentRouter } from './installment.routes'
 const mainRouter = Router()
 
 mainRouter.get('/test', (req, res) => {
@@ -20,6 +21,8 @@ mainRouter.get('/test', (req, res) => {
         // server: APP_ENV,
     })
 })
+
+mainRouter.use('/installment', installmentRouter)
 
 mainRouter.use('/role', roleRouter)
 
