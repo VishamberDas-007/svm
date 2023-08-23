@@ -9,12 +9,10 @@ renderRedis.on('connect', () => {
     console.log('Connected to Redis')
 })
 
-export const setValueInRedis = async (obj: any) => {
-    await renderRedis.set('apple', 10)
+export const setValueInRedis = async (key: number, value: string) => {
+    await renderRedis.set(key.toString(), value)
 }
 
-export const getValueInRedis = async (key: string) => {
-    await renderRedis.get(key)
-}
+export const getValueInRedis = async (key: string) => await renderRedis.get(key)
 
 export { renderRedis }

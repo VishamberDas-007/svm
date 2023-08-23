@@ -3,7 +3,6 @@
 import express from 'express'
 import Server from './server'
 import { PORT } from './config/const'
-import './redis/config'
 // import listEndpoints from 'express-list-endpoints'
 
 console.log(process.env.DATABASE_URL)

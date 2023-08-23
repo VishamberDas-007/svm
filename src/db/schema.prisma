@@ -53,7 +53,6 @@ model Booking {
     installmentCount Int
     referralId       String?
     referral         Referral?       @relation(name: "BookingToReferral", fields: [referralId], references: [referralId])
-    penalty          Int?
     createdAt        DateTime        @default(now())
     updatedAt        DateTime        @updatedAt
     cashPayment      CashPayment[]   @relation(name: "BookingToCashPayment")

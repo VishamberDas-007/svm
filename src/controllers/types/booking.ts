@@ -35,3 +35,11 @@ export type TBookingList = TQueryRequest & {
         paymentType: string
     }
 }
+
+export type TRedisData = {
+    bookingId: string
+    name: string
+    email: string
+    phone: string
+    amount: number
+}

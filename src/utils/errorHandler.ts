@@ -31,6 +31,9 @@ export default (
             case 'P2002': {
                 return responseHandler(res, DB_E_0001)
             }
+            case 'P2003': {
+                return responseHandler(res, DB_E_0002)
+            }
             case 'P2025': {
                 return responseHandler(res, DB_E_0002)
             }
