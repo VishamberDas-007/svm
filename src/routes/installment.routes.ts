@@ -10,4 +10,9 @@ installmentRouter.get(
     installmentController.fetchInstallmentDetails
 )
 
+installmentRouter.put(
+    '/update/:installmentId',
+    installmentController.updateInstallmentDetails
+)
+
 export { installmentRouter }
