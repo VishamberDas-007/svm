@@ -5,7 +5,7 @@ export const createInstallmentValidator = Joi.object({
     amount: Joi.number().required(),
     name: Joi.string().required(),
     bookingId: util.uuid.required(),
-    paymentType: Joi.valid('').required(),
+    paymentType: Joi.valid('CHEQUE', 'UPI', 'CASH', 'BANK_TRANSFER').required(),
     accountNumber: Joi.string().required(),
     bankName: Joi.string().required(),
     chequeNumber: Joi.string().required(),

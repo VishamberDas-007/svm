@@ -21,7 +21,7 @@ import {
     Installment,
 } from '@prisma/client'
 import validator from '../validations'
-import * as validation from '../validations/installment.valuation'
+import * as validation from '../validations/installment.validator'
 
 export const createInstallment = catchAsync(
     async (req: Request, res: Response) => {
