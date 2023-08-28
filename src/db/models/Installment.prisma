@@ -6,6 +6,7 @@ model Installment {
     amount        Int
     paymentType   IPaymentType
     installmentNo Int
+    penalty       Int?
     createdAt     DateTime     @default(now())
     updatedAt     DateTime     @updatedAt
 
