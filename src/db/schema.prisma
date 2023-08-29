@@ -170,12 +170,12 @@ model Installment {
     bankPayment   IBankPayment[]   @relation(name: "IBankPaymentToInstallment")
     cashPayment   ICashPayment[]   @relation(name: "ICashPaymentToInstallment")
     chequePayment IChequePayment[] @relation(name: "IChequePaymentToInstallment")
-    name          String
     bookingId     String
     booking       Booking          @relation(name: "BookingToInstallment", fields: [bookingId], references: [bookingId])
     amount        Int
     paymentType   IPaymentType
     installmentNo Int
+    penalty       Int?
     createdAt     DateTime         @default(now())
     updatedAt     DateTime         @updatedAt
     upiPayment    IUpiPayment[]    @relation(name: "IUpiPaymentToInstallment")
