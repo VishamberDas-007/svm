@@ -16,6 +16,14 @@ export const INSTALLMENT_E_0002: TResponseCode = {
     statusCode: 404,
 }
 
+export const INSTALLMENT_E_0003: TResponseCode = {
+    type: RESPONSE_TYPE.ERROR,
+    code: 'INSTALLMENT_E_0003',
+    isNotify: true,
+    message: 'The installment exceeds the actual amount',
+    statusCode: 400,
+}
+
 export const INSTALLMENT_S_0001: TResponseCode = {
     type: RESPONSE_TYPE.ERROR,
     code: 'INSTALLMENT_S_0001',

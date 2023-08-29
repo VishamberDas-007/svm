@@ -7,6 +7,7 @@ import AppError from '../utils/AppError'
 import {
     INSTALLMENT_E_0001,
     INSTALLMENT_E_0002,
+    INSTALLMENT_E_0003,
     INSTALLMENT_S_0001,
     INSTALLMENT_S_0002,
     INSTALLMENT_S_0003,
@@ -28,18 +29,9 @@ export const createInstallment = catchAsync(
         await validator(validation.createInstallmentValidator, req.body)
 
         // proper upiId validation, correct account number validation
-        const {
-            amount,
-            bookingId,
-            name,
-            paymentType,
-            accountNumber,
-            bankName,
-            chequeNumber,
-            upiId,
-        }: TCreateInstallment = req.body
+        const { amount, bookingId, data }: TCreateInstallment = req.body
 
-        const installmentNo = await getInstallmentCount(bookingId)
+        let installmentNo = await getInstallmentCount(bookingId)
         const bookingDetails = await getBookingDetails(bookingId)
         let newInstallment: Installment | undefined,
             paymentDetails:
@@ -50,17 +42,58 @@ export const createInstallment = catchAsync(
                 | undefined
 
         if (!bookingDetails.remainAmt) throw new AppError(INSTALLMENT_E_0001)
+        else if (bookingDetails.remainAmt - +(+amount * data.length) < 0)
+            throw new AppError(INSTALLMENT_E_0003)
 
         await prisma.$transaction(async (prisma) => {
-            newInstallment = await prisma.installment.create({
-                data: {
-                    amount: +amount,
-                    installmentNo,
-                    name,
-                    paymentType,
-                    bookingId,
-                },
-            })
+            for await (const iterator of data) {
+                newInstallment = await prisma.installment.create({
+                    data: {
+                        amount: +amount,
+                        bookingId,
+                        installmentNo,
+                        paymentType: iterator.paymentType,
+                        penalty: iterator.penalty,
+                    },
+                })
+
+                ++installmentNo
+
+                if (iterator.paymentType === 'BANK_TRANSFER') {
+                    paymentDetails = await prisma.iBankPayment.create({
+                        data: {
+                            accountNumber: iterator.accountNumber || '',
+                            amount,
+                            bankName: iterator.bankName || '',
+                            installmentId: newInstallment.installmentId,
+                        },
+                    })
+                } else if (iterator.paymentType === 'CHEQUE') {
+                    paymentDetails = await prisma.iChequePayment.create({
+                        data: {
+                            amount,
+                            bankName: iterator.bankName || '',
+                            chequeNumber: iterator.chequeNumber || '',
+                            installmentId: newInstallment.installmentId,
+                        },
+                    })
+                } else if (iterator.paymentType === 'UPI') {
+                    paymentDetails = await prisma.iUpiPayment.create({
+                        data: {
+                            upiId: iterator.upiId || '',
+                            amount,
+                            installmentId: newInstallment.installmentId,
+                        },
+                    })
+                } else {
+                    paymentDetails = await prisma.iCashPayment.create({
+                        data: {
+                            amount,
+                            installmentId: newInstallment.installmentId,
+                        },
+                    })
+                }
+            }
 
             // add penalty if already missed the due date
 
@@ -69,44 +102,9 @@ export const createInstallment = catchAsync(
                     bookingId,
                 },
                 data: {
-                    remainAmt: bookingDetails.remainAmt - +amount,
+                    remainAmt: bookingDetails.remainAmt - +amount * data.length,
                 },
             })
-
-            if (paymentType === 'BANK_TRANSFER') {
-                paymentDetails = await prisma.iBankPayment.create({
-                    data: {
-                        accountNumber,
-                        amount,
-                        bankName,
-                        installmentId: newInstallment.installmentId,
-                    },
-                })
-            } else if (paymentType === 'CHEQUE') {
-                paymentDetails = await prisma.iChequePayment.create({
-                    data: {
-                        amount,
-                        bankName,
-                        chequeNumber,
-                        installmentId: newInstallment.installmentId,
-                    },
-                })
-            } else if (paymentType === 'UPI') {
-                paymentDetails = await prisma.iUpiPayment.create({
-                    data: {
-                        upiId,
-                        amount,
-                        installmentId: newInstallment.installmentId,
-                    },
-                })
-            } else {
-                paymentDetails = await prisma.iCashPayment.create({
-                    data: {
-                        amount,
-                        installmentId: newInstallment.installmentId,
-                    },
-                })
-            }
         })
 
         return responseHandler(res, INSTALLMENT_S_0001, {
@@ -149,7 +147,7 @@ export const updateInstallmentDetails = catchAsync(
 
         const { installmentId } = req.params
 
-        const { amount, name, installmentNo }: Installment = req.body
+        const { amount, installmentNo }: Installment = req.body
 
         const installmentDetailExists = await prisma.installment.findFirst({
             where: { installmentId },
@@ -163,7 +161,6 @@ export const updateInstallmentDetails = catchAsync(
             },
             data: {
                 amount: +amount,
-                name,
                 installmentNo: +installmentNo,
             },
         })
