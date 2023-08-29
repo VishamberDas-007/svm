@@ -10,6 +10,11 @@ installmentRouter.get(
     installmentController.fetchInstallmentDetails
 )
 
+installmentRouter.get(
+    '/get/booking/installment-details/:bookingId',
+    installmentController.fetchBookingInstallmentDetails
+)
+
 installmentRouter.put(
     '/update/:installmentId',
     installmentController.updateInstallmentDetails

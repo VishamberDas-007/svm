@@ -36,7 +36,7 @@ export const INSTALLMENT_S_0002: TResponseCode = {
     type: RESPONSE_TYPE.ERROR,
     code: 'INSTALLMENT_S_0002',
     isNotify: true,
-    message: 'Installment fetched successfully',
+    message: 'Installment details fetched successfully',
     statusCode: 200,
 }
 

@@ -168,3 +168,24 @@ export const updateInstallmentDetails = catchAsync(
         return responseHandler(res, INSTALLMENT_S_0003, updateInstallment)
     }
 )
+
+export const fetchBookingInstallmentDetails = catchAsync(
+    async (req: Request, res: Response) => {
+        const { bookingId } = req.params
+
+        const installmentNo = await getInstallmentCount(bookingId)
+        const bookingDetails = await getBookingDetails(bookingId)
+
+        return responseHandler(res, INSTALLMENT_S_0002, {
+            customerName:
+                bookingDetails.customer.firstName +
+                ' ' +
+                bookingDetails.customer.lastName,
+            installmentAmt: bookingDetails.installmentAmt,
+            pincode: bookingDetails.pincode,
+            installmentNo,
+            address1: bookingDetails.address1,
+            address2: bookingDetails.address2,
+        })
+    }
+)
