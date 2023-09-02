@@ -20,9 +20,12 @@ import {
     IChequePayment,
     IUpiPayment,
     Installment,
+    PaymentStatus,
 } from '@prisma/client'
 import validator from '../validations'
 import * as validation from '../validations/installment.validator'
+import { TRedisData } from './types/booking'
+import { getValueInRedis, setValueInRedis } from '../redis/config'
 
 export const createInstallment = catchAsync(
     async (req: Request, res: Response) => {
@@ -40,10 +43,17 @@ export const createInstallment = catchAsync(
                 | IChequePayment
                 | IBankPayment
                 | undefined
+        let bookingUpdateData:
+            | {
+                  status: PaymentStatus
+              }
+            | undefined
+
+        const bookingRemainAmt =
+            bookingDetails.remainAmt - +(+amount * data.length)
 
         if (!bookingDetails.remainAmt) throw new AppError(INSTALLMENT_E_0001)
-        else if (bookingDetails.remainAmt - +(+amount * data.length) < 0)
-            throw new AppError(INSTALLMENT_E_0003)
+        else if (bookingRemainAmt < 0) throw new AppError(INSTALLMENT_E_0003)
 
         await prisma.$transaction(async (prisma) => {
             for await (const iterator of data) {
@@ -95,7 +105,27 @@ export const createInstallment = catchAsync(
                 }
             }
 
-            // add penalty if already missed the due date
+            if (!bookingRemainAmt) {
+                bookingUpdateData = {
+                    status: 'COMPLETED',
+                }
+
+                // need to check the transaction time if exceeded then need to place the redis outside the transaction
+
+                const date = bookingDetails.createdAt.getDate()
+
+                const redisDetails: TRedisData[] = JSON.parse(
+                    JSON.stringify((await getValueInRedis(`${date}`)) || [])
+                )
+
+                const bookingDataIndexToDelete = redisDetails.findIndex(
+                    (obj) => obj.bookingId === bookingDetails.bookingId
+                )
+
+                redisDetails.splice(bookingDataIndexToDelete, 1)
+
+                await setValueInRedis(date, JSON.stringify(redisDetails))
+            }
 
             await prisma.booking.update({
                 where: {
@@ -103,6 +133,7 @@ export const createInstallment = catchAsync(
                 },
                 data: {
                     remainAmt: bookingDetails.remainAmt - +amount * data.length,
+                    ...bookingUpdateData,
                 },
             })
         })
