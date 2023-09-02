@@ -1,0 +1,10 @@
+model ContactUs {
+    contactUsId String   @id @default(uuid())
+    email       String?
+    name        String
+    message     String
+    number      String
+    subject     String
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+}

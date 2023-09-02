@@ -129,6 +129,17 @@ model ChequePayment {
     updatedAt    DateTime @updatedAt
 }
 
+model ContactUs {
+    contactUsId String   @id @default(uuid())
+    email       String?
+    name        String
+    message     String
+    number      String
+    subject     String
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+}
+
 model CustomerImage {
     customerImageId String   @id @default(uuid())
     imageUrl        String
