@@ -15,3 +15,11 @@ export const WEBSITE_S_0002: TResponseCode = {
     message: 'Fetched all contact-us list successfully',
     statusCode: 200,
 }
+
+export const WEBSITE_S_0003: TResponseCode = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'WEBSITE_S_0003',
+    isNotify: true,
+    message: 'Added new Festival details successfully',
+    statusCode: 200,
+}
