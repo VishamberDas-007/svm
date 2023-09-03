@@ -1,10 +1,16 @@
 model ContactUs {
-    contactUsId String   @id @default(uuid())
+    contactUsId String          @id @default(uuid())
     email       String?
     name        String
     message     String
     number      String
     subject     String
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
+    status      ContactUsStatus @default(PENDING)
+    createdAt   DateTime        @default(now())
+    updatedAt   DateTime        @updatedAt
+}
+
+enum ContactUsStatus {
+    PENDING
+    COMPLETED
 }
