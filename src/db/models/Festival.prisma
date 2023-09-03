@@ -1,0 +1,10 @@
+model Festival {
+    festivalId   String   @id @default(uuid())
+    url          String
+    thumbnailImg String
+    description  String
+    title        String
+    isLatest     Boolean  @default(false)
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+}
