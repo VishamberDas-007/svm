@@ -9,10 +9,12 @@ import {
     WEBSITE_S_0003,
 } from '../config/responseCodes/website'
 import { Festival } from '@prisma/client'
-
-// !!!!!! validation is pending !!!!!!!!!!!!!!
+import validator from '../validations'
+import * as validation from '../validations/website.validator'
 
 export const saveContactUs = catchAsync(async (req: Request, res: Response) => {
+    await validator(validation.saveContactUsValidator, req.body)
+
     const { email, name, message, number, subject }: TContactUs = req.body
 
     await prisma.contactUs.create({
@@ -30,6 +32,8 @@ export const saveContactUs = catchAsync(async (req: Request, res: Response) => {
 
 export const fetchContactUsList = catchAsync(
     async (req: TFetchContactUsListReq, res: Response) => {
+        await validator(validation.statusValidator, req.query)
+
         const { status } = req.query
         let whereClause = {}
 
@@ -56,6 +60,8 @@ export const fetchContactUsList = catchAsync(
 
 export const addFestivalDetails = catchAsync(
     async (req: TFetchContactUsListReq, res: Response) => {
+        await validator(validation.addFestivalValidator, req.body)
+
         const { description, thumbnailImg, title, url, isLatest }: Festival =
             req.body
 
