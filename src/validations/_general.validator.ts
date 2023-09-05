@@ -4,3 +4,7 @@ import util from '../utils/helper'
 export const projectIdValidator = Joi.object({
     projectId: util.uuid.required(),
 })
+
+export const bookingIdValidator = Joi.object({
+    bookingId: util.uuid.required(),
+})

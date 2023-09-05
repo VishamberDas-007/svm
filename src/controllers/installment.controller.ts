@@ -24,6 +24,7 @@ import {
 } from '@prisma/client'
 import validator from '../validations'
 import * as validation from '../validations/installment.validator'
+import * as generalValidation from '../validations/_general.validator'
 import { TRedisData } from './types/booking'
 import { getValueInRedis, setValueInRedis } from '../redis/config'
 
@@ -202,6 +203,7 @@ export const updateInstallmentDetails = catchAsync(
 
 export const fetchBookingInstallmentDetails = catchAsync(
     async (req: Request, res: Response) => {
+        await validator(generalValidation.bookingIdValidator, req.params)
         const { bookingId } = req.params
 
         const installmentNo = await getInstallmentCount(bookingId)
