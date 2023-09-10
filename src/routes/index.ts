@@ -11,6 +11,8 @@ import { expenseRouter } from './expense.routes'
 import { userRouter } from './user.routes'
 import { roleRouter } from './role.routes'
 import { installmentRouter } from './installment.routes'
+// import { sendMessage } from '../services/twilio.service'
+import { websiteRouter } from './website.routes'
 const mainRouter = Router()
 
 mainRouter.get('/test', (req, res) => {
@@ -21,6 +23,12 @@ mainRouter.get('/test', (req, res) => {
         // server: APP_ENV,
     })
 })
+
+// mainRouter.use('/twilio', (req: Request, res: Response) => {
+//     sendMessage()
+// })
+
+mainRouter.use('/website', websiteRouter)
 
 mainRouter.use('/installment', installmentRouter)
 
