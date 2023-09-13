@@ -1,27 +1,30 @@
-// import { AWS_CONFIG } from '../../config/const'
-// import AWS from '../config'
+import multer from 'multer'
+import multerS3 from 'multer-s3'
+import { awsConfig } from '../../config/const'
 
-// export const createUploadLink = async (fileName: string, folder: string) => {
-//     const s3 = new AWS.S3()
-//     const params = {
-//         Bucket: AWS_CONFIG.s3Bucket,
-//         Key: `${folder}/${fileName}`,
-//         Expires: 60,
-//         ContentType: 'image/jpeg',
-//         ACL: 'public-read',
-//     }
-//     const uploadLink = await s3.getSignedUrlPromise('putObject', params)
-//     return uploadLink
-// }
+import AWS from '../config'
+
+const s3 = new AWS.S3()
+
+// Set up Multer with Multer-S3 to handle file uploads to DigitalOcean Spaces
+export const upload = multer({
+    storage: multerS3({
+        s3: s3,
+        bucket: 'YOUR_SPACE_NAME', // Replace with your Space's name
+        acl: 'public-read', // Adjust ACL as needed
+        metadata: function (_req, file, cb) {
+            cb(null, { fieldName: file.fieldname })
+        },
+        key: function (_req, file, cb) {
+            cb(null, Date.now().toString() + '-' + file.originalname)
+        },
+    }),
+})
 
 // digital ocean
 /*
 
-
 const express = require('express');
-const multer = require('multer');
-const aws = require('aws-sdk');
-const multerS3 = require('multer-s3');
 
 const app = express();
 
@@ -45,7 +48,5 @@ const upload = multer({
     },
   }),
 });
-
-
 
 */
