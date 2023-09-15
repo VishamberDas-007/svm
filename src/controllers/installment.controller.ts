@@ -25,8 +25,8 @@ import {
 import validator from '../validations'
 import * as validation from '../validations/installment.validator'
 import * as generalValidation from '../validations/_general.validator'
-import { TRedisData } from './types/booking'
-import { getValueInRedis, setValueInRedis } from '../redis/config'
+// import { TRedisData } from './types/booking'
+// import { getValueInRedis, setValueInRedis } from '../redis/config'
 
 export const createInstallment = catchAsync(
     async (req: Request, res: Response) => {
@@ -113,7 +113,9 @@ export const createInstallment = catchAsync(
 
                 // need to check the transaction time if exceeded then need to place the redis outside the transaction
 
-                const date = bookingDetails.createdAt.getDate()
+                // uncomment on remote redis
+
+                /*                const date = bookingDetails.createdAt.getDate()
 
                 const redisDetails: TRedisData[] = JSON.parse(
                     JSON.stringify((await getValueInRedis(`${date}`)) || [])
@@ -125,7 +127,7 @@ export const createInstallment = catchAsync(
 
                 redisDetails.splice(bookingDataIndexToDelete, 1)
 
-                await setValueInRedis(date, JSON.stringify(redisDetails))
+                await setValueInRedis(date, JSON.stringify(redisDetails))*/
             }
 
             await prisma.booking.update({

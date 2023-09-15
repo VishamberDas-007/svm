@@ -14,6 +14,8 @@ export const createProjectValidator = Joi.object({
     unit: Joi.string().required(),
     address2: Joi.string().allow('', null).optional(),
     parentId: util.uuid.allow('', null).optional(),
+    planningImages: Joi.any().optional(),
+    siteImages: Joi.any().optional(),
 })
 
 export const updateProjectValidator = Joi.object({
@@ -26,4 +28,6 @@ export const updateProjectValidator = Joi.object({
     status: Joi.valid(...projectStatus).optional(),
     unit: Joi.string().optional(),
     address2: Joi.string().optional(),
+    planningImages: Joi.any().optional(),
+    siteImages: Joi.any().optional(),
 })

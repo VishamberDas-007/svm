@@ -29,7 +29,7 @@ import {
     UpiPayment,
 } from '@prisma/client'
 import { TListData } from '../types/global.types'
-import { getValueInRedis, setValueInRedis } from '../redis/config'
+// import { getValueInRedis, setValueInRedis } from '../redis/config'
 import { fetchCustomerDetails } from '../services/_general.service'
 
 export const createBooking = catchAsync(async (req: Request, res: Response) => {
@@ -127,25 +127,27 @@ export const createBooking = catchAsync(async (req: Request, res: Response) => {
 
         const date = newBooking.createdAt.getDate()
 
-        let redisDetails: TRedisData[] = JSON.parse(
-            JSON.stringify((await getValueInRedis(`${date}`)) || [])
-        )
+        // uncomment on remote redis
 
-        redisDetails = [
-            ...redisDetails,
-            {
-                bookingId: newBooking.bookingId,
-                amount: installmentAmt,
-                email: customerDetails?.email || '',
-                name:
-                    customerDetails?.firstName +
-                    ' ' +
-                    customerDetails?.lastName,
-                phone: customerDetails?.phone || '',
-            },
-        ]
+        // let redisDetails: TRedisData[] = JSON.parse(
+        //     JSON.stringify((await getValueInRedis(`${date}`)) || [])
+        // )
 
-        await setValueInRedis(date, JSON.stringify(redisDetails))
+        // redisDetails = [
+        //     ...redisDetails,
+        //     {
+        //         bookingId: newBooking.bookingId,
+        //         amount: installmentAmt,
+        //         email: customerDetails?.email || '',
+        //         name:
+        //             customerDetails?.firstName +
+        //             ' ' +
+        //             customerDetails?.lastName,
+        //         phone: customerDetails?.phone || '',
+        //     },
+        // ]
+
+        // await setValueInRedis(date, JSON.stringify(redisDetails))
     }
 
     return responseHandler(res, BOOKING_S_0001, {

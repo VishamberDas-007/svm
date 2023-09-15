@@ -7,12 +7,18 @@ const projectRouter = express.Router()
 projectRouter.post(
     '/create',
     upload.array('planningImages'),
+    upload.array('siteImages'),
     projectController.newProject
 )
 
 projectRouter.get('/list', projectController.getAllProjects)
 
-projectRouter.put('/update/:projectId', projectController.updateProject)
+projectRouter.put(
+    '/update/:projectId',
+    upload.array('planningImages'),
+    upload.array('siteImages'),
+    projectController.updateProject
+)
 
 projectRouter.get('/get/:projectId', projectController.getProject)
 
