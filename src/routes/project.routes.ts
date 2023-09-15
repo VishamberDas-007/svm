@@ -1,6 +1,6 @@
 import express from 'express'
 import * as projectController from '../controllers/project.controller'
-import { upload } from '../services/project.service'
+import { upload } from '../aws/s3'
 
 const projectRouter = express.Router()
 
