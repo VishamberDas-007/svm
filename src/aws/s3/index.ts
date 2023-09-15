@@ -14,7 +14,7 @@ const s3Config = new S3Client({
 export const upload = multer({
     storage: multerS3({
         s3: s3Config,
-        bucket: 'vidasbucket',
+        bucket: 'vidas',
         // acl: 'public-read',
         contentType: multerS3.AUTO_CONTENT_TYPE,
         metadata: function (req, file, cb) {

@@ -7,7 +7,7 @@ const projectRouter = express.Router()
 projectRouter.post(
     '/create',
     upload.array('planningImages'),
-    upload.array('siteImages'),
+    // upload.array('siteImages'),
     projectController.newProject
 )
 
