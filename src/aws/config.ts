@@ -1,10 +1,10 @@
-import AWS from 'aws-sdk'
-import { awsConfig } from '../config/const'
+// import AWS from 'aws-sdk'
+// import { awsConfig } from '../config/const'
 
-AWS.config.update({
-    accessKeyId: awsConfig.accessKeyId,
-    secretAccessKey: awsConfig.secretAccessKey,
-    region: 'us-east-1',
-})
+// AWS.config.update({
+//     accessKeyId: awsConfig.AWS_ACCESS_KEY,
+//     secretAccessKey: awsConfig.AWS_SECRET_KEY,
+//     region: 'eu-north-1',
+// })
 
-export default AWS
+// export default AWS
