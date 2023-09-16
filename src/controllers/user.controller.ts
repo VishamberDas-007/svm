@@ -5,7 +5,7 @@ import { TCreateUser, TUpdateUser } from './types/user'
 import prisma from '../db'
 import util from '../utils/helper'
 import bcrypt from 'bcrypt'
-import { SALT_ROUND } from '../config/const'
+import { SALT_ROUND, emailConfig } from '../config/const'
 import {
     USER_E_0001,
     USER_E_0002,
@@ -17,6 +17,7 @@ import { User } from '@prisma/client'
 import { TListData } from '../types/global.types'
 import validator from '../validations'
 import * as validation from '../validations/user.validator'
+import { sendEmail } from '../utils/nodeMailer'
 
 export const createUser = catchAsync(async (req: Request, res: Response) => {
     await validator(validation.userCreateValidator, req.body)
@@ -46,10 +47,14 @@ export const createUser = catchAsync(async (req: Request, res: Response) => {
         },
     })
 
-    return responseHandler(res, USER_S_0001, {
+    const html = `email : ${newUser.email}, password : ${password} `
+
+    responseHandler(res, USER_S_0001, {
         ...newUser,
         password: undefined,
     })
+
+    await sendEmail(newUser.email, emailConfig.SUBJECT, html)
 })
 
 export const getUser = catchAsync(async (req: Request, res: Response) => {
@@ -166,6 +171,9 @@ export const updateUser = catchAsync(async (req: Request, res: Response) => {
             userId,
         },
     })
+    let flag = 0,
+        password: string | undefined,
+        encryptPassword: string | undefined
 
     if (!userDetails) {
         throw new AppError(USER_E_0001)
@@ -182,6 +190,9 @@ export const updateUser = catchAsync(async (req: Request, res: Response) => {
         })
 
         if (emailExists) throw new AppError(USER_E_0002, undefined, null, true)
+        flag = 1
+        password = util.passwordGenerator()
+        encryptPassword = bcrypt.hashSync(password, SALT_ROUND)
     }
 
     const updateUser = await prisma.user.update({
@@ -194,11 +205,17 @@ export const updateUser = catchAsync(async (req: Request, res: Response) => {
             name,
             phone,
             roleId,
+            password: encryptPassword,
         },
     })
 
-    return responseHandler(res, USER_S_0002, {
+    responseHandler(res, USER_S_0002, {
         ...updateUser,
         password: undefined,
     })
+
+    if (flag === 1) {
+        const html = `email : ${updateUser.email}, password : ${password} `
+        await sendEmail(updateUser.email, emailConfig.SUBJECT, html)
+    }
 })

@@ -21,3 +21,12 @@ export const awsConfig = {
     AWS_ACCESS_KEY: process.env.AWS_ACCESS_KEY,
     AWS_SECRET_KEY: process.env.AWS_SECRET_KEY,
 }
+
+export const nodeMailerCredentials = {
+    USER_NAME: 'vishdas111@gmail.com',
+    APP_PASSWORD: process.env.APP_PASSWORD || 'vvBB1@2000',
+}
+
+export const emailConfig = {
+    SUBJECT: 'SVM (Credentials)',
+}
