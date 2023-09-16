@@ -15,6 +15,7 @@ import { ADMIN, SALT_ROUND } from '../config/const'
 import validator from '../validations'
 import * as validation from '../validations/auth.validator'
 import util from '../utils/helper'
+import { TAccessToken } from '../types/global.types'
 
 export const register = catchAsync(async (req: Request, res: Response) => {
     await validator(validation.registerValidator, req.body)
@@ -80,25 +81,36 @@ export const login = catchAsync(async (req: Request, res: Response) => {
 
     const { email, password }: TLogin = req.body
 
-    const emailExists = await prisma.user.findFirst({
+    const userExists = await prisma.user.findFirst({
         where: {
             email,
         },
+        include: {
+            role: {
+                include: {
+                    permission: true,
+                },
+            },
+        },
     })
 
-    if (!emailExists) {
+    if (!userExists) {
         throw new AppError(AUTH_E_0001)
     } else {
         const passwordIsValid = bcrypt.compareSync(
             password,
-            emailExists.password
+            userExists.password
         )
 
         if (!passwordIsValid) {
             throw new AppError(AUTH_E_0001)
         } else {
-            const tokenObj = {
+            const tokenObj: TAccessToken = {
                 email,
+                userId: userExists.userId,
+                isAdmin: userExists.isAdmin,
+                role: userExists.role.label,
+                permissions: userExists.role.permission.map((p) => p.value),
             }
 
             const accessToken = util.accessToken(tokenObj)
@@ -112,8 +124,9 @@ export const login = catchAsync(async (req: Request, res: Response) => {
             })
 
             return responseHandler(res, AUTH_S_0002, {
-                ...emailExists,
+                ...userExists,
                 password: undefined,
+                role: undefined,
                 accessToken,
                 // refreshToken,
             })

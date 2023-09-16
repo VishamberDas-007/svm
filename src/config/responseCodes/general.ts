@@ -111,3 +111,11 @@ export const GENERAL_E_0014 = {
     message: 'Invalid token',
     statusCode: 401,
 }
+
+export const GENERAL_E_0015 = {
+    type: RESPONSE_TYPE.ERROR,
+    code: 'GENERAL_E_0015',
+    isNotify: false,
+    message: 'Invalid Access Attempt',
+    statusCode: 403,
+}

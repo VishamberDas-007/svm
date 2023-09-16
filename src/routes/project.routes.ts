@@ -16,7 +16,7 @@ projectRouter.get('/list', projectController.getAllProjects)
 projectRouter.put(
     '/update/:projectId',
     upload.array('planningImages'),
-    upload.array('siteImages'),
+    // upload.array('siteImages'),
     projectController.updateProject
 )
 

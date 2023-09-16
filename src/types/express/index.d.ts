@@ -1,9 +1,9 @@
-// import { User } from '../global.types'
+import { TAccessToken } from '../global.types'
 
-// declare global {
-//     namespace Express {
-//         export interface Request {
-//             user?: User
-//         }
-//     }
-// }
+declare global {
+    namespace Express {
+        export interface Request {
+            user?: TAccessToken
+        }
+    }
+}

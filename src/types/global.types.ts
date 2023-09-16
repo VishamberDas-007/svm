@@ -30,3 +30,31 @@ export type TQueryRequest = Request & {
         pageSize: number
     }
 }
+
+export type TAccessToken = {
+    email: string
+    role: string
+    userId: string
+    isAdmin: boolean
+    permissions: string[]
+}
+
+export type permission =
+    | 'PROJECT_READ'
+    | 'PROJECT_WRITE'
+    | 'AD_ACCOUNT_READ'
+    | 'AD_ACCOUNT_WRITE'
+    | 'BOOKING_READ'
+    | 'BOOKING_WRITE'
+    | 'CUSTOMER_READ'
+    | 'CUSTOMER_WRITE'
+    | 'EXPENSE_READ'
+    | 'EXPENSE_WRITE'
+    | 'REFERRAL_READ'
+    | 'REFERRAL_WRITE'
+    | 'ROLE_READ'
+    | 'ROLE_WRITE'
+    | 'USER_READ'
+    | 'USER_WRITE'
+    | 'INSTALLMENT_READ'
+    | 'INSTALLMENT_WRITE'
