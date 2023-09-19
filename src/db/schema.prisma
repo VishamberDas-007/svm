@@ -246,6 +246,14 @@ model MiscExpense {
     updatedAt     DateTime @updatedAt
 }
 
+model Otp {
+    otpId      Int      @id @default(autoincrement())
+    email      String
+    otp        Int
+    createdAt  DateTime @default(now())
+    expiryTime DateTime
+}
+
 model Permission {
     permissionId Int       @id @default(autoincrement())
     label        String

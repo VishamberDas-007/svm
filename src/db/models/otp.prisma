@@ -1,0 +1,7 @@
+model Otp {
+    otpId      Int      @id @default(autoincrement())
+    email      String
+    otp        Int
+    createdAt  DateTime @default(now())
+    expiryTime DateTime
+}
