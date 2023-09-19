@@ -1,12 +1,18 @@
-import { Request, Response, response } from 'express'
+import { Request, Response } from 'express'
 import prisma from '../db'
 import catchAsync from '../utils/catchAsync'
 import responseHandler from '../utils/responseHandler'
-import { TContactUs, TFetchContactUsListReq } from './types/website'
+import {
+    TContactUs,
+    TFetchAllProjectsReq,
+    TFetchContactUsListReq,
+} from './types/website'
 import {
     WEBSITE_S_0001,
     WEBSITE_S_0002,
     WEBSITE_S_0003,
+    WEBSITE_S_0004,
+    WEBSITE_S_0005,
 } from '../config/responseCodes/website'
 import { Festival } from '@prisma/client'
 import validator from '../validations'
@@ -88,5 +94,34 @@ export const addFestivalDetails = catchAsync(
         })
 
         return responseHandler(res, WEBSITE_S_0003, newFestivalDetails)
+    }
+)
+
+export const fetchFestivalDetails = catchAsync(
+    async (req: Request, res: Response) => {
+        const festivalDetails = await prisma.festival.findFirst({
+            where: {
+                isLatest: true,
+            },
+        })
+
+        return responseHandler(res, WEBSITE_S_0005, festivalDetails)
+    }
+)
+
+export const fetchAllProjects = catchAsync(
+    async (req: TFetchAllProjectsReq, res: Response) => {
+        const { status } = req.query
+
+        const projectList = await prisma.project.findMany({
+            where: {
+                status,
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+        })
+
+        return responseHandler(res, WEBSITE_S_0004, projectList)
     }
 )

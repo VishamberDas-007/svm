@@ -1,4 +1,4 @@
-import { ContactUsStatus } from '@prisma/client'
+import { ContactUsStatus, ProjectStatus } from '@prisma/client'
 import { Request } from 'express'
 
 export type TContactUs = {
@@ -12,5 +12,11 @@ export type TContactUs = {
 export type TFetchContactUsListReq = Request & {
     query: {
         status: ContactUsStatus
+    }
+}
+
+export type TFetchAllProjectsReq = Request & {
+    query: {
+        status: ProjectStatus
     }
 }

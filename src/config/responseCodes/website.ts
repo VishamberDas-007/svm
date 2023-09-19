@@ -23,3 +23,19 @@ export const WEBSITE_S_0003: TResponseCode = {
     message: 'Added new Festival details successfully',
     statusCode: 200,
 }
+
+export const WEBSITE_S_0004: TResponseCode = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'WEBSITE_S_0004',
+    isNotify: true,
+    message: 'Project list fetched successfully',
+    statusCode: 200,
+}
+
+export const WEBSITE_S_0005: TResponseCode = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'WEBSITE_S_0005',
+    isNotify: true,
+    message: 'Festival detail fetched successfully',
+    statusCode: 200,
+}
