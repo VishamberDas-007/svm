@@ -14,3 +14,8 @@ export const loginValidator = Joi.object<TLogin>({
     email: util.emailValidator.required(),
     password: Joi.string().required(),
 })
+
+export const emailOtpValidator = Joi.object({
+    email: util.emailValidator.required(),
+    otp: util.otpValidator.required(),
+})

@@ -29,4 +29,5 @@ export const nodeMailerCredentials = {
 
 export const emailConfig = {
     SUBJECT: 'SVM (Credentials)',
+    OTP_SUBJECT: 'SVM (OTP)',
 }

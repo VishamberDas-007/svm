@@ -10,3 +10,8 @@ export type TRegister = {
     phone: string
     address?: string
 }
+
+export type TValidateEmailOtp = {
+    email: string
+    otp: number
+}
