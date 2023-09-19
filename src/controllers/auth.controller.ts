@@ -1,6 +1,11 @@
 import { Request, Response } from 'express'
 import catchAsync from '../utils/catchAsync'
-import { TLogin, TRegister, TValidateEmailOtp } from './types/auth'
+import {
+    TLogin,
+    TRegister,
+    TSetNewPassword,
+    TValidateEmailOtp,
+} from './types/auth'
 import prisma from '../db'
 import AppError from '../utils/AppError'
 import responseHandler from '../utils/responseHandler'
@@ -8,13 +13,16 @@ import {
     AUTH_E_0001,
     AUTH_E_0002,
     AUTH_E_0003,
+    AUTH_E_0007,
+    AUTH_E_0008,
     AUTH_S_0001,
     AUTH_S_0002,
     AUTH_S_0003,
     AUTH_S_0004,
+    AUTH_S_0005,
 } from '../config/responseCodes/auth'
 import bcrypt from 'bcrypt'
-import { ADMIN, SALT_ROUND, emailConfig } from '../config/const'
+import { ADMIN, SALT_ROUND, emailConfig, jwtAccessToken } from '../config/const'
 import validator from '../validations'
 import * as validation from '../validations/auth.validator'
 import * as generalValidation from '../validations/_general.validator'
@@ -22,6 +30,7 @@ import util from '../utils/helper'
 import { TAccessToken } from '../types/global.types'
 import { emailOtpRequest, emailOtpValidate } from '../services/auth.service'
 import { sendEmail } from '../utils/nodeMailer'
+import jwt from 'jsonwebtoken'
 
 export const register = catchAsync(async (req: Request, res: Response) => {
     await validator(validation.registerValidator, req.body)
@@ -196,7 +205,7 @@ export const resetEmailOtpValidation = catchAsync(
         })
     }
 )
-/*
+
 export const setNewPassword = catchAsync(
     async (req: Request, res: Response) => {
         await validator(validation.changePasswordValidator, req.body)
@@ -205,30 +214,25 @@ export const setNewPassword = catchAsync(
         const emailLowerCase = email.toLowerCase()
 
         const { email: decodedEmail } = <{ email: string }>(
-            jwt.verify(emailOtpToken, jwtAccessToken.SECRET)
+            jwt.verify(emailOtpToken, jwtAccessToken.SECRET_KEY)
         )
 
         if (decodedEmail !== emailLowerCase) {
-            throw new AppError(AUTH_E_0007)
+            throw new AppError(AUTH_E_0001)
         }
 
         const userExists = await prisma.user.findFirst({
             where: { email: emailLowerCase },
-            include: {
-                auth: true,
-            },
         })
 
         if (!userExists) {
-            throw new AppError(AUTH_E_0014)
-        } else if (!userExists.auth?.password) {
-            throw new AppError(AUTH_E_0013, undefined, undefined, true)
+            throw new AppError(AUTH_E_0007)
         } else {
             // password encryption using bcrypt
-            const salt = bcrypt.genSaltSync(parseInt(SALT_ROUND))
+            const salt = bcrypt.genSaltSync(+SALT_ROUND)
             const encryptedPassword = bcrypt.hashSync(password, salt)
 
-            const isUpdated = await prisma.auth.update({
+            const isUpdated = await prisma.user.update({
                 where: {
                     userId: userExists.userId,
                 },
@@ -238,11 +242,10 @@ export const setNewPassword = catchAsync(
             })
 
             if (!isUpdated) {
-                throw new AppError(AUTH_E_0015)
+                throw new AppError(AUTH_E_0008)
             }
 
-            return responseHandler(res, AUTH_S_0010, { email })
+            return responseHandler(res, AUTH_S_0005, { email })
         }
     }
 )
-*/

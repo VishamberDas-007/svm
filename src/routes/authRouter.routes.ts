@@ -11,6 +11,6 @@ authRouter.get('/forgot-password/:email', authController.resetRequestEmailOTP)
 
 authRouter.post('/reset-password', authController.resetEmailOtpValidation)
 
-// authRouter.post('/change-password', authController.setNewPassword)
+authRouter.post('/change-password', authController.setNewPassword)
 
 export { authRouter }

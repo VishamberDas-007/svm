@@ -15,3 +15,9 @@ export type TValidateEmailOtp = {
     email: string
     otp: number
 }
+
+export type TSetNewPassword = {
+    email: string
+    password: string
+    emailOtpToken: string
+}

@@ -48,6 +48,22 @@ export const AUTH_E_0006 = {
     statusCode: 403,
 }
 
+export const AUTH_E_0007 = {
+    type: RESPONSE_TYPE.ERROR,
+    code: 'AUTH_E_0007',
+    isNotify: false,
+    message: "User doesn't exist",
+    statusCode: 403,
+}
+
+export const AUTH_E_0008 = {
+    type: RESPONSE_TYPE.ERROR,
+    code: 'AUTH_E_0008',
+    isNotify: false,
+    message: 'Update was failed',
+    statusCode: 500,
+}
+
 export const AUTH_S_0001: TResponseCode = {
     type: RESPONSE_TYPE.SUCCESS,
     code: 'AUTH_S_0001',
@@ -77,5 +93,13 @@ export const AUTH_S_0004 = {
     code: 'AUTH_S_0004',
     isNotify: false,
     message: 'Email verified successfully',
+    statusCode: 200,
+}
+
+export const AUTH_S_0005 = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'AUTH_S_0005',
+    isNotify: false,
+    message: 'Password changed successfully',
     statusCode: 200,
 }

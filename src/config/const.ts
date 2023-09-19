@@ -15,7 +15,7 @@ export const jwtRefreshToken = {
 
 export const ADMIN = 'Admin'
 
-export const SALT_ROUND = process.env.SALT_ROUND || 10
+export const SALT_ROUND = process.env.SALT_ROUND || '10'
 
 export const awsConfig = {
     AWS_ACCESS_KEY: process.env.AWS_ACCESS_KEY,
