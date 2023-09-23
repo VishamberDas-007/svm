@@ -25,8 +25,12 @@ export const createUser = catchAsync(async (req: Request, res: Response) => {
     const { address, email, name, phone, roleId }: TCreateUser = req.body
 
     const password = util.passwordGenerator()
+    console.log(
+        '🚀 ~ file: user.controller.ts:28 ~ createUser ~ password:',
+        password
+    )
 
-    const encryptPassword = bcrypt.hashSync(password, SALT_ROUND)
+    const encryptPassword = bcrypt.hashSync(password, +SALT_ROUND)
 
     const emailExists = await prisma.user.findFirst({
         where: {
@@ -48,13 +52,12 @@ export const createUser = catchAsync(async (req: Request, res: Response) => {
     })
 
     const html = `email : ${newUser.email}, password : ${password} `
+    // await sendEmail(newUser.email, emailConfig.SUBJECT, html)
 
     responseHandler(res, USER_S_0001, {
         ...newUser,
         password: undefined,
     })
-
-    await sendEmail(newUser.email, emailConfig.SUBJECT, html)
 })
 
 export const getUser = catchAsync(async (req: Request, res: Response) => {

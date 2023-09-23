@@ -141,7 +141,8 @@ export const login = catchAsync(async (req: Request, res: Response) => {
             return responseHandler(res, AUTH_S_0002, {
                 ...userExists,
                 password: undefined,
-                role: undefined,
+                permissions: userExists.role.permission.map((p) => p.value),
+                role: userExists.role.label,
                 accessToken,
                 // refreshToken,
             })
