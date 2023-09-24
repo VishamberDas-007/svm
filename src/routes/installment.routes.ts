@@ -6,7 +6,7 @@ const installmentRouter = express.Router()
 
 installmentRouter.post(
     '/create',
-    authMiddleware(['INSTALLMENT_WRITE']),
+    // authMiddleware(['INSTALLMENT_WRITE']),
     installmentController.createInstallment
 )
 
@@ -18,7 +18,7 @@ installmentRouter.get(
 
 installmentRouter.get(
     '/get/booking/installment-details/:bookingId',
-    authMiddleware(['INSTALLMENT_WRITE', 'INSTALLMENT_READ']),
+    // authMiddleware(['INSTALLMENT_WRITE', 'INSTALLMENT_READ']),
     installmentController.fetchBookingInstallmentDetails
 )
 

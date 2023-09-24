@@ -250,28 +250,26 @@ export const getAllBookings = catchAsync(
                 adminAccount: AdminAccount
             })[] = []
 
-        await prisma.$transaction(async (prisma) => {
-            bookingList = await prisma.booking.findMany({
-                take: +pageSize,
-                skip,
-                where: whereClause,
-                include: {
-                    project: true,
-                    customer: true,
-                    adminAccount: true,
-                },
-                // TODO: pass where clause in the below query
-                // where:,
-                orderBy: {
-                    createdAt: 'desc',
-                },
-            })
+        bookingList = await prisma.booking.findMany({
+            take: +pageSize,
+            skip,
+            where: whereClause,
+            include: {
+                project: true,
+                customer: true,
+                adminAccount: true,
+            },
+            // TODO: pass where clause in the below query
+            // where:,
+            orderBy: {
+                createdAt: 'desc',
+            },
+        })
 
-            totalCount = await prisma.booking.count()
+        totalCount = await prisma.booking.count()
 
-            totalQueryCount = await prisma.booking.count({
-                where: whereClause,
-            })
+        totalQueryCount = await prisma.booking.count({
+            where: whereClause,
         })
 
         for await (const booking of bookingList) {
