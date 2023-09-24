@@ -12,7 +12,7 @@ export const createInstallmentValidator = Joi.object<TCreateInstallment>({
                 'CASH',
                 'BANK_TRANSFER'
             ).required(),
-            accountNumber: Joi.string().required(),
+            accountNumber: Joi.string().optional(),
             bankName: Joi.string().optional(),
             chequeNumber: Joi.string().optional(),
             upiId: Joi.string().optional(),
