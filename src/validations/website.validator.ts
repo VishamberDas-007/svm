@@ -4,7 +4,7 @@ import { TContactUs } from '../controllers/types/website'
 import { Festival } from '@prisma/client'
 
 export const saveContactUsValidator = Joi.object<TContactUs>({
-    email: util.emailValidator.required(),
+    email: util.emailValidator.optional(),
     subject: Joi.string().required(),
     name: Joi.string().required(),
     message: Joi.string().required(),
