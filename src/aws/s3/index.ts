@@ -4,18 +4,19 @@ import multerS3 from 'multer-s3'
 import { S3Client } from '@aws-sdk/client-s3'
 
 const s3Config = new S3Client({
-    region: 'eu-north-1',
+    region: 'blr1',
     credentials: {
         accessKeyId: awsConfig.AWS_ACCESS_KEY || '',
         secretAccessKey: awsConfig.AWS_SECRET_KEY || '',
     },
+    endpoint: 'https://blr1.digitaloceanspaces.com',
 })
 
 export const upload = multer({
     storage: multerS3({
         s3: s3Config,
-        bucket: 'vidas',
-        // acl: 'public-read',
+        bucket: 'svm-bucket',
+        acl: 'public-read',
         contentType: multerS3.AUTO_CONTENT_TYPE,
         metadata: function (req, file, cb) {
             cb(null, { fieldName: file.fieldname })
