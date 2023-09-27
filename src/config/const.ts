@@ -23,8 +23,9 @@ export const awsConfig = {
 }
 
 export const nodeMailerCredentials = {
-    USER_NAME: 'vishdas111@gmail.com',
-    APP_PASSWORD: process.env.APP_PASSWORD || 'vvBB1@2000',
+    USER_EMAIL: 'developerssvm18@gmail.com',
+    APP_PASSWORD: process.env.APP_PASSWORD || 'wkfjbzktzsiyibon',
+    TEMP_USER_EMAIL: 'sanjayofficial755@gmail.com',
 }
 
 export const emailConfig = {

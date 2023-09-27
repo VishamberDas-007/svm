@@ -29,7 +29,7 @@ import * as generalValidation from '../validations/_general.validator'
 import util from '../utils/helper'
 import { TAccessToken } from '../types/global.types'
 import { emailOtpRequest, emailOtpValidate } from '../services/auth.service'
-import { sendEmail } from '../utils/nodeMailer'
+import { sendEmailToCustomer } from '../utils/nodeMailer'
 import jwt from 'jsonwebtoken'
 
 export const register = catchAsync(async (req: Request, res: Response) => {
@@ -181,7 +181,7 @@ export const resetRequestEmailOTP = catchAsync(
                 isOtpSent: true,
             })
 
-            await sendEmail(email, emailConfig.OTP_SUBJECT, mailtmp)
+            await sendEmailToCustomer(email, emailConfig.OTP_SUBJECT, mailtmp)
         }
     }
 )

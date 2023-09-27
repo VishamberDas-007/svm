@@ -17,7 +17,7 @@ import { User } from '@prisma/client'
 import { TListData } from '../types/global.types'
 import validator from '../validations'
 import * as validation from '../validations/user.validator'
-import { sendEmail } from '../utils/nodeMailer'
+import { sendEmailToCustomer } from '../utils/nodeMailer'
 
 export const createUser = catchAsync(async (req: Request, res: Response) => {
     await validator(validation.userCreateValidator, req.body)
@@ -25,10 +25,6 @@ export const createUser = catchAsync(async (req: Request, res: Response) => {
     const { address, email, name, phone, roleId }: TCreateUser = req.body
 
     const password = util.passwordGenerator()
-    console.log(
-        '🚀 ~ file: user.controller.ts:28 ~ createUser ~ password:',
-        password
-    )
 
     const encryptPassword = bcrypt.hashSync(password, +SALT_ROUND)
 
@@ -52,12 +48,13 @@ export const createUser = catchAsync(async (req: Request, res: Response) => {
     })
 
     const html = `email : ${newUser.email}, password : ${password} `
-    // await sendEmail(newUser.email, emailConfig.SUBJECT, html)
 
     responseHandler(res, USER_S_0001, {
         ...newUser,
         password: undefined,
     })
+
+    await sendEmailToCustomer(newUser.email, emailConfig.SUBJECT, html)
 })
 
 export const getUser = catchAsync(async (req: Request, res: Response) => {
@@ -219,6 +216,6 @@ export const updateUser = catchAsync(async (req: Request, res: Response) => {
 
     if (flag === 1) {
         const html = `email : ${updateUser.email}, password : ${password} `
-        await sendEmail(updateUser.email, emailConfig.SUBJECT, html)
+        await sendEmailToCustomer(updateUser.email, emailConfig.SUBJECT, html)
     }
 })
