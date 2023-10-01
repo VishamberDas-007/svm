@@ -17,8 +17,9 @@ import {
 import { Festival } from '@prisma/client'
 import validator from '../validations'
 import * as validation from '../validations/website.validator'
-import { sendEmailToAdmin } from '../utils/nodeMailer'
+import { sendEmailToAdmin, sendEmailToCustomer } from '../utils/nodeMailer'
 import { nodeMailerCredentials } from '../config/const'
+import { contactUstemplate } from '../config/contactUsTemplate'
 
 export const saveContactUs = catchAsync(async (req: Request, res: Response) => {
     await validator(validation.saveContactUsValidator, req.body)
@@ -37,12 +38,22 @@ export const saveContactUs = catchAsync(async (req: Request, res: Response) => {
 
     responseHandler(res, WEBSITE_S_0001)
 
-    const html = `${message} `
+    const html = `
+    name : ${name},
+    email : ${email ? email : 'N/A'}
+    message : ${message},
+    `
+
     await sendEmailToAdmin(
         email || nodeMailerCredentials.TEMP_USER_EMAIL,
         subject,
         html
     )
+
+    if (email) {
+        const subject = 'Acknowledgment of Your Inquiry'
+        await sendEmailToCustomer(email, subject, contactUstemplate(name))
+    }
 })
 
 export const fetchContactUsList = catchAsync(
