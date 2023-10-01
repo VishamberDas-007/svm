@@ -64,11 +64,6 @@ export const contactUstemplate = (name: string) => `<!DOCTYPE html>
                 with a comprehensive response.
             </p>
             <p>
-                Please allow us some time to investigate thoroughly. We aim to
-                get back to you as soon as possible with a detailed and helpful
-                resolution.
-            </p>
-            <p>
                 We value your patience and understanding. Thank you for choosing
                 SVM Builders and Developers. We are committed to ensuring your experience with us
                 is seamless.
