@@ -63,24 +63,26 @@ model Booking {
 }
 
 model Project {
-    projectId     String        @id @default(uuid())
-    booking       Booking[]     @relation(name: "BookingToProject")
-    expense       Expense?      @relation(name: "ExpenseToProject")
-    miscExpense   MiscExpense[] @relation(name: "MiscExpenseToProject")
+    projectId     String          @id @default(uuid())
+    booking       Booking[]       @relation(name: "BookingToProject")
+    expense       Expense?        @relation(name: "ExpenseToProject")
+    miscExpense   MiscExpense[]   @relation(name: "MiscExpenseToProject")
     name          String
     description   String?
     ownerName     String
-    area          Int
+    area          Float
     unit          String
-    status        ProjectStatus @default(UPCOMING)
+    status        ProjectStatus   @default(UPCOMING)
     address1      String
     address2      String?
     pincode       String
-    createdAt     DateTime      @default(now())
-    updatedAt     DateTime      @updatedAt
     parentId      String?
-    parentProject Project?      @relation(name: "ParentProject", fields: [parentId], references: [projectId])
-    childProject  Project[]     @relation(name: "ParentProject")
+    parentProject Project?        @relation(name: "ParentProject", fields: [parentId], references: [projectId])
+    childProject  Project[]       @relation(name: "ParentProject")
+    logoUrl       String?
+    createdAt     DateTime        @default(now())
+    updatedAt     DateTime        @updatedAt
+    projectImages ProjectImages[] @relation(name: "ProjectToProjectImages")
 }
 
 model Customer {
@@ -274,6 +276,16 @@ model Role {
     user       User[]       @relation(name: "RoleToUser")
 }
 
+model ProjectImages {
+    projectImageId String           @id @default(uuid())
+    projectId      String
+    type           ProjectImageType
+    url            String
+    project        Project          @relation(name: "ProjectToProjectImages", fields: [projectId], references: [projectId])
+    createdAt      DateTime         @default(now())
+    updatedAt      DateTime         @updatedAt
+}
+
 model UpiPayment {
     paymentId String   @id @default(uuid())
     bookingId String
@@ -339,4 +351,9 @@ enum ProjectStatus {
     ACTIVE
     COMPLETED
     UPCOMING
+}
+
+enum ProjectImageType {
+    PLANNING
+    SITE
 }

@@ -1,6 +1,12 @@
 import { Request, Response } from 'express'
 import catchAsync from '../utils/catchAsync'
-import { TCreateProject, TProjectList, TUpdateProject } from './types/project'
+import {
+    TCreateProject,
+    TImageUpload,
+    TProjectCreateReq,
+    TProjectList,
+    TUpdateProject,
+} from './types/project'
 import prisma from '../db'
 import responseHandler from '../utils/responseHandler'
 import {
@@ -18,45 +24,70 @@ import * as generalValidation from '../validations/_general.validator'
 import { projectExists } from '../services/project.service'
 import { TListData } from '../types/global.types'
 
-export const newProject = catchAsync(async (req: Request, res: Response) => {
-    await validator(validation.createProjectValidator, req.body)
+export const newProject = catchAsync(
+    async (req: TProjectCreateReq, res: Response) => {
+        await validator(validation.createProjectValidator, req.body)
 
-    const {
-        parentId,
-        address1,
-        address2,
-        area,
-        description,
-        name,
-        ownerName,
-        pincode,
-        status,
-        unit,
-    }: TCreateProject = req.body
-
-    if (parentId) {
-        const project = await projectExists(parentId)
-
-        if (!project) throw new AppError(PROJECT_E_0002)
-    }
-
-    const newProject = await prisma.project.create({
-        data: {
+        const {
             parentId,
             address1,
             address2,
-            area: +area,
+            area,
             description,
             name,
             ownerName,
             pincode,
             status,
             unit,
-        },
-    })
+        }: TCreateProject = req.body
 
-    return responseHandler(res, PROJECT_S_0001, newProject)
-})
+        let newProject: Project | null | undefined
+
+        if (parentId) {
+            const project = await projectExists(parentId)
+
+            if (!project) throw new AppError(PROJECT_E_0002)
+        }
+
+        await prisma.$transaction(async (prisma) => {
+            newProject = await prisma.project.create({
+                data: {
+                    parentId,
+                    address1,
+                    address2,
+                    area: +area,
+                    description,
+                    name,
+                    ownerName,
+                    pincode,
+                    status,
+                    unit,
+                },
+            })
+
+            const planningImageUrls = req.files?.['planningImages']?.map(
+                (image: TImageUpload) => ({
+                    url: image.location,
+                    type: 'PLANNING',
+                    projectId: newProject?.projectId,
+                })
+            )
+
+            const siteImageUrls = req.files?.['siteImages']?.map(
+                (image: TImageUpload) => ({
+                    url: image.location,
+                    type: 'SITE',
+                    projectId: newProject?.projectId,
+                })
+            )
+
+            await prisma.projectImages.createMany({
+                data: [...planningImageUrls, ...siteImageUrls],
+            })
+        })
+        return responseHandler(res, PROJECT_S_0001, newProject)
+    }
+)
 
 export const getAllProjects = catchAsync(
     async (req: TProjectList, res: Response) => {
@@ -127,6 +158,9 @@ export const getAllProjects = catchAsync(
             orderBy: {
                 createdAt: 'desc',
             },
+            include: {
+                projectImages: true,
+            },
         })
 
         projectCount = await prisma.project.count()
@@ -194,6 +228,9 @@ export const getProject = catchAsync(async (req: Request, res: Response) => {
     const fetchProject = await prisma.project.findFirst({
         where: {
             projectId,
+        },
+        include: {
+            projectImages: true,
         },
     })
 

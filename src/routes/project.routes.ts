@@ -6,8 +6,10 @@ const projectRouter = express.Router()
 
 projectRouter.post(
     '/create',
-    upload.array('planningImages'),
-    // upload.array('siteImages'),
+    upload.fields([
+        { name: 'planningImages', maxCount: 10 },
+        { name: 'siteImages', maxCount: 5 },
+    ]),
     projectController.newProject
 )
 

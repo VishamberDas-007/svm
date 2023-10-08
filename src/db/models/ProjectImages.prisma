@@ -1,0 +1,19 @@
+model ProjectImages {
+    projectImageId String           @id @default(uuid())
+    projectId      String
+    type           ProjectImageType
+    url            String
+    project        Project          @relation(fields: [projectId], references: [projectId])
+    createdAt      DateTime         @default(now())
+    updatedAt      DateTime         @updatedAt
+}
+
+model Project {
+    projectId     String          @id
+    projectImages ProjectImages[]
+}
+
+enum ProjectImageType {
+    PLANNING
+    SITE
+}
