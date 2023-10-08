@@ -17,7 +17,7 @@ export type TCreateProject = {
     // siteImages?: string[]
 }
 
-export type TProjectCreateReq = Request & {
+export type TProjectReq = Request & {
     files?: {
         planningImages: any
         siteImages: any

@@ -39,3 +39,11 @@ export const PROJECT_S_0003 = {
     message: 'Project details fetched',
     statusCode: 200,
 }
+
+export const PROJECT_S_0004 = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'PROJECT_S_0004',
+    isNotify: false,
+    message: 'Project updated successfully',
+    statusCode: 200,
+}
