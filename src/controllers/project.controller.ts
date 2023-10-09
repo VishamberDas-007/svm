@@ -52,6 +52,8 @@ export const newProject = catchAsync(
         }
 
         await prisma.$transaction(async (prisma) => {
+            const logoUrl = req.files?.['logo']
+
             newProject = await prisma.project.create({
                 data: {
                     parentId,
@@ -64,6 +66,7 @@ export const newProject = catchAsync(
                     pincode,
                     status,
                     unit,
+                    logoUrl,
                 },
             })
 

@@ -3,7 +3,7 @@ import util from '../utils/helper'
 import { TCustomer } from '../controllers/types/customer'
 
 export const createCustomerValidator = Joi.object<TCustomer>({
-    aadharNo: util.aadharValidator.required(),
+    aadharNo: Joi.string().length(12).required(),
     firstName: Joi.string().required(),
     lastName: Joi.string().required(),
     email: util.emailValidator.required(),
@@ -11,7 +11,7 @@ export const createCustomerValidator = Joi.object<TCustomer>({
 })
 
 export const updateCustomerValidator = Joi.object<TCustomer>({
-    aadharNo: util.aadharValidator.optional(),
+    aadharNo: Joi.string().length(12).optional(),
     firstName: Joi.string().optional(),
     lastName: Joi.string().optional(),
     email: util.emailValidator.optional(),

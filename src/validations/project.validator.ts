@@ -16,6 +16,7 @@ export const createProjectValidator = Joi.object({
     parentId: util.uuid.allow('', null).optional(),
     planningImages: Joi.any().optional(),
     siteImages: Joi.any().optional(),
+    logo: Joi.any().required(),
 })
 
 export const updateProjectValidator = Joi.object({
@@ -30,4 +31,5 @@ export const updateProjectValidator = Joi.object({
     address2: Joi.string().optional(),
     planningImages: Joi.any().optional(),
     siteImages: Joi.any().optional(),
+    logo: Joi.any().optional(),
 })

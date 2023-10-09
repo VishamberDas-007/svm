@@ -9,6 +9,7 @@ import {
     TBasicListWhereClause,
     TCustomer,
     TCustomerList,
+    TCustomerRequest,
 } from './types/customer'
 import {
     CUSTOMER_E_0001,
@@ -20,33 +21,56 @@ import {
 } from '../config/responseCodes/customer'
 import { Customer } from '@prisma/client'
 import { TListData } from '../types/global.types'
+import { TImageUpload } from './types/project'
 
-export const newCustomer = catchAsync(async (req: Request, res: Response) => {
-    await validator(validation.createCustomerValidator, req.body)
+export const newCustomer = catchAsync(
+    async (req: TCustomerRequest, res: Response) => {
+        await validator(validation.createCustomerValidator, req.body)
 
-    const { aadharNo, firstName, email, lastName, phone }: TCustomer = req.body
+        const { aadharNo, firstName, email, lastName, phone }: TCustomer =
+            req.body
 
-    const aadharExists = await prisma.customer.findFirst({
-        where: {
-            aadharNo,
-        },
-    })
-
-    if (aadharExists) throw new AppError(CUSTOMER_E_0002)
-    else {
-        const createCustomer = await prisma.customer.create({
-            data: {
+        const aadharExists = await prisma.customer.findFirst({
+            where: {
                 aadharNo,
-                firstName,
-                lastName,
-                phone,
-                email,
             },
         })
 
-        return responseHandler(res, CUSTOMER_S_0001, createCustomer)
+        if (aadharExists) throw new AppError(CUSTOMER_E_0002)
+        else {
+            const aadharImageUrls = req.files?.['aadharImages']?.map(
+                (image: TImageUpload) => ({
+                    imageUrl: image.location,
+                    type: 'AADHAR',
+                })
+            )
+
+            const panImageUrls = req.files?.['panImage']?.map(
+                (image: TImageUpload) => ({
+                    imageUrl: image.location,
+                    type: 'PAN',
+                })
+            )
+
+            const createCustomer = await prisma.customer.create({
+                data: {
+                    aadharNo,
+                    firstName,
+                    lastName,
+                    phone,
+                    email,
+                    customerImage: {
+                        createMany: {
+                            data: [...aadharImageUrls, panImageUrls],
+                        },
+                    },
+                },
+            })
+
+            return responseHandler(res, CUSTOMER_S_0001, createCustomer)
+        }
     }
-})
+)
 
 export const getBasicCustomerList = catchAsync(
     async (req: Request, res: Response) => {

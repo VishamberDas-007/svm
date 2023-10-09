@@ -1,9 +1,17 @@
 import express from 'express'
 import * as customerController from '../controllers/customer.controller'
+import { upload } from '../aws/s3'
 
 const customerRouter = express.Router()
 
-customerRouter.post('/create', customerController.newCustomer)
+customerRouter.post(
+    '/create',
+    upload.fields([
+        { name: 'aadharImages', maxCount: 2 },
+        { name: 'panImages', maxCount: 1 },
+    ]),
+    customerController.newCustomer
+)
 
 customerRouter.get('/basic-list', customerController.getBasicCustomerList)
 

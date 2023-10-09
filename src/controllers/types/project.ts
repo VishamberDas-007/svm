@@ -21,6 +21,7 @@ export type TProjectReq = Request & {
     files?: {
         planningImages: any
         siteImages: any
+        logo: any
     }
 }
 

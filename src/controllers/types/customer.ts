@@ -1,3 +1,4 @@
+import { Request } from 'express'
 import { TQueryRequest } from '../../types/global.types'
 
 export type TCustomer = {
@@ -25,6 +26,13 @@ export type TBasicListWhereClause = {
               }
           }
     )[]
+}
+
+export type TCustomerRequest = Request & {
+    files: {
+        aadharImages: any
+        panImage: any
+    }
 }
 
 export type TCustomerList = TQueryRequest

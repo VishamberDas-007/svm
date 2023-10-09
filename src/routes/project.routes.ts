@@ -7,8 +7,9 @@ const projectRouter = express.Router()
 projectRouter.post(
     '/create',
     upload.fields([
-        { name: 'planningImages', maxCount: 10 },
+        { name: 'planningImages', maxCount: 20 },
         { name: 'siteImages', maxCount: 5 },
+        { name: 'logo', maxCount: 1 },
     ]),
     projectController.newProject
 )
@@ -18,8 +19,9 @@ projectRouter.get('/list', projectController.getAllProjects)
 projectRouter.put(
     '/update/:projectId',
     upload.fields([
-        { name: 'planningImages', maxCount: 10 },
+        { name: 'planningImages', maxCount: 20 },
         { name: 'siteImages', maxCount: 5 },
+        { name: 'logo', maxCount: 1 },
     ]),
     projectController.updateProject
 )
