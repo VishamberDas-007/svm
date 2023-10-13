@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    name: Deploying to EC2 Prod
+    name: Deploying to Digital Ocean
     runs-on: ubuntu-latest
     env:
       NODE_OPTIONS: "--max_old_space_size=4096"
