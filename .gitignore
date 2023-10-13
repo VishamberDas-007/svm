@@ -12,3 +12,4 @@ temp.sql
 .env
 .env.local
 .env.*
+Dockerfile
