@@ -1,4 +1,4 @@
-name: CI/CD FOR DEVELOPMENT
+name: CI/CD FOR PRODUCTION
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
       - name: Set up Node.js and Yarn
         uses: actions/setup-node@v2
         with:
-          node-version: 12
+          node-version: 16
 
       - name: Install dependencies
         run: yarn install
