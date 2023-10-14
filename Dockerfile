@@ -9,7 +9,7 @@ COPY . .
 RUN yarn install
 RUN echo "file copying completed..."
 
-EXPOSE 3030
+EXPOSE 3040
 
 RUN yarn install --verbose
 
