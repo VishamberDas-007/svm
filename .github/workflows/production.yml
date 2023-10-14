@@ -40,7 +40,7 @@ jobs:
           remote_path: ~/backend
           remote_host: ${{ secrets.PROD_SERVER }}
           remote_user: root
-          remote_key: ${{ secrets.PRIVATE_KEY }}
+          remote_key: ${{ secrets.PASSWORD }}
 
       - name: run migration
         run: yarn prisma migrate deploy
