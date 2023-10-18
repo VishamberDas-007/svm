@@ -7,7 +7,6 @@ yarn.lock
 yarn-error.log
 package-lock.json
 .vscode
-dist
 temp.sql
 .env
 .env.local
