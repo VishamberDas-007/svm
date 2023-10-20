@@ -52,7 +52,7 @@ export const newProject = catchAsync(
         }
 
         await prisma.$transaction(async (prisma) => {
-            const logoUrl = req.files?.['logo']
+            const logoUrl = req.files?.['logo']?.location
 
             newProject = await prisma.project.create({
                 data: {
