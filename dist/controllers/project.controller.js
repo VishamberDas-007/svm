@@ -64,7 +64,7 @@ exports.newProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
     }
     yield db_1.default.$transaction((prisma) => __awaiter(void 0, void 0, void 0, function* () {
         var _a, _b, _c, _d, _e, _f;
-        const logoUrl = (_b = (_a = req.files) === null || _a === void 0 ? void 0 : _a['logo']) === null || _b === void 0 ? void 0 : _b.location;
+        const logoUrl = (_b = (_a = req.files) === null || _a === void 0 ? void 0 : _a['logo']) === null || _b === void 0 ? void 0 : _b[0].location;
         let data = [];
         newProject = yield prisma.project.create({
             data: {
