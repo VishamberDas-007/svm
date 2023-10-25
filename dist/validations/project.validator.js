@@ -20,7 +20,7 @@ exports.createProjectValidator = joi_1.default.object({
     parentId: helper_1.default.uuid.allow('', null).optional(),
     planningImages: joi_1.default.any().optional(),
     siteImages: joi_1.default.any().optional(),
-    logo: joi_1.default.any().required(),
+    logo: joi_1.default.any().optional(),
 });
 exports.updateProjectValidator = joi_1.default.object({
     address1: joi_1.default.string().optional(),
