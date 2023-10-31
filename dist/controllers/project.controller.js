@@ -63,8 +63,9 @@ exports.newProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
             throw new AppError_1.default(project_1.PROJECT_E_0002);
     }
     yield db_1.default.$transaction((prisma) => __awaiter(void 0, void 0, void 0, function* () {
-        var _a, _b, _c, _d, _e;
-        const logoUrl = (_a = req.files) === null || _a === void 0 ? void 0 : _a['logo'];
+        var _a, _b, _c, _d, _e, _f;
+        const logoUrl = (_b = (_a = req.files) === null || _a === void 0 ? void 0 : _a['logo']) === null || _b === void 0 ? void 0 : _b[0].location;
+        let data = [];
         newProject = yield prisma.project.create({
             data: {
                 parentId,
@@ -80,18 +81,24 @@ exports.newProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
                 logoUrl,
             },
         });
-        const planningImageUrls = (_c = (_b = req.files) === null || _b === void 0 ? void 0 : _b['planningImages']) === null || _c === void 0 ? void 0 : _c.map((image) => ({
+        const planningImageUrls = (_d = (_c = req.files) === null || _c === void 0 ? void 0 : _c['planningImages']) === null || _d === void 0 ? void 0 : _d.map((image) => ({
             url: image.location,
             type: 'PLANNING',
             projectId: newProject === null || newProject === void 0 ? void 0 : newProject.projectId,
         }));
-        const siteImageUrls = (_e = (_d = req.files) === null || _d === void 0 ? void 0 : _d['siteImages']) === null || _e === void 0 ? void 0 : _e.map((image) => ({
+        const siteImageUrls = (_f = (_e = req.files) === null || _e === void 0 ? void 0 : _e['siteImages']) === null || _f === void 0 ? void 0 : _f.map((image) => ({
             url: image.location,
             type: 'SITE',
             projectId: newProject === null || newProject === void 0 ? void 0 : newProject.projectId,
         }));
+        if (planningImageUrls === null || planningImageUrls === void 0 ? void 0 : planningImageUrls.length) {
+            data = [...planningImageUrls];
+        }
+        if (siteImageUrls === null || siteImageUrls === void 0 ? void 0 : siteImageUrls.length) {
+            data = [...data, ...siteImageUrls];
+        }
         yield prisma.projectImages.createMany({
-            data: [...planningImageUrls, ...siteImageUrls],
+            data,
         });
     }));
     return (0, responseHandler_1.default)(res, project_1.PROJECT_S_0001, newProject);
@@ -165,20 +172,20 @@ exports.getAllProjects = (0, catchAsync_1.default)((req, res) => __awaiter(void 
     return (0, responseHandler_1.default)(res, project_1.PROJECT_S_0002, result);
 }));
 exports.updateProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _f, e_1, _g, _h;
-    var _j, _k, _l, _m;
+    var _g, e_1, _h, _j;
+    var _k, _l, _m, _o;
     yield (0, validations_1.default)(generalValidation.projectIdValidator, req.params);
     yield (0, validations_1.default)(validation.updateProjectValidator, req.body);
     const { projectId } = req.params;
     const { address1, area, name, description, ownerName, pincode, status, unit, address2, } = req.body;
     let planningImageUrls = [], siteImageUrls = [], imageUpdate, deleteProjectImageFileNames = [];
     planningImageUrls =
-        ((_k = (_j = req.files) === null || _j === void 0 ? void 0 : _j['planningImages']) === null || _k === void 0 ? void 0 : _k.map((image) => ({
+        ((_l = (_k = req.files) === null || _k === void 0 ? void 0 : _k['planningImages']) === null || _l === void 0 ? void 0 : _l.map((image) => ({
             url: image.location,
             type: 'PLANNING',
         }))) || [];
     siteImageUrls =
-        ((_m = (_l = req.files) === null || _l === void 0 ? void 0 : _l['siteImages']) === null || _m === void 0 ? void 0 : _m.map((image) => ({
+        ((_o = (_m = req.files) === null || _m === void 0 ? void 0 : _m['siteImages']) === null || _o === void 0 ? void 0 : _o.map((image) => ({
             url: image.location,
             type: 'SITE',
         }))) || [];
@@ -205,22 +212,22 @@ exports.updateProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
         };
     try {
         // }
-        for (var _o = true, deleteProjectImageFileNames_1 = __asyncValues(deleteProjectImageFileNames), deleteProjectImageFileNames_1_1; deleteProjectImageFileNames_1_1 = yield deleteProjectImageFileNames_1.next(), _f = deleteProjectImageFileNames_1_1.done, !_f;) {
-            _h = deleteProjectImageFileNames_1_1.value;
-            _o = false;
+        for (var _p = true, deleteProjectImageFileNames_1 = __asyncValues(deleteProjectImageFileNames), deleteProjectImageFileNames_1_1; deleteProjectImageFileNames_1_1 = yield deleteProjectImageFileNames_1.next(), _g = deleteProjectImageFileNames_1_1.done, !_g;) {
+            _j = deleteProjectImageFileNames_1_1.value;
+            _p = false;
             try {
-                const fileName = _h;
+                const fileName = _j;
                 yield (0, s3_1.deleteImage)(fileName);
             }
             finally {
-                _o = true;
+                _p = true;
             }
         }
     }
     catch (e_1_1) { e_1 = { error: e_1_1 }; }
     finally {
         try {
-            if (!_o && !_f && (_g = deleteProjectImageFileNames_1.return)) yield _g.call(deleteProjectImageFileNames_1);
+            if (!_p && !_g && (_h = deleteProjectImageFileNames_1.return)) yield _h.call(deleteProjectImageFileNames_1);
         }
         finally { if (e_1) throw e_1.error; }
     }
