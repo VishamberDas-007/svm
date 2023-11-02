@@ -15,6 +15,10 @@ export type TCreateProject = {
     pincode: string
     // planningImages: string[]
     // siteImages?: string[]
+    emiAmt: number
+    downPayment: number
+    totalAmt: number
+    location: string
 }
 
 export type TProjectReq = Request & {
@@ -55,6 +59,10 @@ export type TUpdateProject = {
     address1: string
     address2?: string
     pincode: string
+    emiAmt: number
+    downPayment: number
+    totalAmt: number
+    location: string
 }
 
 export type TProjectList = TQueryRequest & {

@@ -41,6 +41,10 @@ export const newProject = catchAsync(
             pincode,
             status,
             unit,
+            downPayment,
+            emiAmt,
+            location,
+            totalAmt,
         }: TCreateProject = req.body
 
         let newProject: Project | null | undefined
@@ -69,6 +73,10 @@ export const newProject = catchAsync(
                     status,
                     unit,
                     logoUrl,
+                    downPayment,
+                    emiAmt,
+                    location,
+                    totalAmt,
                 },
             })
 
@@ -214,6 +222,10 @@ export const updateProject = catchAsync(
             status,
             unit,
             address2,
+            downPayment,
+            emiAmt,
+            location,
+            totalAmt,
         }: TUpdateProject = req.body
 
         let planningImageUrls: string[] = [],
@@ -283,6 +295,7 @@ export const updateProject = catchAsync(
                 projectId,
             },
             data: {
+                ...imageUpdate,
                 address1,
                 address2,
                 area: +area,
@@ -292,7 +305,10 @@ export const updateProject = catchAsync(
                 pincode,
                 status,
                 unit,
-                ...imageUpdate,
+                downPayment,
+                emiAmt,
+                location,
+                totalAmt,
             },
         })
 
