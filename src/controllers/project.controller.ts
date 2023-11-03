@@ -16,6 +16,7 @@ import {
     PROJECT_S_0002,
     PROJECT_S_0003,
     PROJECT_S_0004,
+    PROJECT_S_0005,
 } from '../config/responseCodes/project'
 import { Project } from '@prisma/client'
 import AppError from '../utils/AppError'
@@ -345,5 +346,26 @@ export const getProjectBasicList = catchAsync(
         })
 
         return responseHandler(res, PROJECT_S_0002, fetchProjects)
+    }
+)
+
+export const uploadHappyCustomerImages = catchAsync(
+    async (req: TProjectReq, res: Response) => {
+        await validator(generalValidation.projectIdValidator, req.params)
+
+        const { projectId } = req.params
+
+        const images =
+            req.files?.['customers']?.map((image: TImageUpload) => ({
+                url: image.location,
+                type: 'HAPPY_CUSTOMER',
+                projectId,
+            })) || []
+
+        await prisma.projectImages.createMany({
+            data: images,
+        })
+
+        return responseHandler(res, PROJECT_S_0005)
     }
 )
