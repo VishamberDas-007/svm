@@ -47,3 +47,11 @@ export const PROJECT_S_0004 = {
     message: 'Project updated successfully',
     statusCode: 200,
 }
+
+export const PROJECT_S_0005 = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'PROJECT_S_0005',
+    isNotify: false,
+    message: 'Happy customer images uploaded successfully',
+    statusCode: 200,
+}

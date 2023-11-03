@@ -23,10 +23,12 @@ export type TCreateProject = {
 
 export type TProjectReq = Request & {
     files?: {
-        planningImages: any
-        siteImages: any
-        logo: any
+        planningImages?: any
+        siteImages?: any
+        logo?: any
+        customers?: any
     }
+    file: any
 }
 
 export type TImageUpload = {

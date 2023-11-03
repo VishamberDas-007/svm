@@ -30,4 +30,10 @@ projectRouter.get('/get/:projectId', projectController.getProject)
 
 projectRouter.get('/basic-list', projectController.getProjectBasicList)
 
+projectRouter.put(
+    '/upload/happy-customers/:projectId',
+    upload.array('customers', 10),
+    projectController.uploadHappyCustomerImages
+)
+
 export { projectRouter }
