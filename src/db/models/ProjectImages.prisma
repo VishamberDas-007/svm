@@ -16,4 +16,5 @@ model Project {
 enum ProjectImageType {
     PLANNING
     SITE
+    HAPPY_CUSTOMER
 }

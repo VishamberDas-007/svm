@@ -16,6 +16,7 @@ import {
     PROJECT_S_0002,
     PROJECT_S_0003,
     PROJECT_S_0004,
+    PROJECT_S_0005,
 } from '../config/responseCodes/project'
 import { Project } from '@prisma/client'
 import AppError from '../utils/AppError'
@@ -41,6 +42,10 @@ export const newProject = catchAsync(
             pincode,
             status,
             unit,
+            downPayment,
+            emiAmt,
+            location,
+            totalAmt,
         }: TCreateProject = req.body
 
         let newProject: Project | null | undefined
@@ -69,6 +74,10 @@ export const newProject = catchAsync(
                     status,
                     unit,
                     logoUrl,
+                    downPayment: +downPayment,
+                    emiAmt: +emiAmt,
+                    location,
+                    totalAmt: +totalAmt,
                 },
             })
 
@@ -214,6 +223,10 @@ export const updateProject = catchAsync(
             status,
             unit,
             address2,
+            downPayment,
+            emiAmt,
+            location,
+            totalAmt,
         }: TUpdateProject = req.body
 
         let planningImageUrls: string[] = [],
@@ -283,6 +296,7 @@ export const updateProject = catchAsync(
                 projectId,
             },
             data: {
+                ...imageUpdate,
                 address1,
                 address2,
                 area: +area,
@@ -292,7 +306,10 @@ export const updateProject = catchAsync(
                 pincode,
                 status,
                 unit,
-                ...imageUpdate,
+                downPayment,
+                emiAmt,
+                location,
+                totalAmt,
             },
         })
 
@@ -329,5 +346,26 @@ export const getProjectBasicList = catchAsync(
         })
 
         return responseHandler(res, PROJECT_S_0002, fetchProjects)
+    }
+)
+
+export const uploadHappyCustomerImages = catchAsync(
+    async (req: TProjectReq, res: Response) => {
+        await validator(generalValidation.projectIdValidator, req.params)
+
+        const { projectId } = req.params
+
+        const images =
+            req.files?.['customers']?.map((image: TImageUpload) => ({
+                url: image.location,
+                type: 'HAPPY_CUSTOMER',
+                projectId,
+            })) || []
+
+        await prisma.projectImages.createMany({
+            data: images,
+        })
+
+        return responseHandler(res, PROJECT_S_0005)
     }
 )
