@@ -21,6 +21,10 @@ exports.createProjectValidator = joi_1.default.object({
     planningImages: joi_1.default.any().optional(),
     siteImages: joi_1.default.any().optional(),
     logo: joi_1.default.any().optional(),
+    emiAmt: joi_1.default.number().required(),
+    downPayment: joi_1.default.number().required(),
+    totalAmt: joi_1.default.number().required(),
+    location: joi_1.default.string().required(),
 });
 exports.updateProjectValidator = joi_1.default.object({
     address1: joi_1.default.string().optional(),
@@ -35,4 +39,8 @@ exports.updateProjectValidator = joi_1.default.object({
     planningImages: joi_1.default.any().optional(),
     siteImages: joi_1.default.any().optional(),
     logo: joi_1.default.any().optional(),
+    emiAmt: joi_1.default.number().optional(),
+    downPayment: joi_1.default.number().optional(),
+    totalAmt: joi_1.default.number().optional(),
+    location: joi_1.default.string().optional(),
 });
