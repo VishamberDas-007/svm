@@ -45,3 +45,4 @@ projectRouter.put('/update/:projectId', s3_1.upload.fields([
 ]), projectController.updateProject);
 projectRouter.get('/get/:projectId', projectController.getProject);
 projectRouter.get('/basic-list', projectController.getProjectBasicList);
+projectRouter.put('/upload/happy-customers/:projectId', s3_1.upload.array('customers', 10), projectController.uploadHappyCustomerImages);

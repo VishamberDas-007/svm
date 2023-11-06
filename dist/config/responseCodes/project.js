@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PROJECT_S_0004 = exports.PROJECT_S_0003 = exports.PROJECT_S_0002 = exports.PROJECT_S_0001 = exports.PROJECT_E_0002 = exports.PROJECT_E_0001 = void 0;
+exports.PROJECT_S_0005 = exports.PROJECT_S_0004 = exports.PROJECT_S_0003 = exports.PROJECT_S_0002 = exports.PROJECT_S_0001 = exports.PROJECT_E_0002 = exports.PROJECT_E_0001 = void 0;
 const global_types_1 = require("../../types/global.types");
 exports.PROJECT_E_0001 = {
     type: global_types_1.RESPONSE_TYPE.ERROR,
@@ -42,5 +42,12 @@ exports.PROJECT_S_0004 = {
     code: 'PROJECT_S_0004',
     isNotify: false,
     message: 'Project updated successfully',
+    statusCode: 200,
+};
+exports.PROJECT_S_0005 = {
+    type: global_types_1.RESPONSE_TYPE.SUCCESS,
+    code: 'PROJECT_S_0005',
+    isNotify: false,
+    message: 'Happy customer images uploaded successfully',
     statusCode: 200,
 };

@@ -42,7 +42,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getProjectBasicList = exports.getProject = exports.updateProject = exports.getAllProjects = exports.newProject = void 0;
+exports.uploadHappyCustomerImages = exports.getProjectBasicList = exports.getProject = exports.updateProject = exports.getAllProjects = exports.newProject = void 0;
 const catchAsync_1 = __importDefault(require("../utils/catchAsync"));
 const db_1 = __importDefault(require("../db"));
 const responseHandler_1 = __importDefault(require("../utils/responseHandler"));
@@ -55,7 +55,7 @@ const project_service_1 = require("../services/project.service");
 const s3_1 = require("../aws/s3");
 exports.newProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, validations_1.default)(validation.createProjectValidator, req.body);
-    const { parentId, address1, address2, area, description, name, ownerName, pincode, status, unit, } = req.body;
+    const { parentId, address1, address2, area, description, name, ownerName, pincode, status, unit, downPayment, emiAmt, location, totalAmt, } = req.body;
     let newProject;
     if (parentId) {
         const project = yield (0, project_service_1.projectExists)(parentId);
@@ -79,6 +79,10 @@ exports.newProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
                 status,
                 unit,
                 logoUrl,
+                downPayment: +downPayment,
+                emiAmt: +emiAmt,
+                location,
+                totalAmt: +totalAmt,
             },
         });
         const planningImageUrls = (_d = (_c = req.files) === null || _c === void 0 ? void 0 : _c['planningImages']) === null || _d === void 0 ? void 0 : _d.map((image) => ({
@@ -177,7 +181,7 @@ exports.updateProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
     yield (0, validations_1.default)(generalValidation.projectIdValidator, req.params);
     yield (0, validations_1.default)(validation.updateProjectValidator, req.body);
     const { projectId } = req.params;
-    const { address1, area, name, description, ownerName, pincode, status, unit, address2, } = req.body;
+    const { address1, area, name, description, ownerName, pincode, status, unit, address2, downPayment, emiAmt, location, totalAmt, } = req.body;
     let planningImageUrls = [], siteImageUrls = [], imageUpdate, deleteProjectImageFileNames = [];
     planningImageUrls =
         ((_l = (_k = req.files) === null || _k === void 0 ? void 0 : _k['planningImages']) === null || _l === void 0 ? void 0 : _l.map((image) => ({
@@ -240,13 +244,17 @@ exports.updateProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
         where: {
             projectId,
         },
-        data: Object.assign({ address1,
+        data: Object.assign(Object.assign({}, imageUpdate), { address1,
             address2, area: +area, description,
             name,
             ownerName,
             pincode,
             status,
-            unit }, imageUpdate),
+            unit,
+            downPayment,
+            emiAmt,
+            location,
+            totalAmt }),
     });
     return (0, responseHandler_1.default)(res, project_1.PROJECT_S_0004, updateProject);
 }));
@@ -275,4 +283,18 @@ exports.getProjectBasicList = (0, catchAsync_1.default)((req, res) => __awaiter(
         },
     });
     return (0, responseHandler_1.default)(res, project_1.PROJECT_S_0002, fetchProjects);
+}));
+exports.uploadHappyCustomerImages = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _q, _r;
+    yield (0, validations_1.default)(generalValidation.projectIdValidator, req.params);
+    const { projectId } = req.params;
+    const images = ((_r = (_q = req.files) === null || _q === void 0 ? void 0 : _q['customers']) === null || _r === void 0 ? void 0 : _r.map((image) => ({
+        url: image.location,
+        type: 'HAPPY_CUSTOMER',
+        projectId,
+    }))) || [];
+    yield db_1.default.projectImages.createMany({
+        data: images,
+    });
+    return (0, responseHandler_1.default)(res, project_1.PROJECT_S_0005);
 }));
