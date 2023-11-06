@@ -74,10 +74,10 @@ export const newProject = catchAsync(
                     status,
                     unit,
                     logoUrl,
-                    downPayment,
-                    emiAmt,
+                    downPayment: +downPayment,
+                    emiAmt: +emiAmt,
                     location,
-                    totalAmt,
+                    totalAmt: +totalAmt,
                 },
             })
 
