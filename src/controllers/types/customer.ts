@@ -31,7 +31,8 @@ export type TBasicListWhereClause = {
 export type TCustomerRequest = Request & {
     files: {
         aadharImages: any
-        panImage: any
+        panImages: any
+        customerImage: any
     }
 }
 

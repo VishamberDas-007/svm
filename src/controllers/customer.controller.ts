@@ -45,10 +45,17 @@ export const newCustomer = catchAsync(
                 })
             )
 
-            const panImageUrls = req.files?.['panImage']?.map(
+            const panImageUrls = req.files?.['panImages']?.map(
                 (image: TImageUpload) => ({
                     imageUrl: image.location,
                     type: 'PAN',
+                })
+            )
+
+            const customerImageUrl = req.files?.['customerImage']?.map(
+                (image: TImageUpload) => ({
+                    imageUrl: image.location,
+                    type: 'PHOTO',
                 })
             )
 
@@ -61,9 +68,16 @@ export const newCustomer = catchAsync(
                     email,
                     customerImage: {
                         createMany: {
-                            data: [...aadharImageUrls, panImageUrls],
+                            data: [
+                                ...aadharImageUrls,
+                                ...panImageUrls,
+                                ...customerImageUrl,
+                            ],
                         },
                     },
+                },
+                include: {
+                    customerImage: true,
                 },
             })
 

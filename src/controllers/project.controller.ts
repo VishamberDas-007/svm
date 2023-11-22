@@ -241,7 +241,8 @@ export const updateProject = catchAsync(
                       }
                   }
                 | undefined,
-            deleteProjectImageFileNames: string[] = []
+            deleteProjectImageFileNames: string[] = [],
+            updateProject: Project | undefined
 
         planningImageUrls =
             req.files?.['planningImages']?.map((image: TImageUpload) => ({
@@ -279,40 +280,40 @@ export const updateProject = catchAsync(
                     },
                 },
             }
-        // }
 
-        for await (const fileName of deleteProjectImageFileNames) {
-            await deleteImage(fileName)
-        }
+        await prisma.$transaction(async (prisma) => {
+            for await (const fileName of deleteProjectImageFileNames) {
+                await deleteImage(fileName)
+            }
 
-        await prisma.projectImages.deleteMany({
-            where: {
-                projectId,
-            },
+            await prisma.projectImages.deleteMany({
+                where: {
+                    projectId,
+                },
+            })
+
+            updateProject = await prisma.project.update({
+                where: {
+                    projectId,
+                },
+                data: {
+                    ...imageUpdate,
+                    address1,
+                    address2,
+                    area: +area,
+                    description,
+                    name,
+                    ownerName,
+                    pincode,
+                    status,
+                    unit,
+                    downPayment: +downPayment,
+                    emiAmt: +emiAmt,
+                    location,
+                    totalAmt: +totalAmt,
+                },
+            })
         })
-
-        const updateProject = await prisma.project.update({
-            where: {
-                projectId,
-            },
-            data: {
-                ...imageUpdate,
-                address1,
-                address2,
-                area: +area,
-                description,
-                name,
-                ownerName,
-                pincode,
-                status,
-                unit,
-                downPayment,
-                emiAmt,
-                location,
-                totalAmt,
-            },
-        })
-
         return responseHandler(res, PROJECT_S_0004, updateProject)
     }
 )

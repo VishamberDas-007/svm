@@ -38,7 +38,7 @@ export const deleteImage = async (key: string) => {
             Bucket: 'svm-bucket',
             Key: 'svm/' + key,
         })
-        const result = await s3Config.send(deleteCommand)
+        await s3Config.send(deleteCommand)
         // console.log('Deleted:', result)
     } catch (error) {
         console.error('Error deleting image:', error)
