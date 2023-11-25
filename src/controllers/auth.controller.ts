@@ -20,6 +20,7 @@ import {
     AUTH_S_0003,
     AUTH_S_0004,
     AUTH_S_0005,
+    AUTH_S_0006,
 } from '../config/responseCodes/auth'
 import bcrypt from 'bcrypt'
 import { ADMIN, SALT_ROUND, emailConfig, jwtAccessToken } from '../config/const'
@@ -31,6 +32,7 @@ import { TAccessToken } from '../types/global.types'
 import { emailOtpRequest, emailOtpValidate } from '../services/auth.service'
 import { sendEmailToCustomer } from '../utils/nodeMailer'
 import jwt from 'jsonwebtoken'
+import { GENERAL_E_0007, GENERAL_E_0010 } from '../config/responseCodes/general'
 
 export const register = catchAsync(async (req: Request, res: Response) => {
     await validator(validation.registerValidator, req.body)
@@ -46,7 +48,7 @@ export const register = catchAsync(async (req: Request, res: Response) => {
     if (emailExists) {
         throw new AppError(AUTH_E_0002)
     } else {
-        const encryptedPassword = bcrypt.hashSync(password, SALT_ROUND)
+        const encryptedPassword = bcrypt.hashSync(password, +SALT_ROUND)
 
         const allPermission = (await prisma.permission.findMany())?.map(
             (permission) => ({
@@ -69,19 +71,6 @@ export const register = catchAsync(async (req: Request, res: Response) => {
                 },
                 address,
             },
-        })
-
-        const tokenObj = {
-            email,
-        }
-
-        const accessToken = util.accessToken(tokenObj)
-        // const refreshToken = util.refreshToken(tokenObj)
-
-        res.cookie('token', accessToken, {
-            expires: new Date(Date.now() + 5000),
-            httpOnly: true,
-            secure: true,
         })
 
         return responseHandler(res, AUTH_S_0001, {
@@ -129,14 +118,6 @@ export const login = catchAsync(async (req: Request, res: Response) => {
             }
 
             const accessToken = util.accessToken(tokenObj)
-            // const refreshToken = util.refreshToken(tokenObj)
-
-            res.cookie('token', accessToken, {
-                expires: new Date(Date.now() + 5000),
-                httpOnly: true,
-                // secure: true,
-                sameSite: 'none',
-            })
 
             return responseHandler(res, AUTH_S_0002, {
                 ...userExists,
@@ -248,5 +229,47 @@ export const setNewPassword = catchAsync(
 
             return responseHandler(res, AUTH_S_0005, { email })
         }
+    }
+)
+
+export const validateAccessToken = catchAsync(
+    async (req: Request, res: Response) => {
+        if (!req.user) {
+            throw new AppError(GENERAL_E_0007)
+        }
+
+        const userTokenDetails = req.user
+
+        const userDetails = await prisma.user.findFirst({
+            where: {
+                userId: userTokenDetails.userId,
+            },
+            include: {
+                role: {
+                    include: {
+                        permission: true,
+                    },
+                },
+            },
+        })
+
+        if (!userDetails) throw new AppError(GENERAL_E_0010)
+
+        const tokenPayload: TAccessToken = {
+            email: userTokenDetails.email,
+            isAdmin: userDetails.isAdmin,
+            role: userDetails.role.label,
+            userId: userTokenDetails.userId,
+            permissions: userDetails.role.permission.map(
+                (permission) => permission.value
+            ),
+        }
+
+        const newAccessToken = util.accessToken(tokenPayload)
+
+        return responseHandler(res, AUTH_S_0006, {
+            ...userDetails,
+            accessToken: newAccessToken,
+        })
     }
 )
