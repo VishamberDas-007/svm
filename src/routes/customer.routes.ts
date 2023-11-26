@@ -18,7 +18,15 @@ customerRouter.get('/basic-list', customerController.getBasicCustomerList)
 
 customerRouter.get('/advance-list', customerController.getAdvanceCustomerList)
 
-customerRouter.put('/update/:customerId', customerController.updateCustomer)
+customerRouter.put(
+    '/update/:customerId',
+    upload.fields([
+        { name: 'aadharImages', maxCount: 2 },
+        { name: 'panImages', maxCount: 1 },
+        { name: 'customerImage', maxCount: 3 },
+    ]),
+    customerController.updateCustomer
+)
 
 customerRouter.get('/get/:customerId', customerController.getCustomer)
 

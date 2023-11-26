@@ -25,7 +25,7 @@ export const upload = multer({
             const fileName = file.originalname.split('.')[0]
             const extName = file.originalname.split('.')[1]
             const timeStamp = Date.now().toString()
-            const fullPath = 'svm/' + fileName + timeStamp + extName
+            const fullPath = 'svm/' + fileName + timeStamp + '.' + extName
 
             cb(null, fullPath)
         },
