@@ -2,7 +2,7 @@ import { Application, Request, Response, json, urlencoded } from 'express'
 import cors from 'cors'
 import { mainRouter } from './routes'
 import morgan from 'morgan'
-import cookieParser from 'cookie-parser'
+// import cookieParser from 'cookie-parser'
 
 import errorHandler from './utils/errorHandler'
 export default class Server {
@@ -16,7 +16,7 @@ export default class Server {
 
         app.use(json())
 
-        app.use(cookieParser())
+        // app.use(cookieParser())
 
         app.use(cors())
         // test()

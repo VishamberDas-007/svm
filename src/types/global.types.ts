@@ -58,3 +58,5 @@ export type permission =
     | 'USER_WRITE'
     | 'INSTALLMENT_READ'
     | 'INSTALLMENT_WRITE'
+    | 'WEBSITE_WRITE'
+    | 'WEBSITE_READ'
