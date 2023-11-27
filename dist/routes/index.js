@@ -6,7 +6,7 @@ const project_routes_1 = require("./project.routes");
 const customer_routes_1 = require("./customer.routes");
 const referral_routes_1 = require("./referral.routes");
 const adminAccount_routes_1 = require("./adminAccount.routes");
-const authRouter_routes_1 = require("./authRouter.routes");
+const auth_routes_1 = require("./auth.routes");
 // import { adminMiddleware } from '../middlewares/auth.middleware'
 const booking_routes_1 = require("./booking.routes");
 const appConfig_routes_1 = require("./appConfig.routes");
@@ -40,4 +40,4 @@ mainRouter.use('/expense', expense_routes_1.expenseRouter);
 mainRouter.use('/customer', customer_routes_1.customerRouter);
 mainRouter.use('/referral', referral_routes_1.referralRouter);
 mainRouter.use('/account', adminAccount_routes_1.accountRouter);
-mainRouter.use('/auth', authRouter_routes_1.authRouter);
+mainRouter.use('/auth', auth_routes_1.authRouter);

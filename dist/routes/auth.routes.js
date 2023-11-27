@@ -26,22 +26,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.customerRouter = void 0;
+exports.authRouter = void 0;
 const express_1 = __importDefault(require("express"));
-const customerController = __importStar(require("../controllers/customer.controller"));
-const s3_1 = require("../aws/s3");
-const customerRouter = express_1.default.Router();
-exports.customerRouter = customerRouter;
-customerRouter.post('/create', s3_1.upload.fields([
-    { name: 'aadharImages', maxCount: 2 },
-    { name: 'panImages', maxCount: 1 },
-    { name: 'customerImage', maxCount: 3 },
-]), customerController.newCustomer);
-customerRouter.get('/basic-list', customerController.getBasicCustomerList);
-customerRouter.get('/advance-list', customerController.getAdvanceCustomerList);
-customerRouter.put('/update/:customerId', s3_1.upload.fields([
-    { name: 'aadharImages', maxCount: 2 },
-    { name: 'panImages', maxCount: 1 },
-    { name: 'customerImage', maxCount: 3 },
-]), customerController.updateCustomer);
-customerRouter.get('/get/:customerId', customerController.getCustomer);
+const authController = __importStar(require("../controllers/auth.controller"));
+const auth_middleware_1 = require("../middlewares/auth.middleware");
+const authRouter = express_1.default.Router();
+exports.authRouter = authRouter;
+authRouter.post('/register', authController.register);
+authRouter.post('/login', authController.login);
+authRouter.get('/forgot-password/:email', authController.resetRequestEmailOTP);
+authRouter.post('/reset-password', authController.resetEmailOtpValidation);
+authRouter.post('/change-password', authController.setNewPassword);
+authRouter.post('/access-token/validate', auth_middleware_1.adminMiddleware, authController.validateAccessToken);
