@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setNewPassword = exports.resetEmailOtpValidation = exports.resetRequestEmailOTP = exports.login = exports.register = void 0;
+exports.validateAccessToken = exports.setNewPassword = exports.resetEmailOtpValidation = exports.resetRequestEmailOTP = exports.login = exports.register = void 0;
 const catchAsync_1 = __importDefault(require("../utils/catchAsync"));
 const db_1 = __importDefault(require("../db"));
 const AppError_1 = __importDefault(require("../utils/AppError"));
@@ -50,6 +50,7 @@ const helper_1 = __importDefault(require("../utils/helper"));
 const auth_service_1 = require("../services/auth.service");
 const nodeMailer_1 = require("../utils/nodeMailer");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const general_1 = require("../config/responseCodes/general");
 exports.register = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     yield (0, validations_1.default)(validation.registerValidator, req.body);
@@ -63,7 +64,7 @@ exports.register = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, voi
         throw new AppError_1.default(auth_1.AUTH_E_0002);
     }
     else {
-        const encryptedPassword = bcrypt_1.default.hashSync(password, const_1.SALT_ROUND);
+        const encryptedPassword = bcrypt_1.default.hashSync(password, +const_1.SALT_ROUND);
         const allPermission = (_a = (yield db_1.default.permission.findMany())) === null || _a === void 0 ? void 0 : _a.map((permission) => ({
             permissionId: permission.permissionId,
         }));
@@ -82,16 +83,6 @@ exports.register = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, voi
                 },
                 address,
             },
-        });
-        const tokenObj = {
-            email,
-        };
-        const accessToken = helper_1.default.accessToken(tokenObj);
-        // const refreshToken = util.refreshToken(tokenObj)
-        res.cookie('token', accessToken, {
-            expires: new Date(Date.now() + 5000),
-            httpOnly: true,
-            secure: true,
         });
         return (0, responseHandler_1.default)(res, auth_1.AUTH_S_0001, Object.assign(Object.assign({}, newUser), { password: undefined }));
     }
@@ -128,13 +119,6 @@ exports.login = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0
                 permissions: userExists.role.permission.map((p) => p.value),
             };
             const accessToken = helper_1.default.accessToken(tokenObj);
-            // const refreshToken = util.refreshToken(tokenObj)
-            res.cookie('token', accessToken, {
-                expires: new Date(Date.now() + 5000),
-                httpOnly: true,
-                // secure: true,
-                sameSite: 'none',
-            });
             return (0, responseHandler_1.default)(res, auth_1.AUTH_S_0002, Object.assign(Object.assign({}, userExists), { password: undefined, permissions: userExists.role.permission.map((p) => p.value), role: userExists.role.label, accessToken }));
         }
     }
@@ -211,4 +195,33 @@ exports.setNewPassword = (0, catchAsync_1.default)((req, res) => __awaiter(void 
         }
         return (0, responseHandler_1.default)(res, auth_1.AUTH_S_0005, { email });
     }
+}));
+exports.validateAccessToken = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!req.user) {
+        throw new AppError_1.default(general_1.GENERAL_E_0007);
+    }
+    const userTokenDetails = req.user;
+    const userDetails = yield db_1.default.user.findFirst({
+        where: {
+            userId: userTokenDetails.userId,
+        },
+        include: {
+            role: {
+                include: {
+                    permission: true,
+                },
+            },
+        },
+    });
+    if (!userDetails)
+        throw new AppError_1.default(general_1.GENERAL_E_0010);
+    const tokenPayload = {
+        email: userTokenDetails.email,
+        isAdmin: userDetails.isAdmin,
+        role: userDetails.role.label,
+        userId: userTokenDetails.userId,
+        permissions: userDetails.role.permission.map((permission) => permission.value),
+    };
+    const newAccessToken = helper_1.default.accessToken(tokenPayload);
+    return (0, responseHandler_1.default)(res, auth_1.AUTH_S_0006, Object.assign(Object.assign({}, userDetails), { accessToken: newAccessToken }));
 }));

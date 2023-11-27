@@ -21,16 +21,17 @@ const const_1 = require("../config/const");
 const db_1 = __importDefault(require("../db"));
 const user_service_1 = require("../services/user.service");
 exports.adminMiddleware = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const token = req.cookies.token;
-    console.log({ req });
-    console.dir(req.cookies, { depth: null });
+    var _a;
+    const { authorization } = req.headers;
+    const token = (_a = authorization === null || authorization === void 0 ? void 0 : authorization.split(' ')) === null || _a === void 0 ? void 0 : _a[1];
     if (!token)
         throw new AppError_1.default(general_1.GENERAL_E_0004);
     else {
-        const { email } = (jsonwebtoken_1.default.verify(token, const_1.jwtAccessToken.SECRET_KEY));
+        const { email, userId } = (jsonwebtoken_1.default.verify(token, const_1.jwtAccessToken.SECRET_KEY));
         const emailExists = yield db_1.default.user.findFirst({
             where: {
                 email,
+                userId,
             },
         });
         if (!emailExists)
@@ -39,9 +40,9 @@ exports.adminMiddleware = (0, catchAsync_1.default)((req, res, next) => __awaite
     }
 }));
 const authMiddleware = (requiredPermissions) => (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+    var _b;
     const { authorization } = req.headers;
-    const token = (_a = authorization === null || authorization === void 0 ? void 0 : authorization.split(' ')) === null || _a === void 0 ? void 0 : _a[1];
+    const token = (_b = authorization === null || authorization === void 0 ? void 0 : authorization.split(' ')) === null || _b === void 0 ? void 0 : _b[1];
     if (!token) {
         throw new AppError_1.default(general_1.GENERAL_E_0004);
     }
