@@ -103,3 +103,11 @@ export const AUTH_S_0005 = {
     message: 'Password changed successfully',
     statusCode: 200,
 }
+
+export const AUTH_S_0006 = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'AUTH_S_0006',
+    isNotify: false,
+    message: 'Access token validated successfully',
+    statusCode: 200,
+}

@@ -15,21 +15,20 @@ import { userExists } from '../services/user.service'
 
 export const adminMiddleware = catchAsync(
     async (req: Request, res: Response, next: NextFunction) => {
-        const token: string = req.cookies.token
+        const { authorization } = req.headers as Record<string, string>
 
-        console.log({ req })
-
-        console.dir(req.cookies, { depth: null })
+        const token = authorization?.split(' ')?.[1]
 
         if (!token) throw new AppError(GENERAL_E_0004)
         else {
-            const { email } = <{ email: string }>(
+            const { email, userId } = <{ email: string; userId: string }>(
                 jwt.verify(token, jwtAccessToken.SECRET_KEY)
             )
 
             const emailExists = await prisma.user.findFirst({
                 where: {
                     email,
+                    userId,
                 },
             })
 

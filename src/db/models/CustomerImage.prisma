@@ -23,4 +23,5 @@ model Customer {
 enum CustomerImageType {
     AADHAR
     PAN
+    PHOTO
 }
