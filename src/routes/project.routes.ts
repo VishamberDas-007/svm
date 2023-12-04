@@ -8,11 +8,7 @@ const projectRouter = express.Router()
 projectRouter.post(
     '/create',
     // authMiddleware(['PROJECT_WRITE']),
-    upload.fields([
-        { name: 'planningImages', maxCount: 20 },
-        { name: 'siteImages', maxCount: 5 },
-        { name: 'logo', maxCount: 1 },
-    ]),
+    upload.single('logo'),
     projectController.newProject
 )
 

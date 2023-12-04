@@ -25,7 +25,7 @@ import * as validation from '../validations/project.validator'
 import * as generalValidation from '../validations/_general.validator'
 import { projectExists } from '../services/project.service'
 import { TListData } from '../types/global.types'
-import { deleteImage } from '../aws/s3'
+// import { deleteImage } from '../aws/s3'
 
 export const newProject = catchAsync(
     async (req: TProjectReq, res: Response) => {
@@ -57,9 +57,7 @@ export const newProject = catchAsync(
         }
 
         await prisma.$transaction(async (prisma) => {
-            const logoUrl = req.files?.['logo']?.[0].location
-
-            let data: any[] = []
+            const logoUrl = req.file?.location
 
             newProject = await prisma.project.create({
                 data: {
@@ -81,33 +79,33 @@ export const newProject = catchAsync(
                 },
             })
 
-            const planningImageUrls = req.files?.['planningImages']?.map(
-                (image: TImageUpload) => ({
-                    url: image.location,
-                    type: 'PLANNING',
-                    projectId: newProject?.projectId,
-                })
-            )
+            // const planningImageUrls = req.files?.['planningImages']?.map(
+            //     (image: TImageUpload) => ({
+            //         url: image.location,
+            //         type: 'PLANNING',
+            //         projectId: newProject?.projectId,
+            //     })
+            // )
 
-            const siteImageUrls = req.files?.['siteImages']?.map(
-                (image: TImageUpload) => ({
-                    url: image.location,
-                    type: 'SITE',
-                    projectId: newProject?.projectId,
-                })
-            )
+            // const siteImageUrls = req.files?.['siteImages']?.map(
+            //     (image: TImageUpload) => ({
+            //         url: image.location,
+            //         type: 'SITE',
+            //         projectId: newProject?.projectId,
+            //     })
+            // )
 
-            if (planningImageUrls?.length) {
-                data = [...planningImageUrls]
-            }
+            // if (planningImageUrls?.length) {
+            //     data = [...planningImageUrls]
+            // }
 
-            if (siteImageUrls?.length) {
-                data = [...data, ...siteImageUrls]
-            }
+            // if (siteImageUrls?.length) {
+            //     data = [...data, ...siteImageUrls]
+            // }
 
-            await prisma.projectImages.createMany({
-                data,
-            })
+            // await prisma.projectImages.createMany({
+            //     data,
+            // })
         })
         return responseHandler(res, PROJECT_S_0001, newProject)
     }
@@ -229,91 +227,90 @@ export const updateProject = catchAsync(
             totalAmt,
         }: TUpdateProject = req.body
 
-        let planningImageUrls: string[] = [],
-            siteImageUrls: string[] = [],
-            imageUpdate:
-                | {
-                      projectImages: {
-                          createMany: {
-                              data: any[]
-                              skipDuplicates: boolean
-                          }
-                      }
-                  }
-                | undefined,
-            deleteProjectImageFileNames: string[] = [],
-            updateProject: Project | undefined
+        // let planningImageUrls: string[] = [],
+        //     siteImageUrls: string[] = [],
+        //     imageUpdate:
+        //         | {
+        //               projectImages: {
+        //                   createMany: {
+        //                       data: any[]
+        //                       skipDuplicates: boolean
+        //                   }
+        //               }
+        //           }
+        //         | undefined,
+        //     deleteProjectImageFileNames: string[] = [],
+        //  updateProject: Project | undefined
 
-        planningImageUrls =
-            req.files?.['planningImages']?.map((image: TImageUpload) => ({
-                url: image.location,
-                type: 'PLANNING',
-            })) || []
+        // planningImageUrls =
+        //     req.files?.['planningImages']?.map((image: TImageUpload) => ({
+        //         url: image.location,
+        //         type: 'PLANNING',
+        //     })) || []
 
-        siteImageUrls =
-            req.files?.['siteImages']?.map((image: TImageUpload) => ({
-                url: image.location,
-                type: 'SITE',
-            })) || []
+        // siteImageUrls =
+        //     req.files?.['siteImages']?.map((image: TImageUpload) => ({
+        //         url: image.location,
+        //         type: 'SITE',
+        //     })) || []
 
-        const projectImages = await prisma.projectImages.findMany({
+        // const projectImages = await prisma.projectImages.findMany({
+        //     where: {
+        //         projectId,
+        //     },
+        // })
+
+        // deleteProjectImageFileNames = projectImages.length
+        //     ? projectImages.map((project) => {
+        //           const fileName =
+        //               project.url.split('/')[project.url.split('/')?.length - 1]
+
+        //           return fileName
+        //       })
+        //     : []
+
+        // if (siteImageUrls.length || planningImageUrls.length)
+        //     imageUpdate = {
+        //         projectImages: {
+        //             createMany: {
+        //                 data: [...siteImageUrls, ...planningImageUrls],
+        //                 skipDuplicates: true,
+        //             },
+        //         },
+        //     }
+
+        // await prisma.$transaction(async (prisma) => {
+        // for await (const fileName of deleteProjectImageFileNames) {
+        //     await deleteImage(fileName)
+        // }
+
+        // await prisma.projectImages.deleteMany({
+        //     where: {
+        //         projectId,
+        //     },
+        // })
+
+        const updateProject = await prisma.project.update({
             where: {
                 projectId,
             },
+            data: {
+                address1,
+                address2,
+                area: +area,
+                description,
+                name,
+                ownerName,
+                pincode,
+                status,
+                unit,
+                downPayment: +downPayment,
+                emiAmt: +emiAmt,
+                location,
+                totalAmt: +totalAmt,
+            },
         })
-
-        deleteProjectImageFileNames = projectImages.length
-            ? projectImages.map((project) => {
-                  const fileName =
-                      project.url.split('/')[project.url.split('/')?.length - 1]
-
-                  return fileName
-              })
-            : []
-
-        if (siteImageUrls.length || planningImageUrls.length)
-            imageUpdate = {
-                projectImages: {
-                    createMany: {
-                        data: [...siteImageUrls, ...planningImageUrls],
-                        skipDuplicates: true,
-                    },
-                },
-            }
-
-        await prisma.$transaction(async (prisma) => {
-            for await (const fileName of deleteProjectImageFileNames) {
-                await deleteImage(fileName)
-            }
-
-            await prisma.projectImages.deleteMany({
-                where: {
-                    projectId,
-                },
-            })
-
-            updateProject = await prisma.project.update({
-                where: {
-                    projectId,
-                },
-                data: {
-                    ...imageUpdate,
-                    address1,
-                    address2,
-                    area: +area,
-                    description,
-                    name,
-                    ownerName,
-                    pincode,
-                    status,
-                    unit,
-                    downPayment: +downPayment,
-                    emiAmt: +emiAmt,
-                    location,
-                    totalAmt: +totalAmt,
-                },
-            })
-        })
+        // })
         return responseHandler(res, PROJECT_S_0004, updateProject)
     }
 )
