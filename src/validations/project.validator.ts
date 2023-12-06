@@ -17,8 +17,8 @@ export const createProjectValidator = Joi.object<
     unit: Joi.string().required(),
     address2: Joi.string().allow('', null).optional(),
     parentId: util.uuid.allow('', null).optional(),
-    planningImages: Joi.any().optional(),
-    siteImages: Joi.any().optional(),
+    // planningImages: Joi.any().optional(),
+    // siteImages: Joi.any().optional(),
     logo: Joi.any().optional(),
     emiAmt: Joi.number().required(),
     downPayment: Joi.number().required(),
@@ -36,11 +36,15 @@ export const updateProjectValidator = Joi.object({
     status: Joi.valid(...projectStatus).optional(),
     unit: Joi.string().optional(),
     address2: Joi.string().optional(),
-    planningImages: Joi.any().optional(),
-    siteImages: Joi.any().optional(),
-    logo: Joi.any().optional(),
+    // planningImages: Joi.any().optional(),
+    // siteImages: Joi.any().optional(),
+    // logo: Joi.any().optional(),
     emiAmt: Joi.number().optional(),
     downPayment: Joi.number().optional(),
     totalAmt: Joi.number().optional(),
     location: Joi.string().optional(),
+})
+
+export const projectImageIdsValidator = Joi.object({
+    projectImageIds: Joi.array().items(Joi.string().required()).required(),
 })

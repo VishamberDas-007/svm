@@ -55,3 +55,27 @@ export const PROJECT_S_0005 = {
     message: 'Happy customer images uploaded successfully',
     statusCode: 200,
 }
+
+export const PROJECT_S_0006 = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'PROJECT_S_0006',
+    isNotify: false,
+    message: 'Project logo image uploaded successfully',
+    statusCode: 200,
+}
+
+export const PROJECT_S_0007 = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'PROJECT_S_0007',
+    isNotify: false,
+    message: 'Project images uploaded successfully',
+    statusCode: 200,
+}
+
+export const PROJECT_S_0008 = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'PROJECT_S_0008',
+    isNotify: false,
+    message: 'Project images deleted successfully',
+    statusCode: 200,
+}
