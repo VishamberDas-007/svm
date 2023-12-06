@@ -17,6 +17,9 @@ import {
     PROJECT_S_0003,
     PROJECT_S_0004,
     PROJECT_S_0005,
+    PROJECT_S_0006,
+    PROJECT_S_0007,
+    PROJECT_S_0008,
 } from '../config/responseCodes/project'
 import { Project } from '@prisma/client'
 import AppError from '../utils/AppError'
@@ -25,6 +28,7 @@ import * as validation from '../validations/project.validator'
 import * as generalValidation from '../validations/_general.validator'
 import { projectExists } from '../services/project.service'
 import { TListData } from '../types/global.types'
+import { deleteImage } from '../aws/s3'
 // import { deleteImage } from '../aws/s3'
 
 export const newProject = catchAsync(
@@ -57,7 +61,7 @@ export const newProject = catchAsync(
         }
 
         await prisma.$transaction(async (prisma) => {
-            const logoUrl = req.file?.location
+            // const logoUrl = req.file?.location
 
             newProject = await prisma.project.create({
                 data: {
@@ -71,7 +75,7 @@ export const newProject = catchAsync(
                     pincode,
                     status,
                     unit,
-                    logoUrl,
+                    // logoUrl,
                     downPayment: +downPayment,
                     emiAmt: +emiAmt,
                     location,
@@ -365,5 +369,114 @@ export const uploadHappyCustomerImages = catchAsync(
         })
 
         return responseHandler(res, PROJECT_S_0005)
+    }
+)
+
+export const uploadLogoImage = catchAsync(
+    async (req: TProjectReq, res: Response) => {
+        await validator(generalValidation.projectIdValidator, req.params)
+
+        const { projectId } = req.params
+
+        const logoUrl: string = req.file?.location
+
+        const fileName = req.file.originalName
+
+        await prisma.$transaction(async (prisma) => {
+            await deleteImage(fileName)
+
+            await prisma.project.update({
+                where: {
+                    projectId,
+                },
+                data: {
+                    logoUrl,
+                },
+            })
+        })
+
+        return responseHandler(res, PROJECT_S_0006, { logoUrl })
+    }
+)
+
+export const uploadProjectImages = catchAsync(
+    async (req: TProjectReq, res: Response) => {
+        await validator(generalValidation.projectIdValidator, req.params)
+
+        const { projectId } = req.params
+        let data: {
+            url: string
+            type: 'PLANNING' | 'SITE'
+            projectId: string
+        }[] = []
+
+        const planningImageUrls = req.files?.['planningImages']?.map(
+            (image: TImageUpload) => ({
+                url: image.location,
+                type: 'PLANNING',
+                projectId: projectId,
+            })
+        )
+        const siteImageUrls = req.files?.['siteImages']?.map(
+            (image: TImageUpload) => ({
+                url: image.location,
+                type: 'SITE',
+                projectId: projectId,
+            })
+        )
+        if (planningImageUrls?.length) {
+            data = [...planningImageUrls]
+        }
+        if (siteImageUrls?.length) {
+            data = [...data, ...siteImageUrls]
+        }
+        await prisma.projectImages.createMany({
+            data,
+        })
+        // })
+
+        return responseHandler(res, PROJECT_S_0007)
+    }
+)
+
+export const deleteProjectImages = catchAsync(
+    async (req: TProjectReq, res: Response) => {
+        await validator(generalValidation.projectIdValidator, req.params)
+
+        await validator(validation.projectImageIdsValidator, req.body)
+
+        const { projectId } = req.params
+
+        const { projectImageIds }: { projectImageIds: string[] } = req.body
+
+        const imagesFileNames = (
+            await prisma.projectImages.findMany({
+                where: {
+                    projectId,
+                    projectImageId: {
+                        in: projectImageIds,
+                    },
+                },
+            })
+        ).map((image) => {
+            const array = image.url.split('/')
+            return array[array.length - 1]
+        })
+
+        await prisma.$transaction(async (prisma) => {
+            for await (const iterator of imagesFileNames) {
+                await deleteImage(iterator)
+            }
+
+            await prisma.projectImages.deleteMany({
+                where: {
+                    projectId,
+                    projectImageId: {
+                        in: projectImageIds,
+                    },
+                },
+            })
+        })
+        return responseHandler(res, PROJECT_S_0008)
     }
 )

@@ -44,3 +44,7 @@ export const updateProjectValidator = Joi.object({
     totalAmt: Joi.number().optional(),
     location: Joi.string().optional(),
 })
+
+export const projectImageIdsValidator = Joi.object({
+    projectImageIds: Joi.array().items(Joi.string().required()).required(),
+})
