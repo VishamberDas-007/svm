@@ -30,20 +30,41 @@ exports.projectRouter = void 0;
 const express_1 = __importDefault(require("express"));
 const projectController = __importStar(require("../controllers/project.controller"));
 const s3_1 = require("../aws/s3");
-const auth_middleware_1 = require("../middlewares/auth.middleware");
 const projectRouter = express_1.default.Router();
 exports.projectRouter = projectRouter;
-projectRouter.post('/create', (0, auth_middleware_1.authMiddleware)(['PROJECT_WRITE']), s3_1.upload.fields([
+projectRouter.post('/create', 
+// authMiddleware(['PROJECT_WRITE']),
+// upload.single('logo'),
+projectController.newProject);
+projectRouter.get('/list', 
+// authMiddleware(['PROJECT_READ', 'PROJECT_WRITE']),
+projectController.getAllProjects);
+projectRouter.put('/update/:projectId', 
+// authMiddleware(['PROJECT_WRITE']),
+// upload.fields([
+//     { name: 'planningImages', maxCount: 20 },
+//     { name: 'siteImages', maxCount: 5 },
+//     { name: 'logo', maxCount: 1 },
+// ]),
+projectController.updateProject);
+projectRouter.get('/get/:projectId', 
+// authMiddleware(['PROJECT_READ', 'PROJECT_WRITE']),
+projectController.getProject);
+projectRouter.get('/basic-list', 
+// authMiddleware(['PROJECT_READ', 'PROJECT_WRITE']),
+projectController.getProjectBasicList);
+projectRouter.put('/upload/happy-customers/:projectId', 
+// authMiddleware(['PROJECT_WRITE']),
+s3_1.upload.array('customers', 10), projectController.uploadHappyCustomerImages);
+projectRouter.patch('/upload/logo/:projectId', 
+// authMiddleware(['PROJECT_WRITE']),
+s3_1.upload.single('logo'), projectController.uploadLogoImage);
+projectRouter.patch('/upload/project-images/:projectId', 
+// authMiddleware(['PROJECT_WRITE']),
+s3_1.upload.fields([
     { name: 'planningImages', maxCount: 20 },
     { name: 'siteImages', maxCount: 5 },
-    { name: 'logo', maxCount: 1 },
-]), projectController.newProject);
-projectRouter.get('/list', (0, auth_middleware_1.authMiddleware)(['PROJECT_READ', 'PROJECT_WRITE']), projectController.getAllProjects);
-projectRouter.put('/update/:projectId', (0, auth_middleware_1.authMiddleware)(['PROJECT_WRITE']), s3_1.upload.fields([
-    { name: 'planningImages', maxCount: 20 },
-    { name: 'siteImages', maxCount: 5 },
-    { name: 'logo', maxCount: 1 },
-]), projectController.updateProject);
-projectRouter.get('/get/:projectId', (0, auth_middleware_1.authMiddleware)(['PROJECT_READ', 'PROJECT_WRITE']), projectController.getProject);
-projectRouter.get('/basic-list', (0, auth_middleware_1.authMiddleware)(['PROJECT_READ', 'PROJECT_WRITE']), projectController.getProjectBasicList);
-projectRouter.put('/upload/happy-customers/:projectId', (0, auth_middleware_1.authMiddleware)(['PROJECT_WRITE']), s3_1.upload.array('customers', 10), projectController.uploadHappyCustomerImages);
+]), projectController.uploadProjectImages);
+projectRouter.delete('/delete/project-images/:projectId', 
+// authMiddleware(['PROJECT_WRITE']),
+projectController.uploadProjectImages);
