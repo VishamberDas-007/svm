@@ -1,0 +1,33 @@
+name: development
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18
+      - name: Cache clear yarn
+        run: rm -rf ~/.cache/yarn
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Prisma schema generation
+        run: yarn prisma generate
+
+      - name: Build app
+        run: yarn build
+
+      - name: Deploy completed
+
