@@ -30,18 +30,19 @@ exports.customerRouter = void 0;
 const express_1 = __importDefault(require("express"));
 const customerController = __importStar(require("../controllers/customer.controller"));
 const s3_1 = require("../aws/s3");
+const auth_middleware_1 = require("../middlewares/auth.middleware");
 const customerRouter = express_1.default.Router();
 exports.customerRouter = customerRouter;
-customerRouter.post('/create', s3_1.upload.fields([
+customerRouter.post('/create', (0, auth_middleware_1.authMiddleware)(['CUSTOMER_WRITE']), s3_1.upload.fields([
     { name: 'aadharImages', maxCount: 2 },
     { name: 'panImages', maxCount: 1 },
     { name: 'customerImage', maxCount: 3 },
 ]), customerController.newCustomer);
-customerRouter.get('/basic-list', customerController.getBasicCustomerList);
-customerRouter.get('/advance-list', customerController.getAdvanceCustomerList);
-customerRouter.put('/update/:customerId', s3_1.upload.fields([
+customerRouter.get('/basic-list', (0, auth_middleware_1.authMiddleware)(['CUSTOMER_READ', 'CUSTOMER_WRITE']), customerController.getBasicCustomerList);
+customerRouter.get('/advance-list', (0, auth_middleware_1.authMiddleware)(['CUSTOMER_READ', 'CUSTOMER_WRITE']), customerController.getAdvanceCustomerList);
+customerRouter.put('/update/:customerId', (0, auth_middleware_1.authMiddleware)(['CUSTOMER_WRITE']), s3_1.upload.fields([
     { name: 'aadharImages', maxCount: 2 },
     { name: 'panImages', maxCount: 1 },
     { name: 'customerImage', maxCount: 3 },
 ]), customerController.updateCustomer);
-customerRouter.get('/get/:customerId', customerController.getCustomer);
+customerRouter.get('/get/:customerId', (0, auth_middleware_1.authMiddleware)(['CUSTOMER_READ', 'CUSTOMER_WRITE']), customerController.getCustomer);
