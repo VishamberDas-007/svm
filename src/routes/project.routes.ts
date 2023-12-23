@@ -7,49 +7,68 @@ const projectRouter = express.Router()
 
 projectRouter.post(
     '/create',
-    authMiddleware(['PROJECT_WRITE']),
-    upload.fields([
-        { name: 'planningImages', maxCount: 20 },
-        { name: 'siteImages', maxCount: 5 },
-        { name: 'logo', maxCount: 1 },
-    ]),
+    // authMiddleware(['PROJECT_WRITE']),
+    // upload.single('logo'),
     projectController.newProject
 )
 
 projectRouter.get(
     '/list',
-    authMiddleware(['PROJECT_READ', 'PROJECT_WRITE']),
+    // authMiddleware(['PROJECT_READ', 'PROJECT_WRITE']),
     projectController.getAllProjects
 )
 
 projectRouter.put(
     '/update/:projectId',
-    authMiddleware(['PROJECT_WRITE']),
-    upload.fields([
-        { name: 'planningImages', maxCount: 20 },
-        { name: 'siteImages', maxCount: 5 },
-        { name: 'logo', maxCount: 1 },
-    ]),
+    // authMiddleware(['PROJECT_WRITE']),
+    // upload.fields([
+    //     { name: 'planningImages', maxCount: 20 },
+    //     { name: 'siteImages', maxCount: 5 },
+    //     { name: 'logo', maxCount: 1 },
+    // ]),
     projectController.updateProject
 )
 
 projectRouter.get(
     '/get/:projectId',
-    authMiddleware(['PROJECT_READ', 'PROJECT_WRITE']),
+    // authMiddleware(['PROJECT_READ', 'PROJECT_WRITE']),
     projectController.getProject
 )
 
 projectRouter.get(
     '/basic-list',
-    authMiddleware(['PROJECT_READ', 'PROJECT_WRITE']),
+    // authMiddleware(['PROJECT_READ', 'PROJECT_WRITE']),
     projectController.getProjectBasicList
 )
 
 projectRouter.put(
     '/upload/happy-customers/:projectId',
-    authMiddleware(['PROJECT_WRITE']),
+    // authMiddleware(['PROJECT_WRITE']),
     upload.array('customers', 10),
     projectController.uploadHappyCustomerImages
+)
+
+projectRouter.patch(
+    '/upload/logo/:projectId',
+    // authMiddleware(['PROJECT_WRITE']),
+    upload.single('logo'),
+    projectController.uploadLogoImage
+)
+
+projectRouter.patch(
+    '/upload/project-images/:projectId',
+    // authMiddleware(['PROJECT_WRITE']),
+    upload.fields([
+        { name: 'planningImages', maxCount: 20 },
+        { name: 'siteImages', maxCount: 5 },
+    ]),
+    projectController.uploadProjectImages
+)
+
+projectRouter.delete(
+    '/delete/project-images/:projectId',
+    // authMiddleware(['PROJECT_WRITE']),
+    projectController.uploadProjectImages
 )
 
 export { projectRouter }
