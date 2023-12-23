@@ -29,5 +29,4 @@ jobs:
       - name: Build app
         run: yarn build
 
-      - name: Deploy completed
 
