@@ -1,12 +1,17 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.projectImageIdsValidator = exports.updateProjectValidator = exports.createProjectValidator = void 0;
-const joi_1 = __importDefault(require("joi"));
-const helper_1 = __importDefault(require("../utils/helper"));
-const projectStatus = ['ACTIVE', 'COMPLETED', 'UPCOMING'];
+'use strict'
+var __importDefault =
+    (this && this.__importDefault) ||
+    function (mod) {
+        return mod && mod.__esModule ? mod : { default: mod }
+    }
+Object.defineProperty(exports, '__esModule', { value: true })
+exports.projectImageIdsValidator =
+    exports.updateProjectValidator =
+    exports.createProjectValidator =
+        void 0
+const joi_1 = __importDefault(require('joi'))
+const helper_1 = __importDefault(require('../utils/helper'))
+const projectStatus = ['ACTIVE', 'COMPLETED', 'UPCOMING']
 exports.createProjectValidator = joi_1.default.object({
     address1: joi_1.default.string().required(),
     area: joi_1.default.number().required(),
@@ -20,12 +25,14 @@ exports.createProjectValidator = joi_1.default.object({
     parentId: helper_1.default.uuid.allow('', null).optional(),
     // planningImages: Joi.any().optional(),
     // siteImages: Joi.any().optional(),
+    // planningImages: Joi.any().optional(),
+    // siteImages: Joi.any().optional(),
     logo: joi_1.default.any().optional(),
     emiAmt: joi_1.default.number().required(),
     downPayment: joi_1.default.number().required(),
     totalAmt: joi_1.default.number().required(),
     location: joi_1.default.string().required(),
-});
+})
 exports.updateProjectValidator = joi_1.default.object({
     address1: joi_1.default.string().optional(),
     area: joi_1.default.number().optional(),
@@ -43,7 +50,10 @@ exports.updateProjectValidator = joi_1.default.object({
     downPayment: joi_1.default.number().optional(),
     totalAmt: joi_1.default.number().optional(),
     location: joi_1.default.string().optional(),
-});
+})
 exports.projectImageIdsValidator = joi_1.default.object({
-    projectImageIds: joi_1.default.array().items(joi_1.default.string().required()).required(),
-});
+    projectImageIds: joi_1.default
+        .array()
+        .items(joi_1.default.string().required())
+        .required(),
+})
