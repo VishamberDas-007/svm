@@ -9,11 +9,14 @@ projectRouter.post(
     '/create',
     // authMiddleware(['PROJECT_WRITE']),
     // upload.single('logo'),
+    // authMiddleware(['PROJECT_WRITE']),
+    // upload.single('logo'),
     projectController.newProject
 )
 
 projectRouter.get(
     '/list',
+    // authMiddleware(['PROJECT_READ', 'PROJECT_WRITE']),
     // authMiddleware(['PROJECT_READ', 'PROJECT_WRITE']),
     projectController.getAllProjects
 )
@@ -26,23 +29,37 @@ projectRouter.put(
     //     { name: 'siteImages', maxCount: 5 },
     //     { name: 'logo', maxCount: 1 },
     // ]),
+    // authMiddleware(['PROJECT_WRITE']),
+    // upload.fields([
+    //     { name: 'planningImages', maxCount: 20 },
+    //     { name: 'siteImages', maxCount: 5 },
+    //     { name: 'logo', maxCount: 1 },
+    // ]),
     projectController.updateProject
 )
 
 projectRouter.get(
-    '/get/:projectId',
+    '/get-details/:projectId',
     // authMiddleware(['PROJECT_READ', 'PROJECT_WRITE']),
-    projectController.getProject
+    projectController.getProjectDetails
+)
+
+projectRouter.get(
+    '/get-images/:projectId',
+    // authMiddleware(['PROJECT_READ', 'PROJECT_WRITE']),
+    projectController.getProjectImages
 )
 
 projectRouter.get(
     '/basic-list',
+    // authMiddleware(['PROJECT_READ', 'PROJECT_WRITE']),
     // authMiddleware(['PROJECT_READ', 'PROJECT_WRITE']),
     projectController.getProjectBasicList
 )
 
 projectRouter.put(
     '/upload/happy-customers/:projectId',
+    // authMiddleware(['PROJECT_WRITE']),
     // authMiddleware(['PROJECT_WRITE']),
     upload.array('customers', 10),
     projectController.uploadHappyCustomerImages
@@ -68,7 +85,7 @@ projectRouter.patch(
 projectRouter.delete(
     '/delete/project-images/:projectId',
     // authMiddleware(['PROJECT_WRITE']),
-    projectController.uploadProjectImages
+    projectController.deleteProjectImages
 )
 
 export { projectRouter }

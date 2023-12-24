@@ -71,3 +71,9 @@ export type TProjectList = TQueryRequest & {
     area?: number
     status?: ProjectStatus
 }
+
+export type TFetchImage = {
+    projectImageId: string
+    type: string
+    url: string
+}

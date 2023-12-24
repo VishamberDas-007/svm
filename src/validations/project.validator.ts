@@ -35,7 +35,7 @@ export const updateProjectValidator = Joi.object({
     pincode: Joi.string().optional(),
     status: Joi.valid(...projectStatus).optional(),
     unit: Joi.string().optional(),
-    address2: Joi.string().optional(),
+    address2: Joi.string().allow(null, '').optional(),
     // planningImages: Joi.any().optional(),
     // siteImages: Joi.any().optional(),
     // logo: Joi.any().optional(),
