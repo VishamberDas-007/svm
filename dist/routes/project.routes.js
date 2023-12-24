@@ -47,9 +47,12 @@ projectRouter.put('/update/:projectId',
 //     { name: 'logo', maxCount: 1 },
 // ]),
 projectController.updateProject);
-projectRouter.get('/get/:projectId', 
+projectRouter.get('/get-details/:projectId', 
 // authMiddleware(['PROJECT_READ', 'PROJECT_WRITE']),
-projectController.getProject);
+projectController.getProjectDetails);
+projectRouter.get('/get-images/:projectId', 
+// authMiddleware(['PROJECT_READ', 'PROJECT_WRITE']),
+projectController.getProjectImages);
 projectRouter.get('/basic-list', 
 // authMiddleware(['PROJECT_READ', 'PROJECT_WRITE']),
 projectController.getProjectBasicList);
@@ -67,4 +70,4 @@ s3_1.upload.fields([
 ]), projectController.uploadProjectImages);
 projectRouter.delete('/delete/project-images/:projectId', 
 // authMiddleware(['PROJECT_WRITE']),
-projectController.uploadProjectImages);
+projectController.deleteProjectImages);
