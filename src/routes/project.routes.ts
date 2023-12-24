@@ -30,9 +30,15 @@ projectRouter.put(
 )
 
 projectRouter.get(
-    '/get/:projectId',
+    '/get-details/:projectId',
     // authMiddleware(['PROJECT_READ', 'PROJECT_WRITE']),
-    projectController.getProject
+    projectController.getProjectDetails
+)
+
+projectRouter.get(
+    '/get-images/:projectId',
+    // authMiddleware(['PROJECT_READ', 'PROJECT_WRITE']),
+    projectController.getProjectImages
 )
 
 projectRouter.get(
@@ -68,7 +74,7 @@ projectRouter.patch(
 projectRouter.delete(
     '/delete/project-images/:projectId',
     // authMiddleware(['PROJECT_WRITE']),
-    projectController.uploadProjectImages
+    projectController.deleteProjectImages
 )
 
 export { projectRouter }

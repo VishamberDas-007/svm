@@ -42,7 +42,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteProjectImages = exports.uploadProjectImages = exports.uploadLogoImage = exports.uploadHappyCustomerImages = exports.getProjectBasicList = exports.getProject = exports.updateProject = exports.getAllProjects = exports.newProject = void 0;
+exports.deleteProjectImages = exports.uploadProjectImages = exports.uploadLogoImage = exports.uploadHappyCustomerImages = exports.getProjectBasicList = exports.getProjectImages = exports.getProjectDetails = exports.updateProject = exports.getAllProjects = exports.newProject = void 0;
 const catchAsync_1 = __importDefault(require("../utils/catchAsync"));
 const db_1 = __importDefault(require("../db"));
 const responseHandler_1 = __importDefault(require("../utils/responseHandler"));
@@ -260,9 +260,23 @@ exports.updateProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
     // })
     return (0, responseHandler_1.default)(res, project_1.PROJECT_S_0004, updateProject);
 }));
-exports.getProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.getProjectDetails = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, validations_1.default)(generalValidation.projectIdValidator, req.params);
     const projectId = req.params.projectId;
+    const fetchProject = yield db_1.default.project.findFirst({
+        where: {
+            projectId,
+        },
+    });
+    if (!fetchProject)
+        throw new AppError_1.default(project_1.PROJECT_E_0001);
+    else
+        return (0, responseHandler_1.default)(res, project_1.PROJECT_S_0003, fetchProject);
+}));
+exports.getProjectImages = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, validations_1.default)(generalValidation.projectIdValidator, req.params);
+    const projectId = req.params.projectId;
+    const planningImages = [], siteImages = [];
     const fetchProject = yield db_1.default.project.findFirst({
         where: {
             projectId,
@@ -273,8 +287,27 @@ exports.getProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
     });
     if (!fetchProject)
         throw new AppError_1.default(project_1.PROJECT_E_0001);
-    else
-        return (0, responseHandler_1.default)(res, project_1.PROJECT_S_0003, fetchProject);
+    fetchProject.projectImages.forEach((image) => {
+        if (image.type === 'PLANNING')
+            planningImages.push({
+                projectImageId: image.projectImageId,
+                type: image.type,
+                url: image.url,
+            });
+        else if (image.type === 'SITE') {
+            siteImages.push({
+                projectImageId: image.projectImageId,
+                type: image.type,
+                url: image.url,
+            });
+        }
+    });
+    const result = {
+        planningImages,
+        siteImages,
+        logoUrl: fetchProject.logoUrl,
+    };
+    return (0, responseHandler_1.default)(res, project_1.PROJECT_S_0009, result);
 }));
 exports.getProjectBasicList = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const fetchProjects = yield db_1.default.project.findMany({
@@ -320,16 +353,18 @@ exports.uploadLogoImage = (0, catchAsync_1.default)((req, res) => __awaiter(void
     return (0, responseHandler_1.default)(res, project_1.PROJECT_S_0006, { logoUrl });
 }));
 exports.uploadProjectImages = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _d, _e, _f, _g;
+    var _d, e_1, _e, _f;
+    var _g, _h, _j, _k;
     yield (0, validations_1.default)(generalValidation.projectIdValidator, req.params);
     const { projectId } = req.params;
     let data = [];
-    const planningImageUrls = (_e = (_d = req.files) === null || _d === void 0 ? void 0 : _d['planningImages']) === null || _e === void 0 ? void 0 : _e.map((image) => ({
+    const result = [];
+    const planningImageUrls = (_h = (_g = req.files) === null || _g === void 0 ? void 0 : _g['planningImages']) === null || _h === void 0 ? void 0 : _h.map((image) => ({
         url: image.location,
         type: 'PLANNING',
         projectId: projectId,
     }));
-    const siteImageUrls = (_g = (_f = req.files) === null || _f === void 0 ? void 0 : _f['siteImages']) === null || _g === void 0 ? void 0 : _g.map((image) => ({
+    const siteImageUrls = (_k = (_j = req.files) === null || _j === void 0 ? void 0 : _j['siteImages']) === null || _k === void 0 ? void 0 : _k.map((image) => ({
         url: image.location,
         type: 'SITE',
         projectId: projectId,
@@ -340,11 +375,34 @@ exports.uploadProjectImages = (0, catchAsync_1.default)((req, res) => __awaiter(
     if (siteImageUrls === null || siteImageUrls === void 0 ? void 0 : siteImageUrls.length) {
         data = [...data, ...siteImageUrls];
     }
-    yield db_1.default.projectImages.createMany({
-        data,
-    });
-    // })
-    return (0, responseHandler_1.default)(res, project_1.PROJECT_S_0007);
+    try {
+        for (var _l = true, data_1 = __asyncValues(data), data_1_1; data_1_1 = yield data_1.next(), _d = data_1_1.done, !_d;) {
+            _f = data_1_1.value;
+            _l = false;
+            try {
+                const obj = _f;
+                const addImage = yield db_1.default.projectImages.create({
+                    data: obj,
+                });
+                result.push({
+                    projectImageId: addImage.projectImageId,
+                    type: addImage.type,
+                    url: addImage.url,
+                });
+            }
+            finally {
+                _l = true;
+            }
+        }
+    }
+    catch (e_1_1) { e_1 = { error: e_1_1 }; }
+    finally {
+        try {
+            if (!_l && !_d && (_e = data_1.return)) yield _e.call(data_1);
+        }
+        finally { if (e_1) throw e_1.error; }
+    }
+    return (0, responseHandler_1.default)(res, project_1.PROJECT_S_0007, result);
 }));
 exports.deleteProjectImages = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, validations_1.default)(generalValidation.projectIdValidator, req.params);
@@ -363,26 +421,26 @@ exports.deleteProjectImages = (0, catchAsync_1.default)((req, res) => __awaiter(
         return array[array.length - 1];
     });
     yield db_1.default.$transaction((prisma) => __awaiter(void 0, void 0, void 0, function* () {
-        var _h, e_1, _j, _k;
+        var _m, e_2, _o, _p;
         try {
-            for (var _l = true, imagesFileNames_1 = __asyncValues(imagesFileNames), imagesFileNames_1_1; imagesFileNames_1_1 = yield imagesFileNames_1.next(), _h = imagesFileNames_1_1.done, !_h;) {
-                _k = imagesFileNames_1_1.value;
-                _l = false;
+            for (var _q = true, imagesFileNames_1 = __asyncValues(imagesFileNames), imagesFileNames_1_1; imagesFileNames_1_1 = yield imagesFileNames_1.next(), _m = imagesFileNames_1_1.done, !_m;) {
+                _p = imagesFileNames_1_1.value;
+                _q = false;
                 try {
-                    const iterator = _k;
+                    const iterator = _p;
                     yield (0, s3_1.deleteImage)(iterator);
                 }
                 finally {
-                    _l = true;
+                    _q = true;
                 }
             }
         }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        catch (e_2_1) { e_2 = { error: e_2_1 }; }
         finally {
             try {
-                if (!_l && !_h && (_j = imagesFileNames_1.return)) yield _j.call(imagesFileNames_1);
+                if (!_q && !_m && (_o = imagesFileNames_1.return)) yield _o.call(imagesFileNames_1);
             }
-            finally { if (e_1) throw e_1.error; }
+            finally { if (e_2) throw e_2.error; }
         }
         yield prisma.projectImages.deleteMany({
             where: {

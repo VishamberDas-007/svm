@@ -35,7 +35,7 @@ exports.updateProjectValidator = joi_1.default.object({
     pincode: joi_1.default.string().optional(),
     status: joi_1.default.valid(...projectStatus).optional(),
     unit: joi_1.default.string().optional(),
-    address2: joi_1.default.string().optional(),
+    address2: joi_1.default.string().allow(null, '').optional(),
     // planningImages: Joi.any().optional(),
     // siteImages: Joi.any().optional(),
     // logo: Joi.any().optional(),
