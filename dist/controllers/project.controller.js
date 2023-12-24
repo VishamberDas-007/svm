@@ -54,6 +54,7 @@ const generalValidation = __importStar(require("../validations/_general.validato
 const project_service_1 = require("../services/project.service");
 const s3_1 = require("../aws/s3");
 // import { deleteImage } from '../aws/s3'
+// import { deleteImage } from '../aws/s3'
 exports.newProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, validations_1.default)(validation.createProjectValidator, req.body);
     const { parentId, address1, address2, area, description, name, ownerName, pincode, status, unit, downPayment, emiAmt, location, totalAmt, } = req.body;
@@ -64,6 +65,7 @@ exports.newProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
             throw new AppError_1.default(project_1.PROJECT_E_0002);
     }
     yield db_1.default.$transaction((prisma) => __awaiter(void 0, void 0, void 0, function* () {
+        // const logoUrl = req.file?.location
         // const logoUrl = req.file?.location
         newProject = yield prisma.project.create({
             data: {
@@ -78,12 +80,20 @@ exports.newProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
                 status,
                 unit,
                 // logoUrl,
+                // logoUrl,
                 downPayment: +downPayment,
                 emiAmt: +emiAmt,
                 location,
                 totalAmt: +totalAmt,
             },
         });
+        // const planningImageUrls = req.files?.['planningImages']?.map(
+        //     (image: TImageUpload) => ({
+        //         url: image.location,
+        //         type: 'PLANNING',
+        //         projectId: newProject?.projectId,
+        //     })
+        // )
         // const planningImageUrls = req.files?.['planningImages']?.map(
         //     (image: TImageUpload) => ({
         //         url: image.location,
@@ -98,12 +108,28 @@ exports.newProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
         //         projectId: newProject?.projectId,
         //     })
         // )
+        // const siteImageUrls = req.files?.['siteImages']?.map(
+        //     (image: TImageUpload) => ({
+        //         url: image.location,
+        //         type: 'SITE',
+        //         projectId: newProject?.projectId,
+        //     })
+        // )
+        // if (planningImageUrls?.length) {
+        //     data = [...planningImageUrls]
+        // }
         // if (planningImageUrls?.length) {
         //     data = [...planningImageUrls]
         // }
         // if (siteImageUrls?.length) {
         //     data = [...data, ...siteImageUrls]
         // }
+        // if (siteImageUrls?.length) {
+        //     data = [...data, ...siteImageUrls]
+        // }
+        // await prisma.projectImages.createMany({
+        //     data,
+        // })
         // await prisma.projectImages.createMany({
         //     data,
         // })
@@ -197,10 +223,34 @@ exports.updateProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
     //         | undefined,
     //     deleteProjectImageFileNames: string[] = [],
     //  updateProject: Project | undefined
+    // let planningImageUrls: string[] = [],
+    //     siteImageUrls: string[] = [],
+    //     imageUpdate:
+    //         | {
+    //               projectImages: {
+    //                   createMany: {
+    //                       data: any[]
+    //                       skipDuplicates: boolean
+    //                   }
+    //               }
+    //           }
+    //         | undefined,
+    //     deleteProjectImageFileNames: string[] = [],
+    //  updateProject: Project | undefined
     // planningImageUrls =
     //     req.files?.['planningImages']?.map((image: TImageUpload) => ({
     //         url: image.location,
     //         type: 'PLANNING',
+    //     })) || []
+    // planningImageUrls =
+    //     req.files?.['planningImages']?.map((image: TImageUpload) => ({
+    //         url: image.location,
+    //         type: 'PLANNING',
+    //     })) || []
+    // siteImageUrls =
+    //     req.files?.['siteImages']?.map((image: TImageUpload) => ({
+    //         url: image.location,
+    //         type: 'SITE',
     //     })) || []
     // siteImageUrls =
     //     req.files?.['siteImages']?.map((image: TImageUpload) => ({
@@ -212,6 +262,15 @@ exports.updateProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
     //         projectId,
     //     },
     // })
+    // const projectImages = await prisma.projectImages.findMany({
+    //     where: {
+    //         projectId,
+    //     },
+    // })
+    // deleteProjectImageFileNames = projectImages.length
+    //     ? projectImages.map((project) => {
+    //           const fileName =
+    //               project.url.split('/')[project.url.split('/')?.length - 1]
     // deleteProjectImageFileNames = projectImages.length
     //     ? projectImages.map((project) => {
     //           const fileName =
@@ -219,6 +278,18 @@ exports.updateProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
     //           return fileName
     //       })
     //     : []
+    //           return fileName
+    //       })
+    //     : []
+    // if (siteImageUrls.length || planningImageUrls.length)
+    //     imageUpdate = {
+    //         projectImages: {
+    //             createMany: {
+    //                 data: [...siteImageUrls, ...planningImageUrls],
+    //                 skipDuplicates: true,
+    //             },
+    //         },
+    //     }
     // if (siteImageUrls.length || planningImageUrls.length)
     //     imageUpdate = {
     //         projectImages: {
@@ -232,10 +303,20 @@ exports.updateProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
     // for await (const fileName of deleteProjectImageFileNames) {
     //     await deleteImage(fileName)
     // }
+    // await prisma.$transaction(async (prisma) => {
+    // for await (const fileName of deleteProjectImageFileNames) {
+    //     await deleteImage(fileName)
+    // }
     // await prisma.projectImages.deleteMany({
     //     where: {
     //         projectId,
     //     },
+    // })
+    // await prisma.projectImages.deleteMany({
+    //     where: {
+    //         projectId,
+    //     },
+    // })
     // })
     const updateProject = yield db_1.default.project.update({
         where: {
