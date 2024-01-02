@@ -42,7 +42,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateCustomer = exports.getCustomer = exports.getAdvanceCustomerList = exports.getBasicCustomerList = exports.newCustomer = void 0;
+exports.updateCustomer = exports.getCustomer = exports.getAdvanceCustomerList = exports.getBasicCustomerList = exports.uploadCustomerImage = exports.uploadAadharImage = exports.uploadPanImage = exports.newCustomer = void 0;
 const catchAsync_1 = __importDefault(require("../utils/catchAsync"));
 const db_1 = __importDefault(require("../db"));
 const responseHandler_1 = __importDefault(require("../utils/responseHandler"));
@@ -52,7 +52,6 @@ const validation = __importStar(require("../validations/customer.validator"));
 const customer_1 = require("../config/responseCodes/customer");
 const s3_1 = require("../aws/s3");
 exports.newCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d, _e, _f;
     yield (0, validations_1.default)(validation.createCustomerValidator, req.body);
     const { aadharNo, firstName, email, lastName, phone } = req.body;
     const aadharExists = yield db_1.default.customer.findFirst({
@@ -63,18 +62,24 @@ exports.newCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
     if (aadharExists)
         throw new AppError_1.default(customer_1.CUSTOMER_E_0002);
     else {
-        const aadharImageUrls = (_b = (_a = req.files) === null || _a === void 0 ? void 0 : _a['aadharImages']) === null || _b === void 0 ? void 0 : _b.map((image) => ({
-            imageUrl: image.location,
-            type: 'AADHAR',
-        }));
-        const panImageUrls = (_d = (_c = req.files) === null || _c === void 0 ? void 0 : _c['panImages']) === null || _d === void 0 ? void 0 : _d.map((image) => ({
-            imageUrl: image.location,
-            type: 'PAN',
-        }));
-        const customerImageUrl = (_f = (_e = req.files) === null || _e === void 0 ? void 0 : _e['customerImage']) === null || _f === void 0 ? void 0 : _f.map((image) => ({
-            imageUrl: image.location,
-            type: 'PHOTO',
-        }));
+        // const aadharImageUrls = req.files?.['aadharImages']?.map(
+        //     (image: TImageUpload) => ({
+        //         imageUrl: image.location,
+        //         type: 'AADHAR',
+        //     })
+        // )
+        // const panImageUrls = req.files?.['panImages']?.map(
+        //     (image: TImageUpload) => ({
+        //         imageUrl: image.location,
+        //         type: 'PAN',
+        //     })
+        // )
+        // const customerImageUrl = req.files?.['customerImage']?.map(
+        //     (image: TImageUpload) => ({
+        //         imageUrl: image.location,
+        //         type: 'PHOTO',
+        //     })
+        // )
         const createCustomer = yield db_1.default.customer.create({
             data: {
                 aadharNo,
@@ -82,25 +87,67 @@ exports.newCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
                 lastName,
                 phone,
                 email,
-                customerImage: {
-                    createMany: {
-                        data: [
-                            ...aadharImageUrls,
-                            ...panImageUrls,
-                            ...customerImageUrl,
-                        ],
-                    },
-                },
+                // customerImage: {
+                //     createMany: {
+                //         data: [
+                //             ...aadharImageUrls,
+                //             ...panImageUrls,
+                //             ...customerImageUrl,
+                //         ],
+                //     },
+                // },
             },
-            include: {
-                customerImage: true,
-            },
+            // include: {
+            //     customerImage: true,
+            // },
         });
         return (0, responseHandler_1.default)(res, customer_1.CUSTOMER_S_0001, createCustomer);
     }
 }));
+exports.uploadPanImage = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    yield (0, validations_1.default)(validation.customerIdValidator, req.params);
+    const { customerId } = req.params;
+    const imageUrl = (_a = req.file) === null || _a === void 0 ? void 0 : _a.location;
+    const panImage = yield db_1.default.customerImage.create({
+        data: {
+            type: 'PAN',
+            imageUrl,
+            customerId,
+        },
+    });
+    return (0, responseHandler_1.default)(res, customer_1.CUSTOMER_S_0005, panImage);
+}));
+exports.uploadAadharImage = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _b, _c;
+    yield (0, validations_1.default)(validation.customerIdValidator, req.params);
+    const { customerId } = req.params;
+    const aadharImageUrls = (_c = (_b = req.files) === null || _b === void 0 ? void 0 : _b['aadharImages']) === null || _c === void 0 ? void 0 : _c.map((image) => ({
+        imageUrl: image.location,
+        type: 'AADHAR',
+        customerId,
+    }));
+    const aadharImages = yield db_1.default.customerImage.createMany({
+        data: aadharImageUrls,
+    });
+    return (0, responseHandler_1.default)(res, customer_1.CUSTOMER_S_0006, aadharImages);
+}));
+exports.uploadCustomerImage = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _d, _e;
+    yield (0, validations_1.default)(validation.customerIdValidator, req.params);
+    const { customerId } = req.params;
+    const aadharImageUrls = (_e = (_d = req.files) === null || _d === void 0 ? void 0 : _d['aadharImages']) === null || _e === void 0 ? void 0 : _e.map((image) => ({
+        imageUrl: image.location,
+        type: 'PHOTO',
+        customerId,
+    }));
+    const aadharImages = yield db_1.default.customerImage.createMany({
+        data: aadharImageUrls,
+    });
+    return (0, responseHandler_1.default)(res, customer_1.CUSTOMER_S_0007, aadharImages);
+}));
 exports.getBasicCustomerList = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _g;
+    var _f;
     const searchString = req.query.searchString;
     let whereClause;
     if (searchString) {
@@ -121,9 +168,9 @@ exports.getBasicCustomerList = (0, catchAsync_1.default)((req, res) => __awaiter
             ],
         };
     }
-    const fetchCustomerList = (_g = (yield db_1.default.customer.findMany({
+    const fetchCustomerList = (_f = (yield db_1.default.customer.findMany({
         where: whereClause,
-    }))) === null || _g === void 0 ? void 0 : _g.map((customer) => {
+    }))) === null || _f === void 0 ? void 0 : _f.map((customer) => {
         return {
             customerId: customer.customerId,
             firstName: customer.firstName,
@@ -240,8 +287,8 @@ exports.getCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
     }
 }));
 exports.updateCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _h, e_1, _j, _k;
-    var _l, _m, _o, _p, _q, _r;
+    var _g, e_1, _h, _j;
+    var _k, _l, _m, _o, _p, _q;
     yield (0, validations_1.default)(validation.customerIdValidator, req.params);
     yield (0, validations_1.default)(validation.updateCustomerValidator, req.body);
     const customerId = req.params.customerId;
@@ -271,36 +318,36 @@ exports.updateCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 
         }
         else {
             if (req.files) {
-                aadharImageUrls = (_m = (_l = req.files) === null || _l === void 0 ? void 0 : _l['aadharImages']) === null || _m === void 0 ? void 0 : _m.map((image) => ({
+                aadharImageUrls = (_l = (_k = req.files) === null || _k === void 0 ? void 0 : _k['aadharImages']) === null || _l === void 0 ? void 0 : _l.map((image) => ({
                     imageUrl: image.location,
                     type: 'AADHAR',
                 }));
-                panImageUrls = (_p = (_o = req.files) === null || _o === void 0 ? void 0 : _o['panImages']) === null || _p === void 0 ? void 0 : _p.map((image) => ({
+                panImageUrls = (_o = (_m = req.files) === null || _m === void 0 ? void 0 : _m['panImages']) === null || _o === void 0 ? void 0 : _o.map((image) => ({
                     imageUrl: image.location,
                     type: 'PAN',
                 }));
-                customerImageUrl = (_r = (_q = req.files) === null || _q === void 0 ? void 0 : _q['customerImage']) === null || _r === void 0 ? void 0 : _r.map((image) => ({
+                customerImageUrl = (_q = (_p = req.files) === null || _p === void 0 ? void 0 : _p['customerImage']) === null || _q === void 0 ? void 0 : _q.map((image) => ({
                     imageUrl: image.location,
                     type: 'PHOTO',
                 }));
                 try {
-                    for (var _s = true, _t = __asyncValues(fetchCustomer.customerImage), _u; _u = yield _t.next(), _h = _u.done, !_h;) {
-                        _k = _u.value;
-                        _s = false;
+                    for (var _r = true, _s = __asyncValues(fetchCustomer.customerImage), _t; _t = yield _s.next(), _g = _t.done, !_g;) {
+                        _j = _t.value;
+                        _r = false;
                         try {
-                            const image = _k;
+                            const image = _j;
                             const fileName = image.imageUrl.split('/').pop();
                             fileName && (yield (0, s3_1.deleteImage)(fileName));
                         }
                         finally {
-                            _s = true;
+                            _r = true;
                         }
                     }
                 }
                 catch (e_1_1) { e_1 = { error: e_1_1 }; }
                 finally {
                     try {
-                        if (!_s && !_h && (_j = _t.return)) yield _j.call(_t);
+                        if (!_r && !_g && (_h = _s.return)) yield _h.call(_s);
                     }
                     finally { if (e_1) throw e_1.error; }
                 }
