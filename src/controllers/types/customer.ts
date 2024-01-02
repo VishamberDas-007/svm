@@ -34,6 +34,7 @@ export type TCustomerRequest = Request & {
         panImages: any
         customerImage: any
     }
+    file: any
 }
 
 export type TCustomerList = TQueryRequest
