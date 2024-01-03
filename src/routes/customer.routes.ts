@@ -13,6 +13,11 @@ customerRouter.post(
     //     { name: 'panImages', maxCount: 1 },
     //     { name: 'customerImage', maxCount: 3 },
     // ]),
+    // upload.fields([
+    //     { name: 'aadharImages', maxCount: 2 },
+    //     { name: 'panImages', maxCount: 1 },
+    //     { name: 'customerImage', maxCount: 3 },
+    // ]),
     customerController.newCustomer
 )
 
