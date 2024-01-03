@@ -326,9 +326,6 @@ export const updateCustomer = catchAsync(
         await validator(validation.customerIdValidator, req.params)
         await validator(validation.updateCustomerValidator, req.body)
         const customerId = req.params.customerId
-        let aadharImageUrls = [],
-            panImageUrls = [],
-            customerImageUrl = []
 
         const { aadharNo, firstName, email, lastName, phone }: TCustomer =
             req.body
@@ -356,33 +353,6 @@ export const updateCustomer = catchAsync(
             if (aadharExists) {
                 throw new AppError(CUSTOMER_E_0002)
             } else {
-                if (req.files) {
-                    aadharImageUrls = req.files?.['aadharImages']?.map(
-                        (image: TImageUpload) => ({
-                            imageUrl: image.location,
-                            type: 'AADHAR',
-                        })
-                    )
-
-                    panImageUrls = req.files?.['panImages']?.map(
-                        (image: TImageUpload) => ({
-                            imageUrl: image.location,
-                            type: 'PAN',
-                        })
-                    )
-
-                    customerImageUrl = req.files?.['customerImage']?.map(
-                        (image: TImageUpload) => ({
-                            imageUrl: image.location,
-                            type: 'PHOTO',
-                        })
-                    )
-                    for await (const image of fetchCustomer.customerImage) {
-                        const fileName = image.imageUrl.split('/').pop()
-                        fileName && (await deleteImage(fileName))
-                    }
-                }
-
                 const updatedCustomer = await prisma.customer.update({
                     where: {
                         customerId,
@@ -393,18 +363,6 @@ export const updateCustomer = catchAsync(
                         email,
                         lastName,
                         phone,
-                        customerImage: {
-                            deleteMany: {
-                                customerId,
-                            },
-                            createMany: {
-                                data: [
-                                    ...aadharImageUrls,
-                                    ...panImageUrls,
-                                    ...customerImageUrl,
-                                ],
-                            },
-                        },
                     },
                     include: {
                         customerImage: true,
