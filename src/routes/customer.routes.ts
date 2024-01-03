@@ -13,27 +13,32 @@ customerRouter.post(
     //     { name: 'panImages', maxCount: 1 },
     //     { name: 'customerImage', maxCount: 3 },
     // ]),
+    // upload.fields([
+    //     { name: 'aadharImages', maxCount: 2 },
+    //     { name: 'panImages', maxCount: 1 },
+    //     { name: 'customerImage', maxCount: 3 },
+    // ]),
     customerController.newCustomer
 )
 
 customerRouter.patch(
     '/upload/pan-image/:customerId',
-    upload.single('panImages'),
     authMiddleware(['CUSTOMER_WRITE']),
+    upload.single('panImages'),
     customerController.uploadPanImage
 )
 
 customerRouter.patch(
     '/upload/aadhar-image/:customerId',
-    upload.fields([{ name: 'aadharImages', maxCount: 2 }]),
     authMiddleware(['CUSTOMER_WRITE']),
+    upload.fields([{ name: 'aadharImages', maxCount: 2 }]),
     customerController.uploadAadharImage
 )
 
 customerRouter.patch(
     '/upload/customer-image/:customerId',
-    upload.fields([{ name: 'customerImage', maxCount: 3 }]),
     authMiddleware(['CUSTOMER_WRITE']),
+    upload.fields([{ name: 'customerImage', maxCount: 3 }]),
     customerController.uploadCustomerImage
 )
 
