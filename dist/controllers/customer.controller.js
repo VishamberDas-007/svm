@@ -31,13 +31,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __asyncValues = (this && this.__asyncValues) || function (o) {
-    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
-    var m = o[Symbol.asyncIterator], i;
-    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
-    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
-    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -50,7 +43,6 @@ const AppError_1 = __importDefault(require("../utils/AppError"));
 const validations_1 = __importDefault(require("../validations"));
 const validation = __importStar(require("../validations/customer.validator"));
 const customer_1 = require("../config/responseCodes/customer");
-const s3_1 = require("../aws/s3");
 exports.newCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, validations_1.default)(validation.createCustomerValidator, req.body);
     const { aadharNo, firstName, email, lastName, phone } = req.body;
@@ -287,12 +279,9 @@ exports.getCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
     }
 }));
 exports.updateCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _g, e_1, _h, _j;
-    var _k, _l, _m, _o, _p, _q;
     yield (0, validations_1.default)(validation.customerIdValidator, req.params);
     yield (0, validations_1.default)(validation.updateCustomerValidator, req.body);
     const customerId = req.params.customerId;
-    let aadharImageUrls = [], panImageUrls = [], customerImageUrl = [];
     const { aadharNo, firstName, email, lastName, phone } = req.body;
     const fetchCustomer = yield db_1.default.customer.findUnique({
         where: {
@@ -317,41 +306,6 @@ exports.updateCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 
             throw new AppError_1.default(customer_1.CUSTOMER_E_0002);
         }
         else {
-            if (req.files) {
-                aadharImageUrls = (_l = (_k = req.files) === null || _k === void 0 ? void 0 : _k['aadharImages']) === null || _l === void 0 ? void 0 : _l.map((image) => ({
-                    imageUrl: image.location,
-                    type: 'AADHAR',
-                }));
-                panImageUrls = (_o = (_m = req.files) === null || _m === void 0 ? void 0 : _m['panImages']) === null || _o === void 0 ? void 0 : _o.map((image) => ({
-                    imageUrl: image.location,
-                    type: 'PAN',
-                }));
-                customerImageUrl = (_q = (_p = req.files) === null || _p === void 0 ? void 0 : _p['customerImage']) === null || _q === void 0 ? void 0 : _q.map((image) => ({
-                    imageUrl: image.location,
-                    type: 'PHOTO',
-                }));
-                try {
-                    for (var _r = true, _s = __asyncValues(fetchCustomer.customerImage), _t; _t = yield _s.next(), _g = _t.done, !_g;) {
-                        _j = _t.value;
-                        _r = false;
-                        try {
-                            const image = _j;
-                            const fileName = image.imageUrl.split('/').pop();
-                            fileName && (yield (0, s3_1.deleteImage)(fileName));
-                        }
-                        finally {
-                            _r = true;
-                        }
-                    }
-                }
-                catch (e_1_1) { e_1 = { error: e_1_1 }; }
-                finally {
-                    try {
-                        if (!_r && !_g && (_h = _s.return)) yield _h.call(_s);
-                    }
-                    finally { if (e_1) throw e_1.error; }
-                }
-            }
             const updatedCustomer = yield db_1.default.customer.update({
                 where: {
                     customerId,
@@ -362,18 +316,6 @@ exports.updateCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 
                     email,
                     lastName,
                     phone,
-                    customerImage: {
-                        deleteMany: {
-                            customerId,
-                        },
-                        createMany: {
-                            data: [
-                                ...aadharImageUrls,
-                                ...panImageUrls,
-                                ...customerImageUrl,
-                            ],
-                        },
-                    },
                 },
                 include: {
                     customerImage: true,
