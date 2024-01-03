@@ -138,7 +138,7 @@ export const uploadCustomerImage = catchAsync(
 
         const { customerId } = req.params
 
-        const aadharImageUrls = req.files?.['aadharImages']?.map(
+        const customerImageUrls = req.files?.['customerImage']?.map(
             (image: TImageUpload) => ({
                 imageUrl: image.location,
                 type: 'PHOTO',
@@ -146,11 +146,11 @@ export const uploadCustomerImage = catchAsync(
             })
         )
 
-        const aadharImages = await prisma.customerImage.createMany({
-            data: aadharImageUrls,
+        const customerImages = await prisma.customerImage.createMany({
+            data: customerImageUrls,
         })
 
-        return responseHandler(res, CUSTOMER_S_0007, aadharImages)
+        return responseHandler(res, CUSTOMER_S_0007, customerImages)
     }
 )
 
