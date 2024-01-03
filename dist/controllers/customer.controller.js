@@ -136,15 +136,15 @@ exports.uploadCustomerImage = (0, catchAsync_1.default)((req, res) => __awaiter(
     var _d, _e;
     yield (0, validations_1.default)(validation.customerIdValidator, req.params);
     const { customerId } = req.params;
-    const aadharImageUrls = (_e = (_d = req.files) === null || _d === void 0 ? void 0 : _d['aadharImages']) === null || _e === void 0 ? void 0 : _e.map((image) => ({
+    const customerImageUrls = (_e = (_d = req.files) === null || _d === void 0 ? void 0 : _d['customerImage']) === null || _e === void 0 ? void 0 : _e.map((image) => ({
         imageUrl: image.location,
         type: 'PHOTO',
         customerId,
     }));
-    const aadharImages = yield db_1.default.customerImage.createMany({
-        data: aadharImageUrls,
+    const customerImages = yield db_1.default.customerImage.createMany({
+        data: customerImageUrls,
     });
-    return (0, responseHandler_1.default)(res, customer_1.CUSTOMER_S_0007, aadharImages);
+    return (0, responseHandler_1.default)(res, customer_1.CUSTOMER_S_0007, customerImages);
 }));
 exports.getBasicCustomerList = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _f;
