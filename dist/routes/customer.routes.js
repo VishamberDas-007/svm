@@ -40,9 +40,9 @@ customerRouter.post('/create', (0, auth_middleware_1.authMiddleware)(['CUSTOMER_
 //     { name: 'customerImage', maxCount: 3 },
 // ]),
 customerController.newCustomer);
-customerRouter.patch('/upload/pan-image/:customerId', s3_1.upload.single('panImages'), (0, auth_middleware_1.authMiddleware)(['CUSTOMER_WRITE']), customerController.uploadPanImage);
-customerRouter.patch('/upload/aadhar-image/:customerId', s3_1.upload.fields([{ name: 'aadharImages', maxCount: 2 }]), (0, auth_middleware_1.authMiddleware)(['CUSTOMER_WRITE']), customerController.uploadAadharImage);
-customerRouter.patch('/upload/customer-image/:customerId', s3_1.upload.fields([{ name: 'customerImage', maxCount: 3 }]), (0, auth_middleware_1.authMiddleware)(['CUSTOMER_WRITE']), customerController.uploadCustomerImage);
+customerRouter.patch('/upload/pan-image/:customerId', (0, auth_middleware_1.authMiddleware)(['CUSTOMER_WRITE']), s3_1.upload.single('panImages'), customerController.uploadPanImage);
+customerRouter.patch('/upload/aadhar-image/:customerId', (0, auth_middleware_1.authMiddleware)(['CUSTOMER_WRITE']), s3_1.upload.fields([{ name: 'aadharImages', maxCount: 2 }]), customerController.uploadAadharImage);
+customerRouter.patch('/upload/customer-image/:customerId', (0, auth_middleware_1.authMiddleware)(['CUSTOMER_WRITE']), s3_1.upload.fields([{ name: 'customerImage', maxCount: 3 }]), customerController.uploadCustomerImage);
 customerRouter.get('/basic-list', (0, auth_middleware_1.authMiddleware)(['CUSTOMER_READ', 'CUSTOMER_WRITE']), customerController.getBasicCustomerList);
 customerRouter.get('/advance-list', (0, auth_middleware_1.authMiddleware)(['CUSTOMER_READ', 'CUSTOMER_WRITE']), customerController.getAdvanceCustomerList);
 customerRouter.put('/update/:customerId', (0, auth_middleware_1.authMiddleware)(['CUSTOMER_WRITE']), s3_1.upload.fields([
