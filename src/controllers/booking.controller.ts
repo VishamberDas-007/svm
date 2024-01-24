@@ -354,6 +354,39 @@ export const getBooking = catchAsync(async (req: Request, res: Response) => {
 
     if (!fetchBooking) throw new AppError(BOOKING_E_0001)
 
+    let paymentDetails:
+        | ChequePayment
+        | UpiPayment
+        | BankPayment
+        | CashPayment
+        | null
+        | undefined
+
+    if (fetchBooking.paymentType === 'BANK_TRANSFER')
+        paymentDetails = await prisma.bankPayment.findFirst({
+            where: {
+                bookingId: fetchBooking.bookingId,
+            },
+        })
+    else if (fetchBooking.paymentType === 'CASH')
+        paymentDetails = await prisma.cashPayment.findFirst({
+            where: {
+                bookingId: fetchBooking.bookingId,
+            },
+        })
+    else if (fetchBooking.paymentType === 'UPI')
+        paymentDetails = await prisma.upiPayment.findFirst({
+            where: {
+                bookingId: fetchBooking.bookingId,
+            },
+        })
+    else if (fetchBooking.paymentType === 'CHEQUE')
+        paymentDetails = await prisma.chequePayment.findFirst({
+            where: {
+                bookingId: fetchBooking.bookingId,
+            },
+        })
+
     return responseHandler(res, BOOKING_S_0003, {
         ...fetchBooking,
         adminBankName: fetchBooking.adminAccount.bankName,
@@ -362,6 +395,7 @@ export const getBooking = catchAsync(async (req: Request, res: Response) => {
             ' ',
             fetchBooking.customer.lastName
         ),
+        ...paymentDetails,
         adminAccount: undefined,
         project: undefined,
         customer: undefined,

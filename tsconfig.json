@@ -10,5 +10,5 @@
         "noImplicitAny": true,
         "resolveJsonModule": true
     },
-    "exclude": ["./node_modules", "./example"]
+    "exclude": ["./node_modules"]
 }
