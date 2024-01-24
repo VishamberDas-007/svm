@@ -8,12 +8,38 @@ const customerRouter = express.Router()
 customerRouter.post(
     '/create',
     authMiddleware(['CUSTOMER_WRITE']),
-    upload.fields([
-        { name: 'aadharImages', maxCount: 2 },
-        { name: 'panImages', maxCount: 1 },
-        { name: 'customerImage', maxCount: 3 },
-    ]),
+    // upload.fields([
+    //     { name: 'aadharImages', maxCount: 2 },
+    //     { name: 'panImages', maxCount: 1 },
+    //     { name: 'customerImage', maxCount: 3 },
+    // ]),
+    // upload.fields([
+    //     { name: 'aadharImages', maxCount: 2 },
+    //     { name: 'panImages', maxCount: 1 },
+    //     { name: 'customerImage', maxCount: 3 },
+    // ]),
     customerController.newCustomer
+)
+
+customerRouter.patch(
+    '/upload/pan-image/:customerId',
+    authMiddleware(['CUSTOMER_WRITE']),
+    upload.single('panImages'),
+    customerController.uploadPanImage
+)
+
+customerRouter.patch(
+    '/upload/aadhar-image/:customerId',
+    authMiddleware(['CUSTOMER_WRITE']),
+    upload.fields([{ name: 'aadharImages', maxCount: 2 }]),
+    customerController.uploadAadharImage
+)
+
+customerRouter.patch(
+    '/upload/customer-image/:customerId',
+    authMiddleware(['CUSTOMER_WRITE']),
+    upload.fields([{ name: 'customerImage', maxCount: 3 }]),
+    customerController.uploadCustomerImage
 )
 
 customerRouter.get(
@@ -31,11 +57,6 @@ customerRouter.get(
 customerRouter.put(
     '/update/:customerId',
     authMiddleware(['CUSTOMER_WRITE']),
-    upload.fields([
-        { name: 'aadharImages', maxCount: 2 },
-        { name: 'panImages', maxCount: 1 },
-        { name: 'customerImage', maxCount: 3 },
-    ]),
     customerController.updateCustomer
 )
 

@@ -47,3 +47,27 @@ export const CUSTOMER_S_0004 = {
     message: 'Customer updated successfully',
     statusCode: 200,
 }
+
+export const CUSTOMER_S_0005 = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'CUSTOMER_S_0005',
+    isNotify: false,
+    message: 'Customer PAN uploaded successfully',
+    statusCode: 200,
+}
+
+export const CUSTOMER_S_0006 = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'CUSTOMER_S_0006',
+    isNotify: false,
+    message: 'Customer Aadhar uploaded successfully',
+    statusCode: 200,
+}
+
+export const CUSTOMER_S_0007 = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'CUSTOMER_S_0007',
+    isNotify: false,
+    message: 'Customer images uploaded successfully',
+    statusCode: 200,
+}

@@ -18,6 +18,9 @@ import {
     CUSTOMER_S_0002,
     CUSTOMER_S_0003,
     CUSTOMER_S_0004,
+    CUSTOMER_S_0005,
+    CUSTOMER_S_0006,
+    CUSTOMER_S_0007,
 } from '../config/responseCodes/customer'
 import { Customer } from '@prisma/client'
 import { TListData } from '../types/global.types'
@@ -39,26 +42,26 @@ export const newCustomer = catchAsync(
 
         if (aadharExists) throw new AppError(CUSTOMER_E_0002)
         else {
-            const aadharImageUrls = req.files?.['aadharImages']?.map(
-                (image: TImageUpload) => ({
-                    imageUrl: image.location,
-                    type: 'AADHAR',
-                })
-            )
+            // const aadharImageUrls = req.files?.['aadharImages']?.map(
+            //     (image: TImageUpload) => ({
+            //         imageUrl: image.location,
+            //         type: 'AADHAR',
+            //     })
+            // )
 
-            const panImageUrls = req.files?.['panImages']?.map(
-                (image: TImageUpload) => ({
-                    imageUrl: image.location,
-                    type: 'PAN',
-                })
-            )
+            // const panImageUrls = req.files?.['panImages']?.map(
+            //     (image: TImageUpload) => ({
+            //         imageUrl: image.location,
+            //         type: 'PAN',
+            //     })
+            // )
 
-            const customerImageUrl = req.files?.['customerImage']?.map(
-                (image: TImageUpload) => ({
-                    imageUrl: image.location,
-                    type: 'PHOTO',
-                })
-            )
+            // const customerImageUrl = req.files?.['customerImage']?.map(
+            //     (image: TImageUpload) => ({
+            //         imageUrl: image.location,
+            //         type: 'PHOTO',
+            //     })
+            // )
 
             const createCustomer = await prisma.customer.create({
                 data: {
@@ -67,23 +70,87 @@ export const newCustomer = catchAsync(
                     lastName,
                     phone,
                     email,
-                    customerImage: {
-                        createMany: {
-                            data: [
-                                ...aadharImageUrls,
-                                ...panImageUrls,
-                                ...customerImageUrl,
-                            ],
-                        },
-                    },
+                    // customerImage: {
+                    //     createMany: {
+                    //         data: [
+                    //             ...aadharImageUrls,
+                    //             ...panImageUrls,
+                    //             ...customerImageUrl,
+                    //         ],
+                    //     },
+                    // },
                 },
-                include: {
-                    customerImage: true,
-                },
+                // include: {
+                //     customerImage: true,
+                // },
             })
 
             return responseHandler(res, CUSTOMER_S_0001, createCustomer)
         }
+    }
+)
+
+export const uploadPanImage = catchAsync(
+    async (req: TCustomerRequest, res: Response) => {
+        await validator(validation.customerIdValidator, req.params)
+
+        const { customerId } = req.params
+
+        const imageUrl = req.file?.location
+
+        const panImage = await prisma.customerImage.create({
+            data: {
+                type: 'PAN',
+                imageUrl,
+                customerId,
+            },
+        })
+
+        return responseHandler(res, CUSTOMER_S_0005, panImage)
+    }
+)
+
+export const uploadAadharImage = catchAsync(
+    async (req: TCustomerRequest, res: Response) => {
+        await validator(validation.customerIdValidator, req.params)
+
+        const { customerId } = req.params
+
+        const aadharImageUrls = req.files?.['aadharImages']?.map(
+            (image: TImageUpload) => ({
+                imageUrl: image.location,
+                type: 'AADHAR',
+                customerId,
+            })
+        )
+
+        const aadharImages = await prisma.customerImage.createMany({
+            data: aadharImageUrls,
+        })
+
+        return responseHandler(res, CUSTOMER_S_0006, aadharImages)
+    }
+)
+
+export const uploadCustomerImage = catchAsync(
+    async (req: TCustomerRequest, res: Response) => {
+        await validator(validation.customerIdValidator, req.params)
+
+        const { customerId } = req.params
+
+        const customerImageUrls = req.files?.['customerImage']?.map(
+            (image: TImageUpload) => ({
+                imageUrl: image.location,
+                type: 'PHOTO',
+                customerId,
+            })
+        )
+
+        const customerImages = await prisma.customerImage.createMany({
+            data: customerImageUrls,
+        })
+
+        return responseHandler(res, CUSTOMER_S_0007, customerImages)
     }
 )
 
@@ -259,9 +326,6 @@ export const updateCustomer = catchAsync(
         await validator(validation.customerIdValidator, req.params)
         await validator(validation.updateCustomerValidator, req.body)
         const customerId = req.params.customerId
-        let aadharImageUrls = [],
-            panImageUrls = [],
-            customerImageUrl = []
 
         const { aadharNo, firstName, email, lastName, phone }: TCustomer =
             req.body
@@ -289,33 +353,6 @@ export const updateCustomer = catchAsync(
             if (aadharExists) {
                 throw new AppError(CUSTOMER_E_0002)
             } else {
-                if (req.files) {
-                    aadharImageUrls = req.files?.['aadharImages']?.map(
-                        (image: TImageUpload) => ({
-                            imageUrl: image.location,
-                            type: 'AADHAR',
-                        })
-                    )
-
-                    panImageUrls = req.files?.['panImages']?.map(
-                        (image: TImageUpload) => ({
-                            imageUrl: image.location,
-                            type: 'PAN',
-                        })
-                    )
-
-                    customerImageUrl = req.files?.['customerImage']?.map(
-                        (image: TImageUpload) => ({
-                            imageUrl: image.location,
-                            type: 'PHOTO',
-                        })
-                    )
-                    for await (const image of fetchCustomer.customerImage) {
-                        const fileName = image.imageUrl.split('/').pop()
-                        fileName && (await deleteImage(fileName))
-                    }
-                }
-
                 const updatedCustomer = await prisma.customer.update({
                     where: {
                         customerId,
@@ -326,18 +363,6 @@ export const updateCustomer = catchAsync(
                         email,
                         lastName,
                         phone,
-                        customerImage: {
-                            deleteMany: {
-                                customerId,
-                            },
-                            createMany: {
-                                data: [
-                                    ...aadharImageUrls,
-                                    ...panImageUrls,
-                                    ...customerImageUrl,
-                                ],
-                            },
-                        },
                     },
                     include: {
                         customerImage: true,
