@@ -292,7 +292,32 @@ exports.getBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
     });
     if (!fetchBooking)
         throw new AppError_1.default(booking_1.BOOKING_E_0001);
-    return (0, responseHandler_1.default)(res, booking_1.BOOKING_S_0003, Object.assign(Object.assign({}, fetchBooking), { adminBankName: fetchBooking.adminAccount.bankName, projectName: fetchBooking.project.name, customerName: fetchBooking.customer.firstName.concat(' ', fetchBooking.customer.lastName), adminAccount: undefined, project: undefined, customer: undefined }));
+    let paymentDetails;
+    if (fetchBooking.paymentType === 'BANK_TRANSFER')
+        paymentDetails = yield db_1.default.bankPayment.findFirst({
+            where: {
+                bookingId: fetchBooking.bookingId,
+            },
+        });
+    else if (fetchBooking.paymentType === 'CASH')
+        paymentDetails = yield db_1.default.cashPayment.findFirst({
+            where: {
+                bookingId: fetchBooking.bookingId,
+            },
+        });
+    else if (fetchBooking.paymentType === 'UPI')
+        paymentDetails = yield db_1.default.upiPayment.findFirst({
+            where: {
+                bookingId: fetchBooking.bookingId,
+            },
+        });
+    else if (fetchBooking.paymentType === 'CHEQUE')
+        paymentDetails = yield db_1.default.chequePayment.findFirst({
+            where: {
+                bookingId: fetchBooking.bookingId,
+            },
+        });
+    return (0, responseHandler_1.default)(res, booking_1.BOOKING_S_0003, Object.assign(Object.assign(Object.assign(Object.assign({}, fetchBooking), { adminBankName: fetchBooking.adminAccount.bankName, projectName: fetchBooking.project.name, customerName: fetchBooking.customer.firstName.concat(' ', fetchBooking.customer.lastName) }), paymentDetails), { adminAccount: undefined, project: undefined, customer: undefined }));
 }));
 exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, validations_1.default)(validation.bookingIdValidator, req.params);
