@@ -440,7 +440,95 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
 
     if (!bookingExists) throw new AppError(BOOKING_E_0001)
     else {
+        let paymentDetails = {}
         await prisma.$transaction(async (prisma) => {
+            if (paymentType === bookingExists.paymentType) {
+                if (paymentType === 'BANK_TRANSFER') {
+                    paymentDetails = {
+                        bankPayment: {
+                            update: {
+                                where: {
+                                    paymentId,
+                                },
+                                data: {
+                                    accountNumber: accountNo,
+                                    amount: +paidAmt,
+                                    bankName,
+                                },
+                            },
+                        },
+                    }
+                } else if (paymentType === 'CASH') {
+                    paymentDetails = {
+                        cashPayment: {
+                            update: {
+                                where: { paymentId },
+                                data: { amount: +paidAmt },
+                            },
+                        },
+                    }
+                } else if (paymentType === 'CHEQUE') {
+                    paymentDetails = {
+                        chequePayment: {
+                            update: {
+                                where: {
+                                    paymentId,
+                                },
+                                data: {
+                                    amount: +paidAmt,
+                                    bankName,
+                                    chequeNumber: chequeNo,
+                                },
+                            },
+                        },
+                    }
+                } else {
+                    paymentDetails = {
+                        where: {
+                            paymentId,
+                        },
+                        data: {
+                            amount: +paidAmt,
+                            upiId,
+                        },
+                    }
+                }
+            } else {
+                if (bookingExists.paymentType === 'BANK_TRANSFER') {
+                    paymentDetails = {
+                        bankPayment: {
+                            delete: {
+                                paymentId,
+                            },
+                        },
+                    }
+                } else if (bookingExists.paymentType === 'CASH') {
+                    paymentDetails = {
+                        cashPayment: {
+                            delete: {
+                                paymentId,
+                            },
+                        },
+                    }
+                } else if (bookingExists.paymentType === 'CHEQUE') {
+                    paymentDetails = {
+                        chequePayment: {
+                            delete: {
+                                paymentId,
+                            },
+                        },
+                    }
+                } else {
+                    paymentDetails = {
+                        upiPayment: {
+                            delete: {
+                                paymentId,
+                            },
+                        },
+                    }
+                }
+            }
+
             updatedBookingDetails = await prisma.booking.update({
                 where: {
                     bookingId,
@@ -461,48 +549,41 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
                     remainAmt: +remainAmt,
                     totalAmt: +totalAmt,
                     referralId,
+                    ...paymentDetails,
                 },
             })
 
             if (paymentType) {
                 if (paymentType === 'CHEQUE') {
-                    await prisma.chequePayment.update({
-                        where: {
-                            paymentId,
-                        },
+                    await prisma.chequePayment.create({
                         data: {
+                            bookingId,
                             amount: +paidAmt,
                             bankName,
                             chequeNumber: chequeNo,
                         },
                     })
                 } else if (paymentType === 'UPI') {
-                    await prisma.upiPayment.update({
-                        where: {
-                            paymentId,
-                        },
+                    await prisma.upiPayment.create({
                         data: {
+                            bookingId,
                             amount: +paidAmt,
                             upiId,
                         },
                     })
                 } else if (paymentType === 'BANK_TRANSFER') {
-                    await prisma.bankPayment.update({
-                        where: {
-                            paymentId,
-                        },
+                    await prisma.bankPayment.create({
                         data: {
+                            bookingId,
                             accountNumber: accountNo,
                             amount: +paidAmt,
                             bankName,
                         },
                     })
                 } else {
-                    await prisma.cashPayment.update({
-                        where: {
-                            paymentId,
-                        },
+                    await prisma.cashPayment.create({
                         data: {
+                            bookingId,
                             amount: +paidAmt,
                         },
                     })
