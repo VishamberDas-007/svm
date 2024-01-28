@@ -333,44 +333,53 @@ exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
     if (!bookingExists)
         throw new AppError_1.default(booking_1.BOOKING_E_0001);
     else {
+        let paymentDetails = {};
         yield db_1.default.$transaction((prisma) => __awaiter(void 0, void 0, void 0, function* () {
-            updatedBookingDetails = yield prisma.booking.update({
-                where: {
-                    bookingId,
-                },
-                data: {
-                    address1,
-                    address2,
-                    adminAccountId,
-                    area: +area,
-                    customerId,
-                    installmentAmt: +installmentAmt,
-                    installmentCount: +installmentCount,
-                    paidAmt: +paidAmt,
-                    paymentStatus,
-                    paymentType,
-                    pincode,
-                    projectId,
-                    remainAmt: +remainAmt,
-                    totalAmt: +totalAmt,
-                    referralId,
-                },
-            });
-            if (paymentType) {
-                if (paymentType === 'CHEQUE') {
-                    yield prisma.chequePayment.update({
-                        where: {
-                            paymentId,
+            if (paymentType === bookingExists.paymentType) {
+                if (paymentType === 'BANK_TRANSFER') {
+                    paymentDetails = {
+                        bankPayment: {
+                            update: {
+                                where: {
+                                    paymentId,
+                                },
+                                data: {
+                                    accountNumber: accountNo,
+                                    amount: +paidAmt,
+                                    bankName,
+                                },
+                            },
                         },
-                        data: {
-                            amount: +paidAmt,
-                            bankName,
-                            chequeNumber: chequeNo,
-                        },
-                    });
+                    };
                 }
-                else if (paymentType === 'UPI') {
-                    yield prisma.upiPayment.update({
+                else if (paymentType === 'CASH') {
+                    paymentDetails = {
+                        cashPayment: {
+                            update: {
+                                where: { paymentId },
+                                data: { amount: +paidAmt },
+                            },
+                        },
+                    };
+                }
+                else if (paymentType === 'CHEQUE') {
+                    paymentDetails = {
+                        chequePayment: {
+                            update: {
+                                where: {
+                                    paymentId,
+                                },
+                                data: {
+                                    amount: +paidAmt,
+                                    bankName,
+                                    chequeNumber: chequeNo,
+                                },
+                            },
+                        },
+                    };
+                }
+                else {
+                    paymentDetails = {
                         where: {
                             paymentId,
                         },
@@ -378,14 +387,82 @@ exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
                             amount: +paidAmt,
                             upiId,
                         },
+                    };
+                }
+            }
+            else {
+                if (bookingExists.paymentType === 'BANK_TRANSFER') {
+                    paymentDetails = {
+                        bankPayment: {
+                            delete: {
+                                paymentId,
+                            },
+                        },
+                    };
+                }
+                else if (bookingExists.paymentType === 'CASH') {
+                    paymentDetails = {
+                        cashPayment: {
+                            delete: {
+                                paymentId,
+                            },
+                        },
+                    };
+                }
+                else if (bookingExists.paymentType === 'CHEQUE') {
+                    paymentDetails = {
+                        chequePayment: {
+                            delete: {
+                                paymentId,
+                            },
+                        },
+                    };
+                }
+                else {
+                    paymentDetails = {
+                        upiPayment: {
+                            delete: {
+                                paymentId,
+                            },
+                        },
+                    };
+                }
+            }
+            updatedBookingDetails = yield prisma.booking.update({
+                where: {
+                    bookingId,
+                },
+                data: Object.assign({ address1,
+                    address2,
+                    adminAccountId, area: +area, customerId, installmentAmt: +installmentAmt, installmentCount: +installmentCount, paidAmt: +paidAmt, paymentStatus,
+                    paymentType,
+                    pincode,
+                    projectId, remainAmt: +remainAmt, totalAmt: +totalAmt, referralId }, paymentDetails),
+            });
+            if (paymentType) {
+                if (paymentType === 'CHEQUE') {
+                    yield prisma.chequePayment.create({
+                        data: {
+                            bookingId,
+                            amount: +paidAmt,
+                            bankName,
+                            chequeNumber: chequeNo,
+                        },
+                    });
+                }
+                else if (paymentType === 'UPI') {
+                    yield prisma.upiPayment.create({
+                        data: {
+                            bookingId,
+                            amount: +paidAmt,
+                            upiId,
+                        },
                     });
                 }
                 else if (paymentType === 'BANK_TRANSFER') {
-                    yield prisma.bankPayment.update({
-                        where: {
-                            paymentId,
-                        },
+                    yield prisma.bankPayment.create({
                         data: {
+                            bookingId,
                             accountNumber: accountNo,
                             amount: +paidAmt,
                             bankName,
@@ -393,11 +470,9 @@ exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
                     });
                 }
                 else {
-                    yield prisma.cashPayment.update({
-                        where: {
-                            paymentId,
-                        },
+                    yield prisma.cashPayment.create({
                         data: {
+                            bookingId,
                             amount: +paidAmt,
                         },
                     });
