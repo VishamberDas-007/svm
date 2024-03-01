@@ -30,6 +30,7 @@ export const upload = multer({
             cb(null, fullPath)
         },
     }),
+    limits: { fileSize: 1024 * 1024 * 5 },
 })
 
 export const deleteImage = async (key: string) => {

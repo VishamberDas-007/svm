@@ -44,7 +44,7 @@ customerRouter.patch(
 
 customerRouter.get(
     '/basic-list',
-    authMiddleware(['CUSTOMER_READ', 'CUSTOMER_WRITE']),
+    // authMiddleware(['CUSTOMER_READ', 'CUSTOMER_WRITE']),
     customerController.getBasicCustomerList
 )
 

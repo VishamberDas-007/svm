@@ -60,9 +60,9 @@ export const updateBookingValidator = Joi.object<TBookingUpdate>({
     paymentType: Joi.string().optional(),
     pincode: Joi.string().optional(),
     projectId: Joi.string().optional(),
-    remainAmt: Joi.string().optional(),
-    totalAmt: Joi.string().optional(),
-    referralId: util.uuid.allow('', null).optional(),
+    remainAmt: Joi.number().optional(),
+    totalAmt: Joi.number().optional(),
+    referralId: util.uuid.allow(null).optional(),
     accountNo: Joi.string().when('paymentType', {
         is: 'BANK_TRANSFER',
         then: Joi.required(),
