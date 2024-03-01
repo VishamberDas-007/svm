@@ -21,7 +21,7 @@ export default class Server {
         app.use(cors())
         // test()
 
-        app.use('/s@#$%^&*((/api', mainRouter)
+        app.use('/xq12opmpas/api', mainRouter)
         app.use('/*', (req: Request, res: Response) => {
             return res.status(404).send({
                 message: 'Route not found',
