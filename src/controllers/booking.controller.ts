@@ -415,7 +415,6 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
         customerId,
         installmentAmt,
         installmentCount,
-        paidAmt,
         paymentStatus,
         paymentType,
         pincode,
@@ -429,6 +428,9 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
         paymentId,
         referralId,
     }: TBookingUpdate = req.body
+
+    let { paidAmt } = req.body
+    paidAmt = !isNaN(+paidAmt) ? +paidAmt : undefined
 
     let updatedBookingDetails: Booking | undefined
 
@@ -452,7 +454,7 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
                                 },
                                 data: {
                                     accountNumber: accountNo,
-                                    amount: +paidAmt,
+                                    amount: paidAmt,
                                     bankName,
                                 },
                             },
@@ -463,7 +465,7 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
                         cashPayment: {
                             update: {
                                 where: { paymentId },
-                                data: { amount: +paidAmt },
+                                data: { amount: paidAmt },
                             },
                         },
                     }
@@ -475,7 +477,7 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
                                     paymentId,
                                 },
                                 data: {
-                                    amount: +paidAmt,
+                                    amount: paidAmt,
                                     bankName,
                                     chequeNumber: chequeNo,
                                 },
@@ -488,7 +490,7 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
                             paymentId,
                         },
                         data: {
-                            amount: +paidAmt,
+                            amount: paidAmt,
                             upiId,
                         },
                     }
@@ -541,7 +543,7 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
                     customerId,
                     installmentAmt: +installmentAmt,
                     installmentCount: +installmentCount,
-                    paidAmt: +paidAmt,
+                    paidAmt: paidAmt,
                     paymentStatus,
                     paymentType,
                     pincode,
@@ -558,7 +560,7 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
                     await prisma.chequePayment.create({
                         data: {
                             bookingId,
-                            amount: +paidAmt,
+                            amount: paidAmt,
                             bankName,
                             chequeNumber: chequeNo,
                         },
@@ -567,7 +569,7 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
                     await prisma.upiPayment.create({
                         data: {
                             bookingId,
-                            amount: +paidAmt,
+                            amount: paidAmt,
                             upiId,
                         },
                     })
@@ -576,7 +578,7 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
                         data: {
                             bookingId,
                             accountNumber: accountNo,
-                            amount: +paidAmt,
+                            amount: paidAmt,
                             bankName,
                         },
                     })
@@ -584,7 +586,7 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
                     await prisma.cashPayment.create({
                         data: {
                             bookingId,
-                            amount: +paidAmt,
+                            amount: paidAmt,
                         },
                     })
                 }
