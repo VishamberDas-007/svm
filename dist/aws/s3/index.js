@@ -42,6 +42,7 @@ exports.upload = (0, multer_1.default)({
             cb(null, fullPath);
         },
     }),
+    limits: { fileSize: 1024 * 1024 * 5 },
 });
 const deleteImage = (key) => __awaiter(void 0, void 0, void 0, function* () {
     try {

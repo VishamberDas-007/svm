@@ -323,7 +323,9 @@ exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
     yield (0, validations_1.default)(validation.bookingIdValidator, req.params);
     yield (0, validations_1.default)(validation.updateBookingValidator, req.body);
     const { bookingId } = req.params;
-    const { address1, address2, adminAccountId, area, customerId, installmentAmt, installmentCount, paidAmt, paymentStatus, paymentType, pincode, projectId, remainAmt, totalAmt, accountNo, bankName, chequeNo, upiId, paymentId, referralId, } = req.body;
+    const { address1, address2, adminAccountId, area, customerId, installmentAmt, installmentCount, paymentStatus, paymentType, pincode, projectId, remainAmt, totalAmt, accountNo, bankName, chequeNo, upiId, paymentId, referralId, } = req.body;
+    let { paidAmt } = req.body;
+    paidAmt = !isNaN(+paidAmt) ? +paidAmt : undefined;
     let updatedBookingDetails;
     const bookingExists = yield db_1.default.booking.findFirst({
         where: {
@@ -345,7 +347,7 @@ exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
                                 },
                                 data: {
                                     accountNumber: accountNo,
-                                    amount: +paidAmt,
+                                    amount: paidAmt,
                                     bankName,
                                 },
                             },
@@ -357,7 +359,7 @@ exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
                         cashPayment: {
                             update: {
                                 where: { paymentId },
-                                data: { amount: +paidAmt },
+                                data: { amount: paidAmt },
                             },
                         },
                     };
@@ -370,7 +372,7 @@ exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
                                     paymentId,
                                 },
                                 data: {
-                                    amount: +paidAmt,
+                                    amount: paidAmt,
                                     bankName,
                                     chequeNumber: chequeNo,
                                 },
@@ -384,7 +386,7 @@ exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
                             paymentId,
                         },
                         data: {
-                            amount: +paidAmt,
+                            amount: paidAmt,
                             upiId,
                         },
                     };
@@ -434,7 +436,7 @@ exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
                 },
                 data: Object.assign({ address1,
                     address2,
-                    adminAccountId, area: +area, customerId, installmentAmt: +installmentAmt, installmentCount: +installmentCount, paidAmt: +paidAmt, paymentStatus,
+                    adminAccountId, area: +area, customerId, installmentAmt: +installmentAmt, installmentCount: +installmentCount, paidAmt: paidAmt, paymentStatus,
                     paymentType,
                     pincode,
                     projectId, remainAmt: +remainAmt, totalAmt: +totalAmt, referralId }, paymentDetails),
@@ -444,7 +446,7 @@ exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
                     yield prisma.chequePayment.create({
                         data: {
                             bookingId,
-                            amount: +paidAmt,
+                            amount: paidAmt,
                             bankName,
                             chequeNumber: chequeNo,
                         },
@@ -454,7 +456,7 @@ exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
                     yield prisma.upiPayment.create({
                         data: {
                             bookingId,
-                            amount: +paidAmt,
+                            amount: paidAmt,
                             upiId,
                         },
                     });
@@ -464,7 +466,7 @@ exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
                         data: {
                             bookingId,
                             accountNumber: accountNo,
-                            amount: +paidAmt,
+                            amount: paidAmt,
                             bankName,
                         },
                     });
@@ -473,7 +475,7 @@ exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
                     yield prisma.cashPayment.create({
                         data: {
                             bookingId,
-                            amount: +paidAmt,
+                            amount: paidAmt,
                         },
                     });
                 }

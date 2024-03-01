@@ -61,9 +61,9 @@ exports.updateBookingValidator = joi_1.default.object({
     paymentType: joi_1.default.string().optional(),
     pincode: joi_1.default.string().optional(),
     projectId: joi_1.default.string().optional(),
-    remainAmt: joi_1.default.string().optional(),
-    totalAmt: joi_1.default.string().optional(),
-    referralId: helper_1.default.uuid.allow('', null).optional(),
+    remainAmt: joi_1.default.number().optional(),
+    totalAmt: joi_1.default.number().optional(),
+    referralId: helper_1.default.uuid.allow(null).optional(),
     accountNo: joi_1.default.string().when('paymentType', {
         is: 'BANK_TRANSFER',
         then: joi_1.default.required(),
