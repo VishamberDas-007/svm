@@ -20,7 +20,7 @@ class Server {
         // app.use(cookieParser())
         app.use((0, cors_1.default)());
         // test()
-        app.use('/s@#$%^&*((/api', routes_1.mainRouter);
+        app.use('/xq12opmpas/api', routes_1.mainRouter);
         app.use('/*', (req, res) => {
             return res.status(404).send({
                 message: 'Route not found',
