@@ -287,7 +287,11 @@ exports.getBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
         include: {
             adminAccount: true,
             project: true,
-            customer: true,
+            customer: {
+                include: {
+                    customerImage: true,
+                },
+            },
         },
     });
     if (!fetchBooking)
@@ -317,7 +321,7 @@ exports.getBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
                 bookingId: fetchBooking.bookingId,
             },
         });
-    return (0, responseHandler_1.default)(res, booking_1.BOOKING_S_0003, Object.assign(Object.assign(Object.assign(Object.assign({}, fetchBooking), { adminBankName: fetchBooking.adminAccount.bankName, projectName: fetchBooking.project.name, customerName: fetchBooking.customer.firstName.concat(' ', fetchBooking.customer.lastName) }), paymentDetails), { adminAccount: undefined, project: undefined, customer: undefined }));
+    return (0, responseHandler_1.default)(res, booking_1.BOOKING_S_0003, Object.assign(Object.assign(Object.assign(Object.assign({}, fetchBooking), { adminBankName: fetchBooking.adminAccount.bankName, projectName: fetchBooking.project.name, customerName: fetchBooking.customer.firstName.concat(' ', fetchBooking.customer.lastName), customerImage: fetchBooking.customer.customerImage, phone: fetchBooking.customer.phone }), paymentDetails), { adminAccount: undefined, project: undefined, customer: undefined }));
 }));
 exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, validations_1.default)(validation.bookingIdValidator, req.params);

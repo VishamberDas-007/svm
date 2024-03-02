@@ -348,7 +348,11 @@ export const getBooking = catchAsync(async (req: Request, res: Response) => {
         include: {
             adminAccount: true,
             project: true,
-            customer: true,
+            customer: {
+                include: {
+                    customerImage: true,
+                },
+            },
         },
     })
 
@@ -395,6 +399,8 @@ export const getBooking = catchAsync(async (req: Request, res: Response) => {
             ' ',
             fetchBooking.customer.lastName
         ),
+        customerImage: fetchBooking.customer.customerImage,
+        phone: fetchBooking.customer.phone,
         ...paymentDetails,
         adminAccount: undefined,
         project: undefined,
