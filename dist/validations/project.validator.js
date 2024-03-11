@@ -5,7 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.projectImageIdsValidator = exports.updateProjectValidator = exports.createProjectValidator = void 0;
 const joi_1 = __importDefault(require("joi"));
-const helper_1 = __importDefault(require("../utils/helper"));
 const projectStatus = ['ACTIVE', 'COMPLETED', 'UPCOMING'];
 exports.createProjectValidator = joi_1.default.object({
     address1: joi_1.default.string().required(),
@@ -17,7 +16,6 @@ exports.createProjectValidator = joi_1.default.object({
     status: joi_1.default.valid(...projectStatus).required(),
     unit: joi_1.default.string().required(),
     address2: joi_1.default.string().allow('', null).optional(),
-    parentId: helper_1.default.uuid.allow('', null).optional(),
     // planningImages: Joi.any().optional(),
     // siteImages: Joi.any().optional(),
     logo: joi_1.default.any().optional(),

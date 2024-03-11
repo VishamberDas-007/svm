@@ -16,7 +16,6 @@ export const createProjectValidator = Joi.object<
     status: Joi.valid(...projectStatus).required(),
     unit: Joi.string().required(),
     address2: Joi.string().allow('', null).optional(),
-    parentId: util.uuid.allow('', null).optional(),
     // planningImages: Joi.any().optional(),
     // siteImages: Joi.any().optional(),
     logo: Joi.any().optional(),

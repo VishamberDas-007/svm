@@ -75,9 +75,6 @@ model Project {
     address1      String
     address2      String?
     pincode       String
-    parentId      String?
-    parentProject Project?        @relation(name: "ParentProject", fields: [parentId], references: [projectId])
-    childProject  Project[]       @relation(name: "ParentProject")
     logoUrl       String?
     location      String
     downPayment   Float

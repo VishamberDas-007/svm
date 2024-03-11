@@ -1,24 +1,24 @@
 model Project {
-    projectId     String        @id @default(uuid())
-    name          String
-    description   String?
-    ownerName     String
-    area          Float
-    unit          String
-    status        ProjectStatus @default(UPCOMING)
-    address1      String
-    address2      String?
-    pincode       String
-    parentId      String?
-    parentProject Project?      @relation("ParentProject", fields: [parentId], references: [projectId])
-    childProject  Project[]     @relation("ParentProject")
-    logoUrl       String?
-    location      String
-    downPayment   Float
-    emiAmt        Float
-    totalAmt      Float
-    createdAt     DateTime      @default(now())
-    updatedAt     DateTime      @updatedAt
+    projectId   String        @id @default(uuid())
+    name        String
+    description String?
+    ownerName   String
+    area        Float
+    unit        String
+    status      ProjectStatus @default(UPCOMING)
+    address1    String
+    address2    String?
+    pincode     String
+    // parentId      String?
+    // parentProject Project?      @relation("ParentProject", fields: [parentId], references: [projectId])
+    // childProject  Project[]     @relation("ParentProject")
+    logoUrl     String?
+    location    String
+    downPayment Float
+    emiAmt      Float
+    totalAmt    Float
+    createdAt   DateTime      @default(now())
+    updatedAt   DateTime      @updatedAt
 }
 
 enum ProjectStatus {
