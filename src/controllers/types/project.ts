@@ -5,7 +5,6 @@ import { Request } from 'express'
 export type TCreateProject = {
     name: string
     description?: string
-    parentId?: string
     ownerName: string
     area: number
     unit: string

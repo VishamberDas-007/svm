@@ -28,7 +28,7 @@ import AppError from '../utils/AppError'
 import validator from '../validations'
 import * as validation from '../validations/project.validator'
 import * as generalValidation from '../validations/_general.validator'
-import { projectExists } from '../services/project.service'
+
 import { TListData } from '../types/global.types'
 import { deleteImage } from '../aws/s3'
 // import { deleteImage } from '../aws/s3'
@@ -39,7 +39,6 @@ export const newProject = catchAsync(
         await validator(validation.createProjectValidator, req.body)
 
         const {
-            parentId,
             address1,
             address2,
             area,
@@ -57,19 +56,12 @@ export const newProject = catchAsync(
 
         let newProject: Project | null | undefined
 
-        if (parentId) {
-            const project = await projectExists(parentId)
-
-            if (!project) throw new AppError(PROJECT_E_0002)
-        }
-
         await prisma.$transaction(async (prisma) => {
             // const logoUrl = req.file?.location
             // const logoUrl = req.file?.location
 
             newProject = await prisma.project.create({
                 data: {
-                    parentId,
                     address1,
                     address2,
                     area: +area,

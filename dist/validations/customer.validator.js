@@ -10,7 +10,7 @@ exports.createCustomerValidator = joi_1.default.object({
     aadharNo: joi_1.default.string().length(12).required(),
     firstName: joi_1.default.string().required(),
     lastName: joi_1.default.string().required(),
-    email: helper_1.default.emailValidator.required(),
+    email: helper_1.default.emailValidator.allow(null, '').optional(),
     phone: helper_1.default.phoneValidator.required(),
 });
 exports.updateCustomerValidator = joi_1.default.object({

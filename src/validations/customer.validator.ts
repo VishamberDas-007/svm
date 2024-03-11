@@ -6,7 +6,7 @@ export const createCustomerValidator = Joi.object<TCustomer>({
     aadharNo: Joi.string().length(12).required(),
     firstName: Joi.string().required(),
     lastName: Joi.string().required(),
-    email: util.emailValidator.required(),
+    email: util.emailValidator.allow(null, '').optional(),
     phone: util.phoneValidator.required(),
 })
 

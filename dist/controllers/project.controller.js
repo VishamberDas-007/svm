@@ -51,25 +51,18 @@ const AppError_1 = __importDefault(require("../utils/AppError"));
 const validations_1 = __importDefault(require("../validations"));
 const validation = __importStar(require("../validations/project.validator"));
 const generalValidation = __importStar(require("../validations/_general.validator"));
-const project_service_1 = require("../services/project.service");
 const s3_1 = require("../aws/s3");
 // import { deleteImage } from '../aws/s3'
 // import { deleteImage } from '../aws/s3'
 exports.newProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, validations_1.default)(validation.createProjectValidator, req.body);
-    const { parentId, address1, address2, area, description, name, ownerName, pincode, status, unit, downPayment, emiAmt, location, totalAmt, } = req.body;
+    const { address1, address2, area, description, name, ownerName, pincode, status, unit, downPayment, emiAmt, location, totalAmt, } = req.body;
     let newProject;
-    if (parentId) {
-        const project = yield (0, project_service_1.projectExists)(parentId);
-        if (!project)
-            throw new AppError_1.default(project_1.PROJECT_E_0002);
-    }
     yield db_1.default.$transaction((prisma) => __awaiter(void 0, void 0, void 0, function* () {
         // const logoUrl = req.file?.location
         // const logoUrl = req.file?.location
         newProject = yield prisma.project.create({
             data: {
-                parentId,
                 address1,
                 address2,
                 area: +area,
