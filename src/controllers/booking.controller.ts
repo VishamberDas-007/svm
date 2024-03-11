@@ -12,6 +12,8 @@ import validator from '../validations'
 import * as validation from '../validations/booking.validator'
 import {
     BOOKING_E_0001,
+    BOOKING_E_0002,
+    BOOKING_E_0003,
     BOOKING_S_0001,
     BOOKING_S_0002,
     BOOKING_S_0003,
@@ -31,6 +33,7 @@ import {
 import { TListData } from '../types/global.types'
 // import { getValueInRedis, setValueInRedis } from '../redis/config'
 import { fetchCustomerDetails } from '../services/_general.service'
+import { checkIfProjectAreaExists } from '../services/booking.service'
 
 export const createBooking = catchAsync(async (req: Request, res: Response) => {
     await validator(validation.createBookingValidator, req.body)
@@ -56,6 +59,21 @@ export const createBooking = catchAsync(async (req: Request, res: Response) => {
         upiId,
         referralId,
     }: TBooking = req.body
+
+    const projectData = await prisma.project.findFirst({
+        where: {
+            projectId,
+        },
+        include: {
+            booking: true,
+        },
+    })
+
+    if (!projectData) throw new AppError(BOOKING_E_0002)
+
+    const areaExists = checkIfProjectAreaExists(projectData, area)
+
+    if (!areaExists) throw new AppError(BOOKING_E_0003)
 
     let newBooking: Booking | undefined,
         paymentDetails:

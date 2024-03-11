@@ -8,6 +8,22 @@ export const BOOKING_E_0001: TResponseCode = {
     statusCode: 404,
 }
 
+export const BOOKING_E_0002: TResponseCode = {
+    type: RESPONSE_TYPE.ERROR,
+    code: 'BOOKING_E_0002',
+    isNotify: true,
+    message: 'Failed to fetch Project Details',
+    statusCode: 404,
+}
+
+export const BOOKING_E_0003: TResponseCode = {
+    type: RESPONSE_TYPE.ERROR,
+    code: 'BOOKING_E_0003',
+    isNotify: true,
+    message: 'Area Unavailability: It exceeds the total project area',
+    statusCode: 400,
+}
+
 export const BOOKING_S_0001: TResponseCode = {
     type: RESPONSE_TYPE.SUCCESS,
     code: 'BOOKING_S_0001',
