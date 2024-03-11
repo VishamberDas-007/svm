@@ -12,11 +12,6 @@ export type TCreateProject = {
     address1: string
     address2?: string
     pincode: string
-    // planningImages: string[]
-    // siteImages?: string[]
-    emiAmt: number
-    downPayment: number
-    totalAmt: number
     location: string
 }
 
