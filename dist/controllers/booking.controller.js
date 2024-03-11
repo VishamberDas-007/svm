@@ -52,9 +52,23 @@ const booking_1 = require("../config/responseCodes/booking");
 const AppError_1 = __importDefault(require("../utils/AppError"));
 // import { getValueInRedis, setValueInRedis } from '../redis/config'
 const _general_service_1 = require("../services/_general.service");
+const booking_service_1 = require("../services/booking.service");
 exports.createBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, validations_1.default)(validation.createBookingValidator, req.body);
     const { address1, address2, adminAccountId, area, customerId, installmentAmt, installmentCount, paidAmt, paymentStatus, paymentType, pincode, projectId, remainAmt, totalAmt, accountNo, bankName, chequeNo, upiId, referralId, } = req.body;
+    const projectData = yield db_1.default.project.findFirst({
+        where: {
+            projectId,
+        },
+        include: {
+            booking: true,
+        },
+    });
+    if (!projectData)
+        throw new AppError_1.default(booking_1.BOOKING_E_0002);
+    const areaExists = (0, booking_service_1.checkIfProjectAreaExists)(projectData, area);
+    if (!areaExists)
+        throw new AppError_1.default(booking_1.BOOKING_E_0003);
     let newBooking, paymentDetails;
     yield db_1.default.$transaction((prisma) => __awaiter(void 0, void 0, void 0, function* () {
         newBooking = yield prisma.booking.create({
