@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.accountIdValidator = exports.updateAccountValidator = exports.createAccountValidator = void 0;
 const joi_1 = __importDefault(require("joi"));
 exports.createAccountValidator = joi_1.default.object({
-    accNo: joi_1.default.string().required(),
+    accNo: joi_1.default.string().max(25).required(),
     bankName: joi_1.default.string().required(),
     name: joi_1.default.string().required(),
 });

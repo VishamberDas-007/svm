@@ -31,7 +31,10 @@ customerRouter.patch(
 customerRouter.patch(
     '/upload/aadhar-image/:customerId',
     authMiddleware(['CUSTOMER_WRITE']),
-    upload.fields([{ name: 'aadharImages', maxCount: 2 }]),
+    upload.fields([
+        { name: 'aadharImageFront', maxCount: 1 },
+        { name: 'aadharImageRear', maxCount: 1 },
+    ]),
     customerController.uploadAadharImage
 )
 
@@ -64,6 +67,12 @@ customerRouter.get(
     '/get/:customerId',
     authMiddleware(['CUSTOMER_READ', 'CUSTOMER_WRITE']),
     customerController.getCustomer
+)
+
+customerRouter.delete(
+    '/delete-image/:customerImageId',
+    authMiddleware(['CUSTOMER_READ', 'CUSTOMER_WRITE']),
+    customerController.deleteCustomerImage
 )
 
 export { customerRouter }

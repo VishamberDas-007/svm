@@ -82,10 +82,16 @@ projectRouter.patch(
     projectController.uploadProjectImages
 )
 
+// projectRouter.delete(
+//     '/delete/project-images/:projectId',
+//     // authMiddleware(['PROJECT_WRITE']),
+//     projectController.deleteProjectImages
+// )
+
 projectRouter.delete(
-    '/delete/project-images/:projectId',
+    '/delete-image/:projectImageId',
     // authMiddleware(['PROJECT_WRITE']),
-    projectController.deleteProjectImages
+    projectController.deleteProjectImage
 )
 
 export { projectRouter }

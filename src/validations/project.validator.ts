@@ -1,5 +1,6 @@
 import Joi from 'joi'
 import { Project } from '@prisma/client'
+import util from '../utils/helper'
 
 const projectStatus = ['ACTIVE', 'COMPLETED', 'UPCOMING']
 
@@ -34,5 +35,9 @@ export const updateProjectValidator = Joi.object({
 })
 
 export const projectImageIdsValidator = Joi.object({
-    projectImageIds: Joi.array().items(Joi.string().required()).required(),
+    projectImageIds: Joi.array().items(util.uuid.required()).required(),
+})
+
+export const projectImageIdValidator = Joi.object({
+    projectImageId: util.uuid.required(),
 })

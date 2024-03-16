@@ -16,6 +16,14 @@ export const PROJECT_E_0002 = {
     statusCode: 404,
 }
 
+export const PROJECT_E_0003 = {
+    type: RESPONSE_TYPE.ERROR,
+    code: 'PROJECT_E_0003',
+    isNotify: false,
+    message: 'No such Project Image exists',
+    statusCode: 400,
+}
+
 export const PROJECT_S_0001 = {
     type: RESPONSE_TYPE.SUCCESS,
     code: 'PROJECT_S_0001',
@@ -85,5 +93,13 @@ export const PROJECT_S_0009 = {
     code: 'PROJECT_S_0009',
     isNotify: false,
     message: 'Project images fetched successfully',
+    statusCode: 200,
+}
+
+export const PROJECT_S_0010 = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'PROJECT_S_0010',
+    isNotify: false,
+    message: 'Project image deleted successfully',
     statusCode: 200,
 }

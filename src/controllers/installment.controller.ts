@@ -210,17 +210,15 @@ export const fetchBookingInstallmentDetails = catchAsync(
 
         const installmentNo = await getInstallmentCount(bookingId)
         const bookingDetails = await getBookingDetails(bookingId)
-
+        // TODO: Add the address of project and plot no of the booking in response
         return responseHandler(res, INSTALLMENT_S_0002, {
-            customerName:
-                bookingDetails.customer.firstName +
-                ' ' +
-                bookingDetails.customer.lastName,
+            customerName: bookingDetails.customer.name,
             installmentAmt: bookingDetails.installmentAmt,
-            pincode: bookingDetails.pincode,
+            // pincode: bookingDetails.pincode,
             installmentNo,
-            address1: bookingDetails.address1,
-            address2: bookingDetails.address2,
+            plotNo: bookingDetails.plotNo,
+            // address1: bookingDetails.address1,
+            // address2: bookingDetails.address2,
         })
     }
 )

@@ -3,9 +3,7 @@ import { TQueryRequest } from '../../types/global.types'
 
 export type TBooking = {
     projectId: string
-    address1: string
-    address2: string
-    pincode: string
+    plotNo: string
     area: number
     totalAmt: number
     paidAmt: number

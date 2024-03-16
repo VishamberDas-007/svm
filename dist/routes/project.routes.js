@@ -79,6 +79,11 @@ s3_1.upload.fields([
     { name: 'planningImages', maxCount: 20 },
     { name: 'siteImages', maxCount: 5 },
 ]), projectController.uploadProjectImages);
-projectRouter.delete('/delete/project-images/:projectId', 
+// projectRouter.delete(
+//     '/delete/project-images/:projectId',
+//     // authMiddleware(['PROJECT_WRITE']),
+//     projectController.deleteProjectImages
+// )
+projectRouter.delete('/delete-image/:projectImageId', 
 // authMiddleware(['PROJECT_WRITE']),
-projectController.deleteProjectImages);
+projectController.deleteProjectImage);

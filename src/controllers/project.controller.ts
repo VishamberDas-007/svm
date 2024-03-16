@@ -13,6 +13,7 @@ import responseHandler from '../utils/responseHandler'
 import {
     PROJECT_E_0001,
     PROJECT_E_0002,
+    PROJECT_E_0003,
     PROJECT_S_0001,
     PROJECT_S_0002,
     PROJECT_S_0003,
@@ -22,6 +23,7 @@ import {
     PROJECT_S_0007,
     PROJECT_S_0008,
     PROJECT_S_0009,
+    PROJECT_S_0010,
 } from '../config/responseCodes/project'
 import { Project } from '@prisma/client'
 import AppError from '../utils/AppError'
@@ -324,7 +326,7 @@ export const uploadLogoImage = catchAsync(
         const fileName = req.file.originalName
 
         await prisma.$transaction(async (prisma) => {
-            await deleteImage(fileName)
+            await deleteImage(fileName) // check if it is deleting the existing logo
 
             await prisma.project.update({
                 where: {
@@ -429,5 +431,31 @@ export const deleteProjectImages = catchAsync(
             })
         })
         return responseHandler(res, PROJECT_S_0008)
+    }
+)
+
+export const deleteProjectImage = catchAsync(
+    async (req: Request, res: Response) => {
+        await validator(validation.projectImageIdValidator, req.params)
+
+        const { projectImageId } = req.params
+
+        const imageExists = await prisma.projectImages.findFirst({
+            where: {
+                projectImageId,
+            },
+        })
+
+        if (!imageExists) throw new AppError(PROJECT_E_0003)
+
+        await deleteImage(imageExists.url?.split('/')?.pop() || '')
+
+        await prisma.projectImages.delete({
+            where: {
+                projectImageId,
+            },
+        })
+
+        return responseHandler(res, PROJECT_S_0010)
     }
 )

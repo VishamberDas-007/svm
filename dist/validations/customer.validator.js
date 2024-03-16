@@ -3,23 +3,34 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.customerIdValidator = exports.updateCustomerValidator = exports.createCustomerValidator = void 0;
+exports.customerImageIdValidator = exports.customerIdValidator = exports.updateCustomerValidator = exports.createCustomerValidator = void 0;
 const joi_1 = __importDefault(require("joi"));
 const helper_1 = __importDefault(require("../utils/helper"));
 exports.createCustomerValidator = joi_1.default.object({
     aadharNo: joi_1.default.string().length(12).required(),
-    firstName: joi_1.default.string().required(),
-    lastName: joi_1.default.string().required(),
+    name: joi_1.default.string().required(),
     email: helper_1.default.emailValidator.allow(null, '').optional(),
-    phone: helper_1.default.phoneValidator.required(),
+    phone1: helper_1.default.phoneValidator.optional(),
+    phone2: helper_1.default.phoneValidator.allow('', null).optional(),
+    city: joi_1.default.string().optional(),
+    pincode: joi_1.default.string().length(6).optional(),
+    state: joi_1.default.string().optional(),
+    address: joi_1.default.string().optional(),
 });
 exports.updateCustomerValidator = joi_1.default.object({
     aadharNo: joi_1.default.string().length(12).optional(),
-    firstName: joi_1.default.string().optional(),
-    lastName: joi_1.default.string().optional(),
+    name: joi_1.default.string().optional(),
     email: helper_1.default.emailValidator.optional(),
-    phone: helper_1.default.phoneValidator.optional(),
+    phone1: helper_1.default.phoneValidator.optional(),
+    phone2: helper_1.default.phoneValidator.allow('', null).optional(),
+    city: joi_1.default.string().allow('').optional(),
+    pincode: joi_1.default.string().length(6).allow('').optional(),
+    state: joi_1.default.string().allow('').optional(),
+    address: joi_1.default.string().allow('').optional(),
 });
 exports.customerIdValidator = joi_1.default.object({
     customerId: helper_1.default.uuid.required(),
+});
+exports.customerImageIdValidator = joi_1.default.object({
+    customerImageId: helper_1.default.uuid.required(),
 });

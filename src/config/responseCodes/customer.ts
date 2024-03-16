@@ -16,6 +16,14 @@ export const CUSTOMER_E_0002 = {
     statusCode: 409,
 }
 
+export const CUSTOMER_E_0003 = {
+    type: RESPONSE_TYPE.ERROR,
+    code: 'CUSTOMER_E_0003',
+    isNotify: false,
+    message: 'No such image exists',
+    statusCode: 400,
+}
+
 export const CUSTOMER_S_0001 = {
     type: RESPONSE_TYPE.SUCCESS,
     code: 'CUSTOMER_S_0001',
@@ -69,5 +77,13 @@ export const CUSTOMER_S_0007 = {
     code: 'CUSTOMER_S_0007',
     isNotify: false,
     message: 'Customer images uploaded successfully',
+    statusCode: 200,
+}
+
+export const CUSTOMER_S_0008 = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'CUSTOMER_S_0008',
+    isNotify: false,
+    message: 'Customer images deleted successfully',
     statusCode: 200,
 }
