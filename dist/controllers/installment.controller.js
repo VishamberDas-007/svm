@@ -208,14 +208,14 @@ exports.fetchBookingInstallmentDetails = (0, catchAsync_1.default)((req, res) =>
     const { bookingId } = req.params;
     const installmentNo = yield (0, installment_service_1.getInstallmentCount)(bookingId);
     const bookingDetails = yield (0, booking_service_1.getBookingDetails)(bookingId);
+    // TODO: Add the address of project and plot no of the booking in response
     return (0, responseHandler_1.default)(res, installment_1.INSTALLMENT_S_0002, {
-        customerName: bookingDetails.customer.firstName +
-            ' ' +
-            bookingDetails.customer.lastName,
+        customerName: bookingDetails.customer.name,
         installmentAmt: bookingDetails.installmentAmt,
-        pincode: bookingDetails.pincode,
+        // pincode: bookingDetails.pincode,
         installmentNo,
-        address1: bookingDetails.address1,
-        address2: bookingDetails.address2,
+        plotNo: bookingDetails.plotNo,
+        // address1: bookingDetails.address1,
+        // address2: bookingDetails.address2,
     });
 }));

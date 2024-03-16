@@ -12,6 +12,8 @@ import validator from '../validations'
 import * as validation from '../validations/booking.validator'
 import {
     BOOKING_E_0001,
+    BOOKING_E_0002,
+    BOOKING_E_0003,
     BOOKING_S_0001,
     BOOKING_S_0002,
     BOOKING_S_0003,
@@ -31,13 +33,12 @@ import {
 import { TListData } from '../types/global.types'
 // import { getValueInRedis, setValueInRedis } from '../redis/config'
 import { fetchCustomerDetails } from '../services/_general.service'
+import { checkIfProjectAreaExists } from '../services/booking.service'
 
 export const createBooking = catchAsync(async (req: Request, res: Response) => {
     await validator(validation.createBookingValidator, req.body)
 
     const {
-        address1,
-        address2,
         adminAccountId,
         area,
         customerId,
@@ -46,7 +47,7 @@ export const createBooking = catchAsync(async (req: Request, res: Response) => {
         paidAmt,
         paymentStatus,
         paymentType,
-        pincode,
+        plotNo,
         projectId,
         remainAmt,
         totalAmt,
@@ -56,6 +57,21 @@ export const createBooking = catchAsync(async (req: Request, res: Response) => {
         upiId,
         referralId,
     }: TBooking = req.body
+
+    const projectData = await prisma.project.findFirst({
+        where: {
+            projectId,
+        },
+        include: {
+            booking: true,
+        },
+    })
+
+    if (!projectData) throw new AppError(BOOKING_E_0002)
+
+    const areaExists = checkIfProjectAreaExists(projectData, area)
+
+    if (!areaExists) throw new AppError(BOOKING_E_0003)
 
     let newBooking: Booking | undefined,
         paymentDetails:
@@ -69,9 +85,7 @@ export const createBooking = catchAsync(async (req: Request, res: Response) => {
         newBooking = await prisma.booking.create({
             data: {
                 projectId,
-                address1,
-                address2,
-                pincode,
+                plotNo,
                 area: +area,
                 totalAmt: +totalAmt,
                 paidAmt: +paidAmt,
@@ -309,10 +323,7 @@ export const getAllBookings = catchAsync(
             result.push({
                 ...booking,
                 projectName: booking.project.name,
-                customerName: booking.customer.firstName.concat(
-                    ' ',
-                    booking.customer.lastName
-                ),
+                customerName: booking.customer.name,
                 adminBankName: booking.adminAccount.bankName,
                 ...paymentDetails,
                 adminAccount: undefined,
@@ -395,12 +406,11 @@ export const getBooking = catchAsync(async (req: Request, res: Response) => {
         ...fetchBooking,
         adminBankName: fetchBooking.adminAccount.bankName,
         projectName: fetchBooking.project.name,
-        customerName: fetchBooking.customer.firstName.concat(
-            ' ',
-            fetchBooking.customer.lastName
-        ),
+        customerName: fetchBooking.customer.name,
         customerImage: fetchBooking.customer.customerImage,
-        phone: fetchBooking.customer.phone,
+        phone1: fetchBooking.customer.phone1,
+        phone2: fetchBooking.customer.phone2,
+        description: fetchBooking.project.description,
         ...paymentDetails,
         adminAccount: undefined,
         project: undefined,
@@ -414,8 +424,6 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
     const { bookingId } = req.params
 
     const {
-        address1,
-        address2,
         adminAccountId,
         area,
         customerId,
@@ -423,8 +431,8 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
         installmentCount,
         paymentStatus,
         paymentType,
-        pincode,
         projectId,
+        plotNo,
         remainAmt,
         totalAmt,
         accountNo,
@@ -542,8 +550,6 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
                     bookingId,
                 },
                 data: {
-                    address1,
-                    address2,
                     adminAccountId,
                     area: +area,
                     customerId,
@@ -552,7 +558,7 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
                     paidAmt: paidAmt,
                     paymentStatus,
                     paymentType,
-                    pincode,
+                    plotNo,
                     projectId,
                     remainAmt: +remainAmt,
                     totalAmt: +totalAmt,

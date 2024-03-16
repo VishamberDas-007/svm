@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getBookingDetails = void 0;
+exports.checkIfProjectAreaExists = exports.getBookingDetails = void 0;
 const booking_1 = require("../config/responseCodes/booking");
 const db_1 = __importDefault(require("../db"));
 const AppError_1 = __importDefault(require("../utils/AppError"));
@@ -31,3 +31,14 @@ const getBookingDetails = (bookingId) => __awaiter(void 0, void 0, void 0, funct
         return bookingDetails;
 });
 exports.getBookingDetails = getBookingDetails;
+const checkIfProjectAreaExists = (projectData, currentArea) => {
+    var _a;
+    let totalArea = 0;
+    (_a = projectData.booking) === null || _a === void 0 ? void 0 : _a.forEach((obj) => {
+        totalArea += obj.area;
+    });
+    if (totalArea + currentArea > projectData.area)
+        return false;
+    return true;
+};
+exports.checkIfProjectAreaExists = checkIfProjectAreaExists;

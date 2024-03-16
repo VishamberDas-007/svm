@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateCustomer = exports.getCustomer = exports.getAdvanceCustomerList = exports.getBasicCustomerList = exports.uploadCustomerImage = exports.uploadAadharImage = exports.uploadPanImage = exports.newCustomer = void 0;
+exports.deleteCustomerImage = exports.updateCustomer = exports.getCustomer = exports.getAdvanceCustomerList = exports.getBasicCustomerList = exports.uploadCustomerImage = exports.uploadAadharImage = exports.uploadPanImage = exports.newCustomer = void 0;
 const catchAsync_1 = __importDefault(require("../utils/catchAsync"));
 const db_1 = __importDefault(require("../db"));
 const responseHandler_1 = __importDefault(require("../utils/responseHandler"));
@@ -43,9 +43,10 @@ const AppError_1 = __importDefault(require("../utils/AppError"));
 const validations_1 = __importDefault(require("../validations"));
 const validation = __importStar(require("../validations/customer.validator"));
 const customer_1 = require("../config/responseCodes/customer");
+const s3_1 = require("../aws/s3");
 exports.newCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, validations_1.default)(validation.createCustomerValidator, req.body);
-    const { aadharNo, firstName, email, lastName, phone } = req.body;
+    const { aadharNo, name, email, phone1, phone2, city, pincode, state, address, } = req.body;
     const aadharExists = yield db_1.default.customer.findFirst({
         where: {
             aadharNo,
@@ -54,44 +55,18 @@ exports.newCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
     if (aadharExists)
         throw new AppError_1.default(customer_1.CUSTOMER_E_0002);
     else {
-        // const aadharImageUrls = req.files?.['aadharImages']?.map(
-        //     (image: TImageUpload) => ({
-        //         imageUrl: image.location,
-        //         type: 'AADHAR',
-        //     })
-        // )
-        // const panImageUrls = req.files?.['panImages']?.map(
-        //     (image: TImageUpload) => ({
-        //         imageUrl: image.location,
-        //         type: 'PAN',
-        //     })
-        // )
-        // const customerImageUrl = req.files?.['customerImage']?.map(
-        //     (image: TImageUpload) => ({
-        //         imageUrl: image.location,
-        //         type: 'PHOTO',
-        //     })
-        // )
         const createCustomer = yield db_1.default.customer.create({
             data: {
                 aadharNo,
-                firstName,
-                lastName,
-                phone,
+                address,
+                city: city || '',
+                pincode: pincode || '',
+                state: state || '',
+                name,
+                phone1,
+                phone2,
                 email,
-                // customerImage: {
-                //     createMany: {
-                //         data: [
-                //             ...aadharImageUrls,
-                //             ...panImageUrls,
-                //             ...customerImageUrl,
-                //         ],
-                //     },
-                // },
             },
-            // include: {
-            //     customerImage: true,
-            // },
         });
         return (0, responseHandler_1.default)(res, customer_1.CUSTOMER_S_0001, createCustomer);
     }
@@ -111,24 +86,29 @@ exports.uploadPanImage = (0, catchAsync_1.default)((req, res) => __awaiter(void 
     return (0, responseHandler_1.default)(res, customer_1.CUSTOMER_S_0005, panImage);
 }));
 exports.uploadAadharImage = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b, _c;
+    var _b, _c, _d, _e;
     yield (0, validations_1.default)(validation.customerIdValidator, req.params);
     const { customerId } = req.params;
-    const aadharImageUrls = (_c = (_b = req.files) === null || _b === void 0 ? void 0 : _b['aadharImages']) === null || _c === void 0 ? void 0 : _c.map((image) => ({
+    const aadharFrontImageUrl = (_c = (_b = req.files) === null || _b === void 0 ? void 0 : _b['aadharImageFront']) === null || _c === void 0 ? void 0 : _c.map((image) => ({
         imageUrl: image.location,
-        type: 'AADHAR',
+        type: 'AADHAR_FRONT',
+        customerId,
+    }));
+    const aadharRearImageUrl = (_e = (_d = req.files) === null || _d === void 0 ? void 0 : _d['aadharImageRear']) === null || _e === void 0 ? void 0 : _e.map((image) => ({
+        imageUrl: image.location,
+        type: 'AADHAR_REAR',
         customerId,
     }));
     const aadharImages = yield db_1.default.customerImage.createMany({
-        data: aadharImageUrls,
+        data: [...aadharFrontImageUrl, ...aadharRearImageUrl],
     });
     return (0, responseHandler_1.default)(res, customer_1.CUSTOMER_S_0006, aadharImages);
 }));
 exports.uploadCustomerImage = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _d, _e;
+    var _f, _g;
     yield (0, validations_1.default)(validation.customerIdValidator, req.params);
     const { customerId } = req.params;
-    const customerImageUrls = (_e = (_d = req.files) === null || _d === void 0 ? void 0 : _d['customerImage']) === null || _e === void 0 ? void 0 : _e.map((image) => ({
+    const customerImageUrls = (_g = (_f = req.files) === null || _f === void 0 ? void 0 : _f['customerImage']) === null || _g === void 0 ? void 0 : _g.map((image) => ({
         imageUrl: image.location,
         type: 'PHOTO',
         customerId,
@@ -139,7 +119,7 @@ exports.uploadCustomerImage = (0, catchAsync_1.default)((req, res) => __awaiter(
     return (0, responseHandler_1.default)(res, customer_1.CUSTOMER_S_0007, customerImages);
 }));
 exports.getBasicCustomerList = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _f;
+    var _h;
     const searchString = req.query.searchString;
     let whereClause;
     if (searchString) {
@@ -160,13 +140,12 @@ exports.getBasicCustomerList = (0, catchAsync_1.default)((req, res) => __awaiter
             ],
         };
     }
-    const fetchCustomerList = (_f = (yield db_1.default.customer.findMany({
+    const fetchCustomerList = (_h = (yield db_1.default.customer.findMany({
         where: whereClause,
-    }))) === null || _f === void 0 ? void 0 : _f.map((customer) => {
+    }))) === null || _h === void 0 ? void 0 : _h.map((customer) => {
         return {
             customerId: customer.customerId,
-            firstName: customer.firstName,
-            lastName: customer.lastName,
+            name: customer.name,
             aadharNo: customer.aadharNo,
         };
     });
@@ -204,19 +183,13 @@ exports.getAdvanceCustomerList = (0, catchAsync_1.default)((req, res) => __await
                     },
                 },
                 {
-                    firstName: {
+                    name: {
                         startsWith: searchString,
                         mode: 'insensitive',
                     },
                 },
                 {
-                    firstName: {
-                        contains: searchString,
-                        mode: 'insensitive',
-                    },
-                },
-                {
-                    lastName: {
+                    name: {
                         contains: searchString,
                         mode: 'insensitive',
                     },
@@ -282,7 +255,7 @@ exports.updateCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 
     yield (0, validations_1.default)(validation.customerIdValidator, req.params);
     yield (0, validations_1.default)(validation.updateCustomerValidator, req.body);
     const customerId = req.params.customerId;
-    const { aadharNo, firstName, email, lastName, phone } = req.body;
+    const { aadharNo, name, email, phone1, address, city, phone2, pincode, state, } = req.body;
     const fetchCustomer = yield db_1.default.customer.findUnique({
         where: {
             customerId,
@@ -312,10 +285,14 @@ exports.updateCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 
                 },
                 data: {
                     aadharNo,
-                    firstName,
+                    address,
+                    city,
+                    name,
+                    phone1,
+                    phone2,
+                    pincode,
+                    state,
                     email,
-                    lastName,
-                    phone,
                 },
                 include: {
                     customerImage: true,
@@ -324,4 +301,25 @@ exports.updateCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 
             return (0, responseHandler_1.default)(res, customer_1.CUSTOMER_S_0004, updatedCustomer);
         }
     }
+}));
+exports.deleteCustomerImage = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, validations_1.default)(validation.customerImageIdValidator, req.params);
+    const { customerImageId } = req.params;
+    const customerImageExist = yield db_1.default.customerImage.findFirst({
+        where: {
+            customerImageId,
+        },
+    });
+    if (!customerImageExist)
+        throw new AppError_1.default(customer_1.CUSTOMER_E_0003);
+    yield db_1.default.$transaction((prisma) => __awaiter(void 0, void 0, void 0, function* () {
+        var _j, _k;
+        yield (0, s3_1.deleteImage)(((_k = (_j = customerImageExist.imageUrl) === null || _j === void 0 ? void 0 : _j.split('/')) === null || _k === void 0 ? void 0 : _k.pop()) || '');
+        yield prisma.customerImage.delete({
+            where: {
+                customerImageId,
+            },
+        });
+    }));
+    return (0, responseHandler_1.default)(res, customer_1.CUSTOMER_S_0008);
 }));

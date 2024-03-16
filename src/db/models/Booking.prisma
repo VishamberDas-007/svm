@@ -2,9 +2,10 @@ model Booking {
     bookingId        String        @id @default(uuid())
     projectId        String
     project          Project       @relation(fields: [projectId], references: [projectId])
-    address1         String
-    address2         String?
-    pincode          String
+    // address1         String
+    // address2         String?
+    // pincode          String
+    plotNo           String
     area             Float
     totalAmt         Float
     paidAmt          Float

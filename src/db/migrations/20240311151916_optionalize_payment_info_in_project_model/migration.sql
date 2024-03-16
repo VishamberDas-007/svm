@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Project" ALTER COLUMN "downPayment" DROP NOT NULL,
+ALTER COLUMN "emiAmt" DROP NOT NULL,
+ALTER COLUMN "totalAmt" DROP NOT NULL;

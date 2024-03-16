@@ -1,12 +1,10 @@
 import Joi from 'joi'
-import util from '../utils/helper'
 import { Project } from '@prisma/client'
+import util from '../utils/helper'
 
 const projectStatus = ['ACTIVE', 'COMPLETED', 'UPCOMING']
 
-export const createProjectValidator = Joi.object<
-    Project & { planningImages: any; siteImages: any; logo: any }
->({
+export const createProjectValidator = Joi.object<Project & { logo: any }>({
     address1: Joi.string().required(),
     area: Joi.number().required(),
     name: Joi.string().required(),
@@ -16,12 +14,7 @@ export const createProjectValidator = Joi.object<
     status: Joi.valid(...projectStatus).required(),
     unit: Joi.string().required(),
     address2: Joi.string().allow('', null).optional(),
-    // planningImages: Joi.any().optional(),
-    // siteImages: Joi.any().optional(),
     logo: Joi.any().optional(),
-    emiAmt: Joi.number().required(),
-    downPayment: Joi.number().required(),
-    totalAmt: Joi.number().required(),
     location: Joi.string().required(),
 })
 
@@ -35,9 +28,6 @@ export const updateProjectValidator = Joi.object({
     status: Joi.valid(...projectStatus).optional(),
     unit: Joi.string().optional(),
     address2: Joi.string().allow(null, '').optional(),
-    // planningImages: Joi.any().optional(),
-    // siteImages: Joi.any().optional(),
-    // logo: Joi.any().optional(),
     emiAmt: Joi.number().optional(),
     downPayment: Joi.number().optional(),
     totalAmt: Joi.number().optional(),
@@ -45,5 +35,9 @@ export const updateProjectValidator = Joi.object({
 })
 
 export const projectImageIdsValidator = Joi.object({
-    projectImageIds: Joi.array().items(Joi.string().required()).required(),
+    projectImageIds: Joi.array().items(util.uuid.required()).required(),
+})
+
+export const projectImageIdValidator = Joi.object({
+    projectImageId: util.uuid.required(),
 })

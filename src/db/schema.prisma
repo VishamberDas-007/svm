@@ -36,9 +36,7 @@ model Booking {
     bankPayment      BankPayment[]   @relation(name: "BankPaymentToBooking")
     projectId        String
     project          Project         @relation(name: "BookingToProject", fields: [projectId], references: [projectId])
-    address1         String
-    address2         String?
-    pincode          String
+    plotNo           String
     area             Float
     totalAmt         Float
     paidAmt          Float
@@ -77,9 +75,9 @@ model Project {
     pincode       String
     logoUrl       String?
     location      String
-    downPayment   Float
-    emiAmt        Float
-    totalAmt      Float
+    downPayment   Float?
+    emiAmt        Float?
+    totalAmt      Float?
     createdAt     DateTime        @default(now())
     updatedAt     DateTime        @updatedAt
     projectImages ProjectImages[] @relation(name: "ProjectToProjectImages")
@@ -88,12 +86,15 @@ model Project {
 model Customer {
     customerId    String          @id @default(uuid())
     booking       Booking[]       @relation(name: "BookingToCustomer")
-    firstName     String
-    lastName      String
+    name          String
     aadharNo      String          @unique
-    phone         String
+    phone1        String
+    phone2        String?
     email         String?
     address       String?
+    pincode       String
+    city          String
+    state         String
     createdAt     DateTime        @default(now())
     updatedAt     DateTime        @updatedAt
     customerImage CustomerImage[] @relation(name: "CustomerToCustomerImage")
@@ -328,7 +329,8 @@ enum ContactUsStatus {
 }
 
 enum CustomerImageType {
-    AADHAR
+    AADHAR_FRONT
+    AADHAR_REAR
     PAN
     PHOTO
 }

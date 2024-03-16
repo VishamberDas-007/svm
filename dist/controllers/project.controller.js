@@ -42,7 +42,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteProjectImages = exports.uploadProjectImages = exports.uploadLogoImage = exports.uploadHappyCustomerImages = exports.getProjectBasicList = exports.getProjectImages = exports.getProjectDetails = exports.updateProject = exports.getAllProjects = exports.newProject = void 0;
+exports.deleteProjectImage = exports.deleteProjectImages = exports.uploadProjectImages = exports.uploadLogoImage = exports.uploadHappyCustomerImages = exports.getProjectBasicList = exports.getProjectImages = exports.getProjectDetails = exports.updateProject = exports.getAllProjects = exports.newProject = void 0;
 const catchAsync_1 = __importDefault(require("../utils/catchAsync"));
 const db_1 = __importDefault(require("../db"));
 const responseHandler_1 = __importDefault(require("../utils/responseHandler"));
@@ -56,7 +56,7 @@ const s3_1 = require("../aws/s3");
 // import { deleteImage } from '../aws/s3'
 exports.newProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, validations_1.default)(validation.createProjectValidator, req.body);
-    const { address1, address2, area, description, name, ownerName, pincode, status, unit, downPayment, emiAmt, location, totalAmt, } = req.body;
+    const { address1, address2, area, description, name, ownerName, pincode, status, unit, location, } = req.body;
     let newProject;
     yield db_1.default.$transaction((prisma) => __awaiter(void 0, void 0, void 0, function* () {
         // const logoUrl = req.file?.location
@@ -72,60 +72,9 @@ exports.newProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
                 pincode,
                 status,
                 unit,
-                // logoUrl,
-                // logoUrl,
-                downPayment: +downPayment,
-                emiAmt: +emiAmt,
                 location,
-                totalAmt: +totalAmt,
             },
         });
-        // const planningImageUrls = req.files?.['planningImages']?.map(
-        //     (image: TImageUpload) => ({
-        //         url: image.location,
-        //         type: 'PLANNING',
-        //         projectId: newProject?.projectId,
-        //     })
-        // )
-        // const planningImageUrls = req.files?.['planningImages']?.map(
-        //     (image: TImageUpload) => ({
-        //         url: image.location,
-        //         type: 'PLANNING',
-        //         projectId: newProject?.projectId,
-        //     })
-        // )
-        // const siteImageUrls = req.files?.['siteImages']?.map(
-        //     (image: TImageUpload) => ({
-        //         url: image.location,
-        //         type: 'SITE',
-        //         projectId: newProject?.projectId,
-        //     })
-        // )
-        // const siteImageUrls = req.files?.['siteImages']?.map(
-        //     (image: TImageUpload) => ({
-        //         url: image.location,
-        //         type: 'SITE',
-        //         projectId: newProject?.projectId,
-        //     })
-        // )
-        // if (planningImageUrls?.length) {
-        //     data = [...planningImageUrls]
-        // }
-        // if (planningImageUrls?.length) {
-        //     data = [...planningImageUrls]
-        // }
-        // if (siteImageUrls?.length) {
-        //     data = [...data, ...siteImageUrls]
-        // }
-        // if (siteImageUrls?.length) {
-        //     data = [...data, ...siteImageUrls]
-        // }
-        // await prisma.projectImages.createMany({
-        //     data,
-        // })
-        // await prisma.projectImages.createMany({
-        //     data,
-        // })
     }));
     return (0, responseHandler_1.default)(res, project_1.PROJECT_S_0001, newProject);
 }));
@@ -202,115 +151,6 @@ exports.updateProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
     yield (0, validations_1.default)(validation.updateProjectValidator, req.body);
     const { projectId } = req.params;
     const { address1, area, name, description, ownerName, pincode, status, unit, address2, downPayment, emiAmt, location, totalAmt, } = req.body;
-    // let planningImageUrls: string[] = [],
-    //     siteImageUrls: string[] = [],
-    //     imageUpdate:
-    //         | {
-    //               projectImages: {
-    //                   createMany: {
-    //                       data: any[]
-    //                       skipDuplicates: boolean
-    //                   }
-    //               }
-    //           }
-    //         | undefined,
-    //     deleteProjectImageFileNames: string[] = [],
-    //  updateProject: Project | undefined
-    // let planningImageUrls: string[] = [],
-    //     siteImageUrls: string[] = [],
-    //     imageUpdate:
-    //         | {
-    //               projectImages: {
-    //                   createMany: {
-    //                       data: any[]
-    //                       skipDuplicates: boolean
-    //                   }
-    //               }
-    //           }
-    //         | undefined,
-    //     deleteProjectImageFileNames: string[] = [],
-    //  updateProject: Project | undefined
-    // planningImageUrls =
-    //     req.files?.['planningImages']?.map((image: TImageUpload) => ({
-    //         url: image.location,
-    //         type: 'PLANNING',
-    //     })) || []
-    // planningImageUrls =
-    //     req.files?.['planningImages']?.map((image: TImageUpload) => ({
-    //         url: image.location,
-    //         type: 'PLANNING',
-    //     })) || []
-    // siteImageUrls =
-    //     req.files?.['siteImages']?.map((image: TImageUpload) => ({
-    //         url: image.location,
-    //         type: 'SITE',
-    //     })) || []
-    // siteImageUrls =
-    //     req.files?.['siteImages']?.map((image: TImageUpload) => ({
-    //         url: image.location,
-    //         type: 'SITE',
-    //     })) || []
-    // const projectImages = await prisma.projectImages.findMany({
-    //     where: {
-    //         projectId,
-    //     },
-    // })
-    // const projectImages = await prisma.projectImages.findMany({
-    //     where: {
-    //         projectId,
-    //     },
-    // })
-    // deleteProjectImageFileNames = projectImages.length
-    //     ? projectImages.map((project) => {
-    //           const fileName =
-    //               project.url.split('/')[project.url.split('/')?.length - 1]
-    // deleteProjectImageFileNames = projectImages.length
-    //     ? projectImages.map((project) => {
-    //           const fileName =
-    //               project.url.split('/')[project.url.split('/')?.length - 1]
-    //           return fileName
-    //       })
-    //     : []
-    //           return fileName
-    //       })
-    //     : []
-    // if (siteImageUrls.length || planningImageUrls.length)
-    //     imageUpdate = {
-    //         projectImages: {
-    //             createMany: {
-    //                 data: [...siteImageUrls, ...planningImageUrls],
-    //                 skipDuplicates: true,
-    //             },
-    //         },
-    //     }
-    // if (siteImageUrls.length || planningImageUrls.length)
-    //     imageUpdate = {
-    //         projectImages: {
-    //             createMany: {
-    //                 data: [...siteImageUrls, ...planningImageUrls],
-    //                 skipDuplicates: true,
-    //             },
-    //         },
-    //     }
-    // await prisma.$transaction(async (prisma) => {
-    // for await (const fileName of deleteProjectImageFileNames) {
-    //     await deleteImage(fileName)
-    // }
-    // await prisma.$transaction(async (prisma) => {
-    // for await (const fileName of deleteProjectImageFileNames) {
-    //     await deleteImage(fileName)
-    // }
-    // await prisma.projectImages.deleteMany({
-    //     where: {
-    //         projectId,
-    //     },
-    // })
-    // await prisma.projectImages.deleteMany({
-    //     where: {
-    //         projectId,
-    //     },
-    // })
-    // })
     const updateProject = yield db_1.default.project.update({
         where: {
             projectId,
@@ -331,7 +171,6 @@ exports.updateProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
             totalAmt: +totalAmt,
         },
     });
-    // })
     return (0, responseHandler_1.default)(res, project_1.PROJECT_S_0004, updateProject);
 }));
 exports.getProjectDetails = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -414,7 +253,7 @@ exports.uploadLogoImage = (0, catchAsync_1.default)((req, res) => __awaiter(void
     const logoUrl = (_c = req.file) === null || _c === void 0 ? void 0 : _c.location;
     const fileName = req.file.originalName;
     yield db_1.default.$transaction((prisma) => __awaiter(void 0, void 0, void 0, function* () {
-        yield (0, s3_1.deleteImage)(fileName);
+        yield (0, s3_1.deleteImage)(fileName); // check if it is deleting the existing logo
         yield prisma.project.update({
             where: {
                 projectId,
@@ -526,4 +365,23 @@ exports.deleteProjectImages = (0, catchAsync_1.default)((req, res) => __awaiter(
         });
     }));
     return (0, responseHandler_1.default)(res, project_1.PROJECT_S_0008);
+}));
+exports.deleteProjectImage = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _r, _s;
+    yield (0, validations_1.default)(validation.projectImageIdValidator, req.params);
+    const { projectImageId } = req.params;
+    const imageExists = yield db_1.default.projectImages.findFirst({
+        where: {
+            projectImageId,
+        },
+    });
+    if (!imageExists)
+        throw new AppError_1.default(project_1.PROJECT_E_0003);
+    yield (0, s3_1.deleteImage)(((_s = (_r = imageExists.url) === null || _r === void 0 ? void 0 : _r.split('/')) === null || _s === void 0 ? void 0 : _s.pop()) || '');
+    yield db_1.default.projectImages.delete({
+        where: {
+            projectImageId,
+        },
+    });
+    return (0, responseHandler_1.default)(res, project_1.PROJECT_S_0010);
 }));

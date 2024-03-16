@@ -1,11 +1,14 @@
 model Customer {
     customerId String   @id @default(uuid())
-    firstName  String
-    lastName   String
+    name       String
     aadharNo   String   @unique
-    phone      String
+    phone1     String
+    phone2     String?
     email      String?
     address    String?
+    pincode    String
+    city       String
+    state      String
     createdAt  DateTime @default(now())
     updatedAt  DateTime @updatedAt
 }

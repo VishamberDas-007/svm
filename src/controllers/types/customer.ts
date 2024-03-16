@@ -2,11 +2,15 @@ import { Request } from 'express'
 import { TQueryRequest } from '../../types/global.types'
 
 export type TCustomer = {
-    firstName: string
-    lastName: string
+    name: string
     aadharNo: string
     email: string
-    phone: string
+    phone1: string
+    phone2?: string
+    city?: string
+    pincode?: string
+    state?: string
+    address?: string
 }
 
 export type TBasicListWhereClause = {
@@ -30,7 +34,8 @@ export type TBasicListWhereClause = {
 
 export type TCustomerRequest = Request & {
     files: {
-        aadharImages: any
+        aadharImageFront: any
+        aadharImageRear: any
         panImages: any
         customerImage: any
     }

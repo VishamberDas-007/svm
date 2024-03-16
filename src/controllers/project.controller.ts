@@ -13,6 +13,7 @@ import responseHandler from '../utils/responseHandler'
 import {
     PROJECT_E_0001,
     PROJECT_E_0002,
+    PROJECT_E_0003,
     PROJECT_S_0001,
     PROJECT_S_0002,
     PROJECT_S_0003,
@@ -22,6 +23,7 @@ import {
     PROJECT_S_0007,
     PROJECT_S_0008,
     PROJECT_S_0009,
+    PROJECT_S_0010,
 } from '../config/responseCodes/project'
 import { Project } from '@prisma/client'
 import AppError from '../utils/AppError'
@@ -48,10 +50,7 @@ export const newProject = catchAsync(
             pincode,
             status,
             unit,
-            downPayment,
-            emiAmt,
             location,
-            totalAmt,
         }: TCreateProject = req.body
 
         let newProject: Project | null | undefined
@@ -71,65 +70,9 @@ export const newProject = catchAsync(
                     pincode,
                     status,
                     unit,
-                    // logoUrl,
-                    // logoUrl,
-                    downPayment: +downPayment,
-                    emiAmt: +emiAmt,
                     location,
-                    totalAmt: +totalAmt,
                 },
             })
-
-            // const planningImageUrls = req.files?.['planningImages']?.map(
-            //     (image: TImageUpload) => ({
-            //         url: image.location,
-            //         type: 'PLANNING',
-            //         projectId: newProject?.projectId,
-            //     })
-            // )
-            // const planningImageUrls = req.files?.['planningImages']?.map(
-            //     (image: TImageUpload) => ({
-            //         url: image.location,
-            //         type: 'PLANNING',
-            //         projectId: newProject?.projectId,
-            //     })
-            // )
-
-            // const siteImageUrls = req.files?.['siteImages']?.map(
-            //     (image: TImageUpload) => ({
-            //         url: image.location,
-            //         type: 'SITE',
-            //         projectId: newProject?.projectId,
-            //     })
-            // )
-            // const siteImageUrls = req.files?.['siteImages']?.map(
-            //     (image: TImageUpload) => ({
-            //         url: image.location,
-            //         type: 'SITE',
-            //         projectId: newProject?.projectId,
-            //     })
-            // )
-
-            // if (planningImageUrls?.length) {
-            //     data = [...planningImageUrls]
-            // }
-            // if (planningImageUrls?.length) {
-            //     data = [...planningImageUrls]
-            // }
-
-            // if (siteImageUrls?.length) {
-            //     data = [...data, ...siteImageUrls]
-            // }
-            // if (siteImageUrls?.length) {
-            //     data = [...data, ...siteImageUrls]
-            // }
-
-            // await prisma.projectImages.createMany({
-            //     data,
-            // })
-            // await prisma.projectImages.createMany({
-            //     data,
-            // })
         })
         return responseHandler(res, PROJECT_S_0001, newProject)
     }
@@ -251,124 +194,6 @@ export const updateProject = catchAsync(
             totalAmt,
         }: TUpdateProject = req.body
 
-        // let planningImageUrls: string[] = [],
-        //     siteImageUrls: string[] = [],
-        //     imageUpdate:
-        //         | {
-        //               projectImages: {
-        //                   createMany: {
-        //                       data: any[]
-        //                       skipDuplicates: boolean
-        //                   }
-        //               }
-        //           }
-        //         | undefined,
-        //     deleteProjectImageFileNames: string[] = [],
-        //  updateProject: Project | undefined
-        // let planningImageUrls: string[] = [],
-        //     siteImageUrls: string[] = [],
-        //     imageUpdate:
-        //         | {
-        //               projectImages: {
-        //                   createMany: {
-        //                       data: any[]
-        //                       skipDuplicates: boolean
-        //                   }
-        //               }
-        //           }
-        //         | undefined,
-        //     deleteProjectImageFileNames: string[] = [],
-        //  updateProject: Project | undefined
-
-        // planningImageUrls =
-        //     req.files?.['planningImages']?.map((image: TImageUpload) => ({
-        //         url: image.location,
-        //         type: 'PLANNING',
-        //     })) || []
-        // planningImageUrls =
-        //     req.files?.['planningImages']?.map((image: TImageUpload) => ({
-        //         url: image.location,
-        //         type: 'PLANNING',
-        //     })) || []
-
-        // siteImageUrls =
-        //     req.files?.['siteImages']?.map((image: TImageUpload) => ({
-        //         url: image.location,
-        //         type: 'SITE',
-        //     })) || []
-        // siteImageUrls =
-        //     req.files?.['siteImages']?.map((image: TImageUpload) => ({
-        //         url: image.location,
-        //         type: 'SITE',
-        //     })) || []
-
-        // const projectImages = await prisma.projectImages.findMany({
-        //     where: {
-        //         projectId,
-        //     },
-        // })
-        // const projectImages = await prisma.projectImages.findMany({
-        //     where: {
-        //         projectId,
-        //     },
-        // })
-
-        // deleteProjectImageFileNames = projectImages.length
-        //     ? projectImages.map((project) => {
-        //           const fileName =
-        //               project.url.split('/')[project.url.split('/')?.length - 1]
-        // deleteProjectImageFileNames = projectImages.length
-        //     ? projectImages.map((project) => {
-        //           const fileName =
-        //               project.url.split('/')[project.url.split('/')?.length - 1]
-
-        //           return fileName
-        //       })
-        //     : []
-        //           return fileName
-        //       })
-        //     : []
-
-        // if (siteImageUrls.length || planningImageUrls.length)
-        //     imageUpdate = {
-        //         projectImages: {
-        //             createMany: {
-        //                 data: [...siteImageUrls, ...planningImageUrls],
-        //                 skipDuplicates: true,
-        //             },
-        //         },
-        //     }
-        // if (siteImageUrls.length || planningImageUrls.length)
-        //     imageUpdate = {
-        //         projectImages: {
-        //             createMany: {
-        //                 data: [...siteImageUrls, ...planningImageUrls],
-        //                 skipDuplicates: true,
-        //             },
-        //         },
-        //     }
-
-        // await prisma.$transaction(async (prisma) => {
-        // for await (const fileName of deleteProjectImageFileNames) {
-        //     await deleteImage(fileName)
-        // }
-        // await prisma.$transaction(async (prisma) => {
-        // for await (const fileName of deleteProjectImageFileNames) {
-        //     await deleteImage(fileName)
-        // }
-
-        // await prisma.projectImages.deleteMany({
-        //     where: {
-        //         projectId,
-        //     },
-        // })
-        // await prisma.projectImages.deleteMany({
-        //     where: {
-        //         projectId,
-        //     },
-        // })
-
-        // })
         const updateProject = await prisma.project.update({
             where: {
                 projectId,
@@ -389,7 +214,6 @@ export const updateProject = catchAsync(
                 totalAmt: +totalAmt,
             },
         })
-        // })
         return responseHandler(res, PROJECT_S_0004, updateProject)
     }
 )
@@ -502,7 +326,7 @@ export const uploadLogoImage = catchAsync(
         const fileName = req.file.originalName
 
         await prisma.$transaction(async (prisma) => {
-            await deleteImage(fileName)
+            await deleteImage(fileName) // check if it is deleting the existing logo
 
             await prisma.project.update({
                 where: {
@@ -607,5 +431,31 @@ export const deleteProjectImages = catchAsync(
             })
         })
         return responseHandler(res, PROJECT_S_0008)
+    }
+)
+
+export const deleteProjectImage = catchAsync(
+    async (req: Request, res: Response) => {
+        await validator(validation.projectImageIdValidator, req.params)
+
+        const { projectImageId } = req.params
+
+        const imageExists = await prisma.projectImages.findFirst({
+            where: {
+                projectImageId,
+            },
+        })
+
+        if (!imageExists) throw new AppError(PROJECT_E_0003)
+
+        await deleteImage(imageExists.url?.split('/')?.pop() || '')
+
+        await prisma.projectImages.delete({
+            where: {
+                projectImageId,
+            },
+        })
+
+        return responseHandler(res, PROJECT_S_0010)
     }
 )

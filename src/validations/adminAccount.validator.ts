@@ -2,7 +2,7 @@ import Joi from 'joi'
 import { TAccountDetails } from '../controllers/types/adminAccount'
 
 export const createAccountValidator = Joi.object<TAccountDetails>({
-    accNo: Joi.string().required(),
+    accNo: Joi.string().max(25).required(),
     bankName: Joi.string().required(),
     name: Joi.string().required(),
 })

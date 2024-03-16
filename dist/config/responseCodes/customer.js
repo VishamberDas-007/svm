@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CUSTOMER_S_0007 = exports.CUSTOMER_S_0006 = exports.CUSTOMER_S_0005 = exports.CUSTOMER_S_0004 = exports.CUSTOMER_S_0003 = exports.CUSTOMER_S_0002 = exports.CUSTOMER_S_0001 = exports.CUSTOMER_E_0002 = exports.CUSTOMER_E_0001 = void 0;
+exports.CUSTOMER_S_0008 = exports.CUSTOMER_S_0007 = exports.CUSTOMER_S_0006 = exports.CUSTOMER_S_0005 = exports.CUSTOMER_S_0004 = exports.CUSTOMER_S_0003 = exports.CUSTOMER_S_0002 = exports.CUSTOMER_S_0001 = exports.CUSTOMER_E_0003 = exports.CUSTOMER_E_0002 = exports.CUSTOMER_E_0001 = void 0;
 const global_types_1 = require("../../types/global.types");
 exports.CUSTOMER_E_0001 = {
     type: global_types_1.RESPONSE_TYPE.ERROR,
@@ -15,6 +15,13 @@ exports.CUSTOMER_E_0002 = {
     isNotify: false,
     message: 'This Aadhar number is already associated with another customer',
     statusCode: 409,
+};
+exports.CUSTOMER_E_0003 = {
+    type: global_types_1.RESPONSE_TYPE.ERROR,
+    code: 'CUSTOMER_E_0003',
+    isNotify: false,
+    message: 'No such image exists',
+    statusCode: 400,
 };
 exports.CUSTOMER_S_0001 = {
     type: global_types_1.RESPONSE_TYPE.SUCCESS,
@@ -63,5 +70,12 @@ exports.CUSTOMER_S_0007 = {
     code: 'CUSTOMER_S_0007',
     isNotify: false,
     message: 'Customer images uploaded successfully',
+    statusCode: 200,
+};
+exports.CUSTOMER_S_0008 = {
+    type: global_types_1.RESPONSE_TYPE.SUCCESS,
+    code: 'CUSTOMER_S_0008',
+    isNotify: false,
+    message: 'Customer images deleted successfully',
     statusCode: 200,
 };
