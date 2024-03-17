@@ -9,6 +9,7 @@ model Customer {
     pincode    String
     city       String
     state      String
+    isDelete   Boolean  @default(false)
     createdAt  DateTime @default(now())
     updatedAt  DateTime @updatedAt
 }

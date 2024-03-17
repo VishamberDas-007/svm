@@ -51,6 +51,7 @@ model Booking {
     installmentCount Int
     referralId       String?
     referral         Referral?       @relation(name: "BookingToReferral", fields: [referralId], references: [referralId])
+    isDelete         Boolean         @default(false)
     createdAt        DateTime        @default(now())
     updatedAt        DateTime        @updatedAt
     cashPayment      CashPayment[]   @relation(name: "BookingToCashPayment")
@@ -78,6 +79,7 @@ model Project {
     downPayment   Float?
     emiAmt        Float?
     totalAmt      Float?
+    isDelete      Boolean         @default(false)
     createdAt     DateTime        @default(now())
     updatedAt     DateTime        @updatedAt
     projectImages ProjectImages[] @relation(name: "ProjectToProjectImages")
@@ -95,6 +97,7 @@ model Customer {
     pincode       String
     city          String
     state         String
+    isDelete      Boolean         @default(false)
     createdAt     DateTime        @default(now())
     updatedAt     DateTime        @updatedAt
     customerImage CustomerImage[] @relation(name: "CustomerToCustomerImage")
@@ -201,6 +204,7 @@ model Installment {
     paymentType   IPaymentType
     installmentNo Int
     penalty       Int?
+    isDelete      Boolean          @default(false)
     createdAt     DateTime         @default(now())
     updatedAt     DateTime         @updatedAt
     upiPayment    IUpiPayment[]    @relation(name: "IUpiPaymentToInstallment")
@@ -306,6 +310,7 @@ model User {
     isAdmin   Boolean  @default(false)
     roleId    Int
     role      Role     @relation(name: "RoleToUser", fields: [roleId], references: [roleId])
+    isDelete  Boolean  @default(false)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
