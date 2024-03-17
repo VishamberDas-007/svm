@@ -7,7 +7,6 @@ exports.customerImageIdValidator = exports.customerIdValidator = exports.updateC
 const joi_1 = __importDefault(require("joi"));
 const helper_1 = __importDefault(require("../utils/helper"));
 exports.createCustomerValidator = joi_1.default.object({
-    aadharNo: joi_1.default.string().length(12).required(),
     name: joi_1.default.string().required(),
     email: helper_1.default.emailValidator.allow(null, '').optional(),
     phone1: helper_1.default.phoneValidator.optional(),
@@ -18,9 +17,8 @@ exports.createCustomerValidator = joi_1.default.object({
     address: joi_1.default.string().allow('', null).optional(),
 });
 exports.updateCustomerValidator = joi_1.default.object({
-    aadharNo: joi_1.default.string().length(12).optional(),
     name: joi_1.default.string().optional(),
-    email: helper_1.default.emailValidator.optional(),
+    email: helper_1.default.emailValidator.allow('').optional(),
     phone1: helper_1.default.phoneValidator.optional(),
     phone2: helper_1.default.phoneValidator.allow('', null).optional(),
     city: joi_1.default.string().allow('').optional(),

@@ -46,18 +46,17 @@ const customer_1 = require("../config/responseCodes/customer");
 const s3_1 = require("../aws/s3");
 exports.newCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, validations_1.default)(validation.createCustomerValidator, req.body);
-    const { aadharNo, name, email, phone1, phone2, city, pincode, state, address, } = req.body;
-    const aadharExists = yield db_1.default.customer.findFirst({
+    const { name, email, phone1, phone2, city, pincode, state, address, } = req.body;
+    const phoneExists = yield db_1.default.customer.findFirst({
         where: {
-            aadharNo,
+            phone1,
         },
     });
-    if (aadharExists)
+    if (phoneExists)
         throw new AppError_1.default(customer_1.CUSTOMER_E_0002);
     else {
         const createCustomer = yield db_1.default.customer.create({
             data: {
-                aadharNo,
                 address,
                 city: city || '',
                 pincode: pincode || '',
@@ -126,13 +125,13 @@ exports.getBasicCustomerList = (0, catchAsync_1.default)((req, res) => __awaiter
         whereClause = {
             OR: [
                 {
-                    aadharNo: {
+                    phone1: {
                         startsWith: searchString,
                         mode: 'insensitive',
                     },
                 },
                 {
-                    aadharNo: {
+                    phone1: {
                         contains: searchString,
                         mode: 'insensitive',
                     },
@@ -146,7 +145,7 @@ exports.getBasicCustomerList = (0, catchAsync_1.default)((req, res) => __awaiter
         return {
             customerId: customer.customerId,
             name: customer.name,
-            aadharNo: customer.aadharNo,
+            phone1: customer.phone1,
         };
     });
     return (0, responseHandler_1.default)(res, customer_1.CUSTOMER_S_0001, fetchCustomerList);
@@ -159,13 +158,13 @@ exports.getAdvanceCustomerList = (0, catchAsync_1.default)((req, res) => __await
         whereClause = {
             OR: [
                 {
-                    aadharNo: {
+                    phone1: {
                         startsWith: searchString,
                         mode: 'insensitive',
                     },
                 },
                 {
-                    aadharNo: {
+                    phone1: {
                         contains: searchString,
                         mode: 'insensitive',
                     },
@@ -254,7 +253,7 @@ exports.updateCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 
     yield (0, validations_1.default)(validation.customerIdValidator, req.params);
     yield (0, validations_1.default)(validation.updateCustomerValidator, req.body);
     const customerId = req.params.customerId;
-    const { aadharNo, name, email, phone1, address, city, phone2, pincode, state, } = req.body;
+    const { name, email, phone1, address, city, phone2, pincode, state, } = req.body;
     const fetchCustomer = yield db_1.default.customer.findFirst({
         where: {
             customerId,
@@ -267,15 +266,15 @@ exports.updateCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 
     if (!fetchCustomer)
         throw new AppError_1.default(customer_1.CUSTOMER_E_0001);
     else {
-        const aadharExists = yield db_1.default.customer.findFirst({
+        const phoneExists = yield db_1.default.customer.findFirst({
             where: {
-                aadharNo,
+                phone1,
                 NOT: {
                     customerId,
                 },
             },
         });
-        if (aadharExists) {
+        if (phoneExists) {
             throw new AppError_1.default(customer_1.CUSTOMER_E_0002);
         }
         else {
@@ -284,7 +283,6 @@ exports.updateCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 
                     customerId,
                 },
                 data: {
-                    aadharNo,
                     address,
                     city,
                     name,
