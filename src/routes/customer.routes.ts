@@ -75,4 +75,10 @@ customerRouter.delete(
     customerController.deleteCustomerImage
 )
 
+customerRouter.delete(
+    '/delete/:customerId',
+    // authMiddleware(['CUSTOMER_READ', 'CUSTOMER_WRITE']),
+    customerController.deleteCustomer
+)
+
 export { customerRouter }
