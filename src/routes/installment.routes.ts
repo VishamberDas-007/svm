@@ -28,4 +28,9 @@ installmentRouter.put(
     installmentController.updateInstallmentDetails
 )
 
+installmentRouter.delete(
+    '/delete/:installmentId',
+    installmentController.deleteInstallment
+)
+
 export { installmentRouter }
