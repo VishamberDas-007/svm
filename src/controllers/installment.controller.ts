@@ -11,6 +11,7 @@ import {
     INSTALLMENT_S_0001,
     INSTALLMENT_S_0002,
     INSTALLMENT_S_0003,
+    INSTALLMENT_S_0004,
 } from '../config/responseCodes/installment'
 import { TCreateInstallment } from './types/installment'
 import responseHandler from '../utils/responseHandler'
@@ -155,7 +156,7 @@ export const fetchInstallmentDetails = catchAsync(
         const { installmentId } = req.params
 
         const getInstallmentDetails = await prisma.installment.findFirst({
-            where: { installmentId },
+            where: { installmentId, isDelete: false },
             include: {
                 bankPayment: true,
                 cashPayment: true,
@@ -184,7 +185,7 @@ export const updateInstallmentDetails = catchAsync(
         const { amount, installmentNo }: Installment = req.body
 
         const installmentDetailExists = await prisma.installment.findFirst({
-            where: { installmentId },
+            where: { installmentId, isDelete: false },
         })
 
         if (!installmentDetailExists) throw new AppError(INSTALLMENT_E_0002)
@@ -220,5 +221,33 @@ export const fetchBookingInstallmentDetails = catchAsync(
             // address1: bookingDetails.address1,
             // address2: bookingDetails.address2,
         })
+    }
+)
+
+export const deleteInstallment = catchAsync(
+    async (req: Request, res: Response) => {
+        await validator(validation.installmentIdValidator, req.params)
+
+        const { installmentId } = req.params
+
+        const installmentDetails = await prisma.installment.findFirst({
+            where: {
+                installmentId,
+                isDelete: false,
+            },
+        })
+
+        if (!installmentDetails) throw new AppError(INSTALLMENT_E_0001)
+
+        await prisma.installment.update({
+            where: {
+                installmentId,
+            },
+            data: {
+                isDelete: true,
+            },
+        })
+
+        return responseHandler(res, INSTALLMENT_S_0004)
     }
 )

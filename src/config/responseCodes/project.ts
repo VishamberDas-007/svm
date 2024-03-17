@@ -103,3 +103,11 @@ export const PROJECT_S_0010 = {
     message: 'Project image deleted successfully',
     statusCode: 200,
 }
+
+export const PROJECT_S_0011 = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'PROJECT_S_0011',
+    isNotify: false,
+    message: 'Project deleted successfully',
+    statusCode: 200,
+}

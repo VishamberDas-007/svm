@@ -41,3 +41,7 @@ export const projectImageIdsValidator = Joi.object({
 export const projectImageIdValidator = Joi.object({
     projectImageId: util.uuid.required(),
 })
+
+export const projectIdValidator = Joi.object({
+    projectId: util.uuid.required(),
+})

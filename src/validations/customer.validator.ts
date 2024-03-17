@@ -8,10 +8,10 @@ export const createCustomerValidator = Joi.object<TCustomer>({
     email: util.emailValidator.allow(null, '').optional(),
     phone1: util.phoneValidator.optional(),
     phone2: util.phoneValidator.allow('', null).optional(),
-    city: Joi.string().optional(),
+    city: Joi.string().allow('', null).optional(),
     pincode: Joi.string().length(6).optional(),
-    state: Joi.string().optional(),
-    address: Joi.string().optional(),
+    state: Joi.string().allow('', null).optional(),
+    address: Joi.string().allow('', null).optional(),
 })
 
 export const updateCustomerValidator = Joi.object<TCustomer>({

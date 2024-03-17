@@ -47,3 +47,11 @@ export const INSTALLMENT_S_0003: TResponseCode = {
     message: 'Installment updated successfully',
     statusCode: 200,
 }
+
+export const INSTALLMENT_S_0004: TResponseCode = {
+    type: RESPONSE_TYPE.ERROR,
+    code: 'INSTALLMENT_S_0004',
+    isNotify: true,
+    message: 'Installment deleted successfully',
+    statusCode: 200,
+}

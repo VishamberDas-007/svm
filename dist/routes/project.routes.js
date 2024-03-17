@@ -87,3 +87,6 @@ s3_1.upload.fields([
 projectRouter.delete('/delete-image/:projectImageId', 
 // authMiddleware(['PROJECT_WRITE']),
 projectController.deleteProjectImage);
+projectRouter.delete('/delete/:projectId', 
+// authMiddleware(['PROJECT_WRITE']),
+projectController.deleteProject);

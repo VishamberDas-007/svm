@@ -42,7 +42,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchBookingInstallmentDetails = exports.updateInstallmentDetails = exports.fetchInstallmentDetails = exports.createInstallment = void 0;
+exports.deleteInstallment = exports.fetchBookingInstallmentDetails = exports.updateInstallmentDetails = exports.fetchInstallmentDetails = exports.createInstallment = void 0;
 const catchAsync_1 = __importDefault(require("../utils/catchAsync"));
 const installment_service_1 = require("../services/installment.service");
 const db_1 = __importDefault(require("../db"));
@@ -169,7 +169,7 @@ exports.fetchInstallmentDetails = (0, catchAsync_1.default)((req, res) => __awai
     yield (0, validations_1.default)(validation.installmentIdValidator, req.params);
     const { installmentId } = req.params;
     const getInstallmentDetails = yield db_1.default.installment.findFirst({
-        where: { installmentId },
+        where: { installmentId, isDelete: false },
         include: {
             bankPayment: true,
             cashPayment: true,
@@ -188,7 +188,7 @@ exports.updateInstallmentDetails = (0, catchAsync_1.default)((req, res) => __awa
     const { installmentId } = req.params;
     const { amount, installmentNo } = req.body;
     const installmentDetailExists = yield db_1.default.installment.findFirst({
-        where: { installmentId },
+        where: { installmentId, isDelete: false },
     });
     if (!installmentDetailExists)
         throw new AppError_1.default(installment_1.INSTALLMENT_E_0002);
@@ -218,4 +218,25 @@ exports.fetchBookingInstallmentDetails = (0, catchAsync_1.default)((req, res) =>
         // address1: bookingDetails.address1,
         // address2: bookingDetails.address2,
     });
+}));
+exports.deleteInstallment = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, validations_1.default)(validation.installmentIdValidator, req.params);
+    const { installmentId } = req.params;
+    const installmentDetails = yield db_1.default.installment.findFirst({
+        where: {
+            installmentId,
+            isDelete: false,
+        },
+    });
+    if (!installmentDetails)
+        throw new AppError_1.default(installment_1.INSTALLMENT_E_0001);
+    yield db_1.default.installment.update({
+        where: {
+            installmentId,
+        },
+        data: {
+            isDelete: true,
+        },
+    });
+    return (0, responseHandler_1.default)(res, installment_1.INSTALLMENT_S_0004);
 }));

@@ -55,3 +55,11 @@ export const BOOKING_S_0004: TResponseCode = {
     message: 'Booking updated successfully',
     statusCode: 200,
 }
+
+export const BOOKING_S_0005: TResponseCode = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'BOOKING_S_0005',
+    isNotify: true,
+    message: 'Booking deleted successfully',
+    statusCode: 200,
+}

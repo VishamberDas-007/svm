@@ -20,6 +20,7 @@ model Booking {
     installmentCount Int
     referralId       String?
     referral         Referral?     @relation(fields: [referralId], references: [referralId])
+    isDelete         Boolean       @default(false)
     createdAt        DateTime      @default(now())
     updatedAt        DateTime      @updatedAt
 }

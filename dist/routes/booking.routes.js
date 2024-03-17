@@ -35,3 +35,4 @@ bookingRouter.post('/create', bookingController.createBooking);
 bookingRouter.get('/list', bookingController.getAllBookings);
 bookingRouter.get('/get/:bookingId', bookingController.getBooking);
 bookingRouter.put('/update/:bookingId', bookingController.updateBooking);
+bookingRouter.delete('/delete/:bookingId', bookingController.deleteBooking);

@@ -87,3 +87,11 @@ export const CUSTOMER_S_0008 = {
     message: 'Customer images deleted successfully',
     statusCode: 200,
 }
+
+export const CUSTOMER_S_0009 = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'CUSTOMER_S_0009',
+    isNotify: false,
+    message: 'Customer deleted successfully',
+    statusCode: 200,
+}

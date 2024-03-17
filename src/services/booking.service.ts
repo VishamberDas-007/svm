@@ -9,6 +9,7 @@ export const getBookingDetails = async (
     const bookingDetails = await prisma.booking.findFirst({
         where: {
             bookingId,
+            isDelete: false,
         },
         include: {
             customer: true,

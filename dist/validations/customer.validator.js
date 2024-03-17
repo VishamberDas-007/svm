@@ -12,10 +12,10 @@ exports.createCustomerValidator = joi_1.default.object({
     email: helper_1.default.emailValidator.allow(null, '').optional(),
     phone1: helper_1.default.phoneValidator.optional(),
     phone2: helper_1.default.phoneValidator.allow('', null).optional(),
-    city: joi_1.default.string().optional(),
+    city: joi_1.default.string().allow('', null).optional(),
     pincode: joi_1.default.string().length(6).optional(),
-    state: joi_1.default.string().optional(),
-    address: joi_1.default.string().optional(),
+    state: joi_1.default.string().allow('', null).optional(),
+    address: joi_1.default.string().allow('', null).optional(),
 });
 exports.updateCustomerValidator = joi_1.default.object({
     aadharNo: joi_1.default.string().length(12).optional(),

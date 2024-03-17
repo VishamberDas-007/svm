@@ -23,6 +23,7 @@ import {
     CUSTOMER_S_0006,
     CUSTOMER_S_0007,
     CUSTOMER_S_0008,
+    CUSTOMER_S_0009,
 } from '../config/responseCodes/customer'
 import { Customer } from '@prisma/client'
 import { TListData } from '../types/global.types'
@@ -171,7 +172,10 @@ export const getBasicCustomerList = catchAsync(
 
         const fetchCustomerList = (
             await prisma.customer.findMany({
-                where: whereClause,
+                where: {
+                    ...whereClause,
+                    isDelete: false,
+                },
             })
         )?.map((customer) => {
             return {
@@ -259,7 +263,10 @@ export const getAdvanceCustomerList = catchAsync(
             fetchCustomerList = await prisma.customer.findMany({
                 take: +pageSize,
                 skip,
-                where: whereClause,
+                where: {
+                    ...whereClause,
+                    isDelete: false,
+                },
                 orderBy: {
                     createdAt: 'desc',
                 },
@@ -292,6 +299,7 @@ export const getCustomer = catchAsync(async (req: Request, res: Response) => {
     const fetchCustomer = await prisma.customer.findFirst({
         where: {
             customerId,
+            isDelete: false,
         },
         include: {
             customerImage: true,
@@ -299,9 +307,8 @@ export const getCustomer = catchAsync(async (req: Request, res: Response) => {
     })
 
     if (!fetchCustomer) throw new AppError(CUSTOMER_E_0001)
-    else {
-        return responseHandler(res, CUSTOMER_S_0002, fetchCustomer)
-    }
+
+    return responseHandler(res, CUSTOMER_S_0002, fetchCustomer)
 })
 
 export const updateCustomer = catchAsync(
@@ -322,9 +329,10 @@ export const updateCustomer = catchAsync(
             state,
         }: TCustomer = req.body
 
-        const fetchCustomer = await prisma.customer.findUnique({
+        const fetchCustomer = await prisma.customer.findFirst({
             where: {
                 customerId,
+                isDelete: false,
             },
             include: {
                 customerImage: true,
@@ -397,5 +405,33 @@ export const deleteCustomerImage = catchAsync(
         })
 
         return responseHandler(res, CUSTOMER_S_0008)
+    }
+)
+
+export const deleteCustomer = catchAsync(
+    async (req: Request, res: Response) => {
+        await validator(validation.customerIdValidator, req.params)
+
+        const { customerId } = req.params
+
+        const customerData = await prisma.customer.findFirst({
+            where: {
+                customerId,
+                isDelete: false,
+            },
+        })
+
+        if (!customerData) throw new AppError(CUSTOMER_E_0001)
+
+        await prisma.customer.update({
+            where: {
+                customerId,
+            },
+            data: {
+                isDelete: true,
+            },
+        })
+
+        return responseHandler(res, CUSTOMER_S_0009)
     }
 )

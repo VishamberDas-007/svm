@@ -40,3 +40,4 @@ installmentRouter.get('/get/booking/installment-details/:bookingId',
 // authMiddleware(['INSTALLMENT_WRITE', 'INSTALLMENT_READ']),
 installmentController.fetchBookingInstallmentDetails);
 installmentRouter.put('/update/:installmentId', (0, auth_middleware_1.authMiddleware)(['INSTALLMENT_WRITE']), installmentController.updateInstallmentDetails);
+installmentRouter.delete('/delete/:installmentId', installmentController.deleteInstallment);
