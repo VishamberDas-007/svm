@@ -35,11 +35,13 @@ export const upload = multer({
 
 export const deleteImage = async (key: string) => {
     try {
-        const deleteCommand = new DeleteObjectCommand({
-            Bucket: 'svm-bucket',
-            Key: 'svm/' + key,
-        })
-        await s3Config.send(deleteCommand)
+        if (key) {
+            const deleteCommand = new DeleteObjectCommand({
+                Bucket: 'svm-bucket',
+                Key: 'svm/' + key,
+            })
+            await s3Config.send(deleteCommand)
+        }
         // console.log('Deleted:', result)
     } catch (error) {
         console.error('Error deleting image:', error)

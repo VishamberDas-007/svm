@@ -18,6 +18,7 @@ import {
     BOOKING_S_0002,
     BOOKING_S_0003,
     BOOKING_S_0004,
+    BOOKING_S_0005,
 } from '../config/responseCodes/booking'
 import AppError from '../utils/AppError'
 import {
@@ -267,7 +268,10 @@ export const getAllBookings = catchAsync(
         bookingList = await prisma.booking.findMany({
             take: +pageSize,
             skip,
-            where: whereClause,
+            where: {
+                ...whereClause,
+                isDelete: false,
+            },
             include: {
                 project: true,
                 customer: true,
@@ -355,6 +359,7 @@ export const getBooking = catchAsync(async (req: Request, res: Response) => {
     const fetchBooking = await prisma.booking.findFirst({
         where: {
             bookingId,
+            isDelete: false,
         },
         include: {
             adminAccount: true,
@@ -451,6 +456,7 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
     const bookingExists = await prisma.booking.findFirst({
         where: {
             bookingId,
+            isDelete: false,
         },
     })
 
@@ -607,4 +613,30 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
 
         return responseHandler(res, BOOKING_S_0004, updatedBookingDetails)
     }
+})
+
+export const deleteBooking = catchAsync(async (req: Request, res: Response) => {
+    await validator(validation.bookingIdValidator, req.params)
+
+    const { bookingId } = req.params
+
+    const bookingData = await prisma.booking.findFirst({
+        where: {
+            bookingId,
+            isDelete: false,
+        },
+    })
+
+    if (!bookingData) throw new AppError(BOOKING_E_0001)
+
+    await prisma.booking.update({
+        where: {
+            bookingId,
+        },
+        data: {
+            isDelete: true,
+        },
+    })
+
+    return responseHandler(res, BOOKING_S_0005)
 })

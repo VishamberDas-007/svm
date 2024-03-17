@@ -11,4 +11,6 @@ bookingRouter.get('/get/:bookingId', bookingController.getBooking)
 
 bookingRouter.put('/update/:bookingId', bookingController.updateBooking)
 
+bookingRouter.delete('/delete/:bookingId', bookingController.deleteBooking)
+
 export { bookingRouter }
