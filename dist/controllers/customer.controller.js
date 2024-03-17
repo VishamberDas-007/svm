@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteCustomerImage = exports.updateCustomer = exports.getCustomer = exports.getAdvanceCustomerList = exports.getBasicCustomerList = exports.uploadCustomerImage = exports.uploadAadharImage = exports.uploadPanImage = exports.newCustomer = void 0;
+exports.deleteCustomer = exports.deleteCustomerImage = exports.updateCustomer = exports.getCustomer = exports.getAdvanceCustomerList = exports.getBasicCustomerList = exports.uploadCustomerImage = exports.uploadAadharImage = exports.uploadPanImage = exports.newCustomer = void 0;
 const catchAsync_1 = __importDefault(require("../utils/catchAsync"));
 const db_1 = __importDefault(require("../db"));
 const responseHandler_1 = __importDefault(require("../utils/responseHandler"));
@@ -141,7 +141,7 @@ exports.getBasicCustomerList = (0, catchAsync_1.default)((req, res) => __awaiter
         };
     }
     const fetchCustomerList = (_h = (yield db_1.default.customer.findMany({
-        where: whereClause,
+        where: Object.assign(Object.assign({}, whereClause), { isDelete: false }),
     }))) === null || _h === void 0 ? void 0 : _h.map((customer) => {
         return {
             customerId: customer.customerId,
@@ -213,7 +213,7 @@ exports.getAdvanceCustomerList = (0, catchAsync_1.default)((req, res) => __await
         fetchCustomerList = yield prisma.customer.findMany({
             take: +pageSize,
             skip,
-            where: whereClause,
+            where: Object.assign(Object.assign({}, whereClause), { isDelete: false }),
             orderBy: {
                 createdAt: 'desc',
             },
@@ -240,6 +240,7 @@ exports.getCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
     const fetchCustomer = yield db_1.default.customer.findFirst({
         where: {
             customerId,
+            isDelete: false,
         },
         include: {
             customerImage: true,
@@ -247,18 +248,17 @@ exports.getCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
     });
     if (!fetchCustomer)
         throw new AppError_1.default(customer_1.CUSTOMER_E_0001);
-    else {
-        return (0, responseHandler_1.default)(res, customer_1.CUSTOMER_S_0002, fetchCustomer);
-    }
+    return (0, responseHandler_1.default)(res, customer_1.CUSTOMER_S_0002, fetchCustomer);
 }));
 exports.updateCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, validations_1.default)(validation.customerIdValidator, req.params);
     yield (0, validations_1.default)(validation.updateCustomerValidator, req.body);
     const customerId = req.params.customerId;
     const { aadharNo, name, email, phone1, address, city, phone2, pincode, state, } = req.body;
-    const fetchCustomer = yield db_1.default.customer.findUnique({
+    const fetchCustomer = yield db_1.default.customer.findFirst({
         where: {
             customerId,
+            isDelete: false,
         },
         include: {
             customerImage: true,
@@ -322,4 +322,25 @@ exports.deleteCustomerImage = (0, catchAsync_1.default)((req, res) => __awaiter(
         });
     }));
     return (0, responseHandler_1.default)(res, customer_1.CUSTOMER_S_0008);
+}));
+exports.deleteCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, validations_1.default)(validation.customerIdValidator, req.params);
+    const { customerId } = req.params;
+    const customerData = yield db_1.default.customer.findFirst({
+        where: {
+            customerId,
+            isDelete: false,
+        },
+    });
+    if (!customerData)
+        throw new AppError_1.default(customer_1.CUSTOMER_E_0001);
+    yield db_1.default.customer.update({
+        where: {
+            customerId,
+        },
+        data: {
+            isDelete: true,
+        },
+    });
+    return (0, responseHandler_1.default)(res, customer_1.CUSTOMER_S_0009);
 }));

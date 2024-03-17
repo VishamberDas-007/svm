@@ -42,7 +42,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteProjectImage = exports.deleteProjectImages = exports.uploadProjectImages = exports.uploadLogoImage = exports.uploadHappyCustomerImages = exports.getProjectBasicList = exports.getProjectImages = exports.getProjectDetails = exports.updateProject = exports.getAllProjects = exports.newProject = void 0;
+exports.deleteProject = exports.deleteProjectImage = exports.deleteProjectImages = exports.uploadProjectImages = exports.uploadLogoImage = exports.uploadHappyCustomerImages = exports.getProjectBasicList = exports.getProjectImages = exports.getProjectDetails = exports.updateProject = exports.getAllProjects = exports.newProject = void 0;
 const catchAsync_1 = __importDefault(require("../utils/catchAsync"));
 const db_1 = __importDefault(require("../db"));
 const responseHandler_1 = __importDefault(require("../utils/responseHandler"));
@@ -125,7 +125,7 @@ exports.getAllProjects = (0, catchAsync_1.default)((req, res) => __awaiter(void 
     projectList = yield db_1.default.project.findMany({
         take: +pageSize,
         skip: skip,
-        where: whereClause,
+        where: Object.assign(Object.assign({}, whereClause), { isDelete: false }),
         orderBy: {
             createdAt: 'desc',
         },
@@ -151,6 +151,14 @@ exports.updateProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
     yield (0, validations_1.default)(validation.updateProjectValidator, req.body);
     const { projectId } = req.params;
     const { address1, area, name, description, ownerName, pincode, status, unit, address2, downPayment, emiAmt, location, totalAmt, } = req.body;
+    const projectData = yield db_1.default.project.findFirst({
+        where: {
+            projectId,
+            isDelete: false,
+        },
+    });
+    if (!projectData)
+        throw new AppError_1.default(project_1.PROJECT_E_0001);
     const updateProject = yield db_1.default.project.update({
         where: {
             projectId,
@@ -179,6 +187,7 @@ exports.getProjectDetails = (0, catchAsync_1.default)((req, res) => __awaiter(vo
     const fetchProject = yield db_1.default.project.findFirst({
         where: {
             projectId,
+            isDelete: false,
         },
     });
     if (!fetchProject)
@@ -193,6 +202,7 @@ exports.getProjectImages = (0, catchAsync_1.default)((req, res) => __awaiter(voi
     const fetchProject = yield db_1.default.project.findFirst({
         where: {
             projectId,
+            isDelete: false,
         },
         include: {
             projectImages: true,
@@ -224,6 +234,9 @@ exports.getProjectImages = (0, catchAsync_1.default)((req, res) => __awaiter(voi
 }));
 exports.getProjectBasicList = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const fetchProjects = yield db_1.default.project.findMany({
+        where: {
+            isDelete: false,
+        },
         select: {
             projectId: true,
             name: true,
@@ -251,9 +264,17 @@ exports.uploadLogoImage = (0, catchAsync_1.default)((req, res) => __awaiter(void
     yield (0, validations_1.default)(generalValidation.projectIdValidator, req.params);
     const { projectId } = req.params;
     const logoUrl = (_c = req.file) === null || _c === void 0 ? void 0 : _c.location;
-    const fileName = req.file.originalName;
+    // const fileName = req.file.originalName
+    const projectData = yield db_1.default.project.findFirst({
+        where: {
+            isDelete: false,
+        },
+    });
+    if (!projectData)
+        throw new AppError_1.default(project_1.PROJECT_E_0001);
     yield db_1.default.$transaction((prisma) => __awaiter(void 0, void 0, void 0, function* () {
-        yield (0, s3_1.deleteImage)(fileName); // check if it is deleting the existing logo
+        var _d, _e;
+        yield (0, s3_1.deleteImage)(((_e = (_d = projectData.logoUrl) === null || _d === void 0 ? void 0 : _d.split('/')) === null || _e === void 0 ? void 0 : _e.pop()) || '');
         yield prisma.project.update({
             where: {
                 projectId,
@@ -266,18 +287,18 @@ exports.uploadLogoImage = (0, catchAsync_1.default)((req, res) => __awaiter(void
     return (0, responseHandler_1.default)(res, project_1.PROJECT_S_0006, { logoUrl });
 }));
 exports.uploadProjectImages = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _d, e_1, _e, _f;
-    var _g, _h, _j, _k;
+    var _f, e_1, _g, _h;
+    var _j, _k, _l, _m;
     yield (0, validations_1.default)(generalValidation.projectIdValidator, req.params);
     const { projectId } = req.params;
     let data = [];
     const result = [];
-    const planningImageUrls = (_h = (_g = req.files) === null || _g === void 0 ? void 0 : _g['planningImages']) === null || _h === void 0 ? void 0 : _h.map((image) => ({
+    const planningImageUrls = (_k = (_j = req.files) === null || _j === void 0 ? void 0 : _j['planningImages']) === null || _k === void 0 ? void 0 : _k.map((image) => ({
         url: image.location,
         type: 'PLANNING',
         projectId: projectId,
     }));
-    const siteImageUrls = (_k = (_j = req.files) === null || _j === void 0 ? void 0 : _j['siteImages']) === null || _k === void 0 ? void 0 : _k.map((image) => ({
+    const siteImageUrls = (_m = (_l = req.files) === null || _l === void 0 ? void 0 : _l['siteImages']) === null || _m === void 0 ? void 0 : _m.map((image) => ({
         url: image.location,
         type: 'SITE',
         projectId: projectId,
@@ -289,11 +310,11 @@ exports.uploadProjectImages = (0, catchAsync_1.default)((req, res) => __awaiter(
         data = [...data, ...siteImageUrls];
     }
     try {
-        for (var _l = true, data_1 = __asyncValues(data), data_1_1; data_1_1 = yield data_1.next(), _d = data_1_1.done, !_d;) {
-            _f = data_1_1.value;
-            _l = false;
+        for (var _o = true, data_1 = __asyncValues(data), data_1_1; data_1_1 = yield data_1.next(), _f = data_1_1.done, !_f;) {
+            _h = data_1_1.value;
+            _o = false;
             try {
-                const obj = _f;
+                const obj = _h;
                 const addImage = yield db_1.default.projectImages.create({
                     data: obj,
                 });
@@ -304,14 +325,14 @@ exports.uploadProjectImages = (0, catchAsync_1.default)((req, res) => __awaiter(
                 });
             }
             finally {
-                _l = true;
+                _o = true;
             }
         }
     }
     catch (e_1_1) { e_1 = { error: e_1_1 }; }
     finally {
         try {
-            if (!_l && !_d && (_e = data_1.return)) yield _e.call(data_1);
+            if (!_o && !_f && (_g = data_1.return)) yield _g.call(data_1);
         }
         finally { if (e_1) throw e_1.error; }
     }
@@ -334,24 +355,24 @@ exports.deleteProjectImages = (0, catchAsync_1.default)((req, res) => __awaiter(
         return array[array.length - 1];
     });
     yield db_1.default.$transaction((prisma) => __awaiter(void 0, void 0, void 0, function* () {
-        var _m, e_2, _o, _p;
+        var _p, e_2, _q, _r;
         try {
-            for (var _q = true, imagesFileNames_1 = __asyncValues(imagesFileNames), imagesFileNames_1_1; imagesFileNames_1_1 = yield imagesFileNames_1.next(), _m = imagesFileNames_1_1.done, !_m;) {
-                _p = imagesFileNames_1_1.value;
-                _q = false;
+            for (var _s = true, imagesFileNames_1 = __asyncValues(imagesFileNames), imagesFileNames_1_1; imagesFileNames_1_1 = yield imagesFileNames_1.next(), _p = imagesFileNames_1_1.done, !_p;) {
+                _r = imagesFileNames_1_1.value;
+                _s = false;
                 try {
-                    const iterator = _p;
+                    const iterator = _r;
                     yield (0, s3_1.deleteImage)(iterator);
                 }
                 finally {
-                    _q = true;
+                    _s = true;
                 }
             }
         }
         catch (e_2_1) { e_2 = { error: e_2_1 }; }
         finally {
             try {
-                if (!_q && !_m && (_o = imagesFileNames_1.return)) yield _o.call(imagesFileNames_1);
+                if (!_s && !_p && (_q = imagesFileNames_1.return)) yield _q.call(imagesFileNames_1);
             }
             finally { if (e_2) throw e_2.error; }
         }
@@ -367,7 +388,7 @@ exports.deleteProjectImages = (0, catchAsync_1.default)((req, res) => __awaiter(
     return (0, responseHandler_1.default)(res, project_1.PROJECT_S_0008);
 }));
 exports.deleteProjectImage = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _r, _s;
+    var _t, _u;
     yield (0, validations_1.default)(validation.projectImageIdValidator, req.params);
     const { projectImageId } = req.params;
     const imageExists = yield db_1.default.projectImages.findFirst({
@@ -377,11 +398,31 @@ exports.deleteProjectImage = (0, catchAsync_1.default)((req, res) => __awaiter(v
     });
     if (!imageExists)
         throw new AppError_1.default(project_1.PROJECT_E_0003);
-    yield (0, s3_1.deleteImage)(((_s = (_r = imageExists.url) === null || _r === void 0 ? void 0 : _r.split('/')) === null || _s === void 0 ? void 0 : _s.pop()) || '');
+    yield (0, s3_1.deleteImage)(((_u = (_t = imageExists.url) === null || _t === void 0 ? void 0 : _t.split('/')) === null || _u === void 0 ? void 0 : _u.pop()) || '');
     yield db_1.default.projectImages.delete({
         where: {
             projectImageId,
         },
     });
     return (0, responseHandler_1.default)(res, project_1.PROJECT_S_0010);
+}));
+exports.deleteProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, validations_1.default)(validation.projectIdValidator, req.params);
+    const { projectId } = req.params;
+    const projectData = yield db_1.default.project.findFirst({
+        where: {
+            projectId,
+        },
+    });
+    if (!projectData)
+        throw new AppError_1.default(project_1.PROJECT_E_0001);
+    yield db_1.default.project.update({
+        where: {
+            projectId,
+        },
+        data: {
+            isDelete: true,
+        },
+    });
+    return (0, responseHandler_1.default)(res, project_1.PROJECT_S_0011);
 }));

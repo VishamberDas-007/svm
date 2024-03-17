@@ -46,11 +46,13 @@ exports.upload = (0, multer_1.default)({
 });
 const deleteImage = (key) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const deleteCommand = new client_s3_1.DeleteObjectCommand({
-            Bucket: 'svm-bucket',
-            Key: 'svm/' + key,
-        });
-        yield s3Config.send(deleteCommand);
+        if (key) {
+            const deleteCommand = new client_s3_1.DeleteObjectCommand({
+                Bucket: 'svm-bucket',
+                Key: 'svm/' + key,
+            });
+            yield s3Config.send(deleteCommand);
+        }
         // console.log('Deleted:', result)
     }
     catch (error) {

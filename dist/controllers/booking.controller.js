@@ -42,7 +42,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateBooking = exports.getBooking = exports.getAllBookings = exports.createBooking = void 0;
+exports.deleteBooking = exports.updateBooking = exports.getBooking = exports.getAllBookings = exports.createBooking = void 0;
 const db_1 = __importDefault(require("../db"));
 const catchAsync_1 = __importDefault(require("../utils/catchAsync"));
 const responseHandler_1 = __importDefault(require("../utils/responseHandler"));
@@ -217,7 +217,7 @@ exports.getAllBookings = (0, catchAsync_1.default)((req, res) => __awaiter(void 
     bookingList = yield db_1.default.booking.findMany({
         take: +pageSize,
         skip,
-        where: whereClause,
+        where: Object.assign(Object.assign({}, whereClause), { isDelete: false }),
         include: {
             project: true,
             customer: true,
@@ -295,6 +295,7 @@ exports.getBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
     const fetchBooking = yield db_1.default.booking.findFirst({
         where: {
             bookingId,
+            isDelete: false,
         },
         include: {
             adminAccount: true,
@@ -346,6 +347,7 @@ exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
     const bookingExists = yield db_1.default.booking.findFirst({
         where: {
             bookingId,
+            isDelete: false,
         },
     });
     if (!bookingExists)
@@ -497,4 +499,25 @@ exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
         }));
         return (0, responseHandler_1.default)(res, booking_1.BOOKING_S_0004, updatedBookingDetails);
     }
+}));
+exports.deleteBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, validations_1.default)(validation.bookingIdValidator, req.params);
+    const { bookingId } = req.params;
+    const bookingData = yield db_1.default.booking.findFirst({
+        where: {
+            bookingId,
+            isDelete: false,
+        },
+    });
+    if (!bookingData)
+        throw new AppError_1.default(booking_1.BOOKING_E_0001);
+    yield db_1.default.booking.update({
+        where: {
+            bookingId,
+        },
+        data: {
+            isDelete: true,
+        },
+    });
+    return (0, responseHandler_1.default)(res, booking_1.BOOKING_S_0005);
 }));

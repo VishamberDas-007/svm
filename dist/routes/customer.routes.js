@@ -58,3 +58,6 @@ customerRouter.get('/advance-list', (0, auth_middleware_1.authMiddleware)(['CUST
 customerRouter.put('/update/:customerId', (0, auth_middleware_1.authMiddleware)(['CUSTOMER_WRITE']), customerController.updateCustomer);
 customerRouter.get('/get/:customerId', (0, auth_middleware_1.authMiddleware)(['CUSTOMER_READ', 'CUSTOMER_WRITE']), customerController.getCustomer);
 customerRouter.delete('/delete-image/:customerImageId', (0, auth_middleware_1.authMiddleware)(['CUSTOMER_READ', 'CUSTOMER_WRITE']), customerController.deleteCustomerImage);
+customerRouter.delete('/delete/:customerId', 
+// authMiddleware(['CUSTOMER_READ', 'CUSTOMER_WRITE']),
+customerController.deleteCustomer);

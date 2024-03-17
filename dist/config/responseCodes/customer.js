@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CUSTOMER_S_0008 = exports.CUSTOMER_S_0007 = exports.CUSTOMER_S_0006 = exports.CUSTOMER_S_0005 = exports.CUSTOMER_S_0004 = exports.CUSTOMER_S_0003 = exports.CUSTOMER_S_0002 = exports.CUSTOMER_S_0001 = exports.CUSTOMER_E_0003 = exports.CUSTOMER_E_0002 = exports.CUSTOMER_E_0001 = void 0;
+exports.CUSTOMER_S_0009 = exports.CUSTOMER_S_0008 = exports.CUSTOMER_S_0007 = exports.CUSTOMER_S_0006 = exports.CUSTOMER_S_0005 = exports.CUSTOMER_S_0004 = exports.CUSTOMER_S_0003 = exports.CUSTOMER_S_0002 = exports.CUSTOMER_S_0001 = exports.CUSTOMER_E_0003 = exports.CUSTOMER_E_0002 = exports.CUSTOMER_E_0001 = void 0;
 const global_types_1 = require("../../types/global.types");
 exports.CUSTOMER_E_0001 = {
     type: global_types_1.RESPONSE_TYPE.ERROR,
@@ -77,5 +77,12 @@ exports.CUSTOMER_S_0008 = {
     code: 'CUSTOMER_S_0008',
     isNotify: false,
     message: 'Customer images deleted successfully',
+    statusCode: 200,
+};
+exports.CUSTOMER_S_0009 = {
+    type: global_types_1.RESPONSE_TYPE.SUCCESS,
+    code: 'CUSTOMER_S_0009',
+    isNotify: false,
+    message: 'Customer deleted successfully',
     statusCode: 200,
 };

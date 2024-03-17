@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.projectImageIdValidator = exports.projectImageIdsValidator = exports.updateProjectValidator = exports.createProjectValidator = void 0;
+exports.projectIdValidator = exports.projectImageIdValidator = exports.projectImageIdsValidator = exports.updateProjectValidator = exports.createProjectValidator = void 0;
 const joi_1 = __importDefault(require("joi"));
 const helper_1 = __importDefault(require("../utils/helper"));
 const projectStatus = ['ACTIVE', 'COMPLETED', 'UPCOMING'];
@@ -40,4 +40,7 @@ exports.projectImageIdsValidator = joi_1.default.object({
 });
 exports.projectImageIdValidator = joi_1.default.object({
     projectImageId: helper_1.default.uuid.required(),
+});
+exports.projectIdValidator = joi_1.default.object({
+    projectId: helper_1.default.uuid.required(),
 });
