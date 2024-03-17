@@ -13,7 +13,7 @@ exports.CUSTOMER_E_0002 = {
     type: global_types_1.RESPONSE_TYPE.ERROR,
     code: 'CUSTOMER_E_0002',
     isNotify: false,
-    message: 'This Aadhar number is already associated with another customer',
+    message: 'This Phone number is already associated with another customer',
     statusCode: 409,
 };
 exports.CUSTOMER_E_0003 = {

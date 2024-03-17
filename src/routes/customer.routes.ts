@@ -41,7 +41,7 @@ customerRouter.patch(
 customerRouter.patch(
     '/upload/customer-image/:customerId',
     authMiddleware(['CUSTOMER_WRITE']),
-    upload.fields([{ name: 'customerImage', maxCount: 3 }]),
+    upload.fields([{ name: 'customerImage', maxCount: 1 }]),
     customerController.uploadCustomerImage
 )
 

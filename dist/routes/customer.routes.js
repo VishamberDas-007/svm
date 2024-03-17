@@ -50,7 +50,7 @@ customerRouter.patch('/upload/aadhar-image/:customerId', (0, auth_middleware_1.a
     { name: 'aadharImageFront', maxCount: 1 },
     { name: 'aadharImageRear', maxCount: 1 },
 ]), customerController.uploadAadharImage);
-customerRouter.patch('/upload/customer-image/:customerId', (0, auth_middleware_1.authMiddleware)(['CUSTOMER_WRITE']), s3_1.upload.fields([{ name: 'customerImage', maxCount: 3 }]), customerController.uploadCustomerImage);
+customerRouter.patch('/upload/customer-image/:customerId', (0, auth_middleware_1.authMiddleware)(['CUSTOMER_WRITE']), s3_1.upload.fields([{ name: 'customerImage', maxCount: 1 }]), customerController.uploadCustomerImage);
 customerRouter.get('/basic-list', 
 // authMiddleware(['CUSTOMER_READ', 'CUSTOMER_WRITE']),
 customerController.getBasicCustomerList);
