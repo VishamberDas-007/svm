@@ -94,4 +94,10 @@ projectRouter.delete(
     projectController.deleteProjectImage
 )
 
+projectRouter.delete(
+    '/delete/:projectId',
+    // authMiddleware(['PROJECT_WRITE']),
+    projectController.deleteProject
+)
+
 export { projectRouter }

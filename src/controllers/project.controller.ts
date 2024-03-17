@@ -24,6 +24,7 @@ import {
     PROJECT_S_0008,
     PROJECT_S_0009,
     PROJECT_S_0010,
+    PROJECT_S_0011,
 } from '../config/responseCodes/project'
 import { Project } from '@prisma/client'
 import AppError from '../utils/AppError'
@@ -143,7 +144,10 @@ export const getAllProjects = catchAsync(
         projectList = await prisma.project.findMany({
             take: +pageSize,
             skip: skip,
-            where: whereClause,
+            where: {
+                ...whereClause,
+                isDelete: false,
+            },
             orderBy: {
                 createdAt: 'desc',
             },
@@ -194,6 +198,15 @@ export const updateProject = catchAsync(
             totalAmt,
         }: TUpdateProject = req.body
 
+        const projectData = await prisma.project.findFirst({
+            where: {
+                projectId,
+                isDelete: false,
+            },
+        })
+
+        if (!projectData) throw new AppError(PROJECT_E_0001)
+
         const updateProject = await prisma.project.update({
             where: {
                 projectId,
@@ -227,6 +240,7 @@ export const getProjectDetails = catchAsync(
         const fetchProject = await prisma.project.findFirst({
             where: {
                 projectId,
+                isDelete: false,
             },
         })
 
@@ -246,6 +260,7 @@ export const getProjectImages = catchAsync(
         const fetchProject = await prisma.project.findFirst({
             where: {
                 projectId,
+                isDelete: false,
             },
             include: {
                 projectImages: true,
@@ -283,6 +298,9 @@ export const getProjectImages = catchAsync(
 export const getProjectBasicList = catchAsync(
     async (req: Request, res: Response) => {
         const fetchProjects = await prisma.project.findMany({
+            where: {
+                isDelete: false,
+            },
             select: {
                 projectId: true,
                 name: true,
@@ -323,10 +341,18 @@ export const uploadLogoImage = catchAsync(
 
         const logoUrl: string = req.file?.location
 
-        const fileName = req.file.originalName
+        // const fileName = req.file.originalName
+
+        const projectData = await prisma.project.findFirst({
+            where: {
+                isDelete: false,
+            },
+        })
+
+        if (!projectData) throw new AppError(PROJECT_E_0001)
 
         await prisma.$transaction(async (prisma) => {
-            await deleteImage(fileName) // check if it is deleting the existing logo
+            await deleteImage(projectData.logoUrl?.split('/')?.pop() || '')
 
             await prisma.project.update({
                 where: {
@@ -459,3 +485,28 @@ export const deleteProjectImage = catchAsync(
         return responseHandler(res, PROJECT_S_0010)
     }
 )
+
+export const deleteProject = catchAsync(async (req: Request, res: Response) => {
+    await validator(validation.projectIdValidator, req.params)
+
+    const { projectId } = req.params
+
+    const projectData = await prisma.project.findFirst({
+        where: {
+            projectId,
+        },
+    })
+
+    if (!projectData) throw new AppError(PROJECT_E_0001)
+
+    await prisma.project.update({
+        where: {
+            projectId,
+        },
+        data: {
+            isDelete: true,
+        },
+    })
+
+    return responseHandler(res, PROJECT_S_0011)
+})
