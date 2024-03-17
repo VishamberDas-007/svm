@@ -35,7 +35,6 @@ export const newCustomer = catchAsync(
         await validator(validation.createCustomerValidator, req.body)
 
         const {
-            aadharNo,
             name,
             email,
             phone1,
@@ -46,17 +45,16 @@ export const newCustomer = catchAsync(
             address,
         }: TCustomer = req.body
 
-        const aadharExists = await prisma.customer.findFirst({
+        const phoneExists = await prisma.customer.findFirst({
             where: {
-                aadharNo,
+                phone1,
             },
         })
 
-        if (aadharExists) throw new AppError(CUSTOMER_E_0002)
+        if (phoneExists) throw new AppError(CUSTOMER_E_0002)
         else {
             const createCustomer = await prisma.customer.create({
                 data: {
-                    aadharNo,
                     address,
                     city: city || '',
                     pincode: pincode || '',
@@ -155,13 +153,13 @@ export const getBasicCustomerList = catchAsync(
             whereClause = {
                 OR: [
                     {
-                        aadharNo: {
+                        phone1: {
                             startsWith: searchString,
                             mode: 'insensitive',
                         },
                     },
                     {
-                        aadharNo: {
+                        phone1: {
                             contains: searchString,
                             mode: 'insensitive',
                         },
@@ -181,7 +179,7 @@ export const getBasicCustomerList = catchAsync(
             return {
                 customerId: customer.customerId,
                 name: customer.name,
-                aadharNo: customer.aadharNo,
+                phone1: customer.phone1,
             }
         })
 
@@ -208,13 +206,13 @@ export const getAdvanceCustomerList = catchAsync(
             whereClause = {
                 OR: [
                     {
-                        aadharNo: {
+                        phone1: {
                             startsWith: searchString,
                             mode: 'insensitive',
                         },
                     },
                     {
-                        aadharNo: {
+                        phone1: {
                             contains: searchString,
                             mode: 'insensitive',
                         },
@@ -318,7 +316,6 @@ export const updateCustomer = catchAsync(
         const customerId = req.params.customerId
 
         const {
-            aadharNo,
             name,
             email,
             phone1,
@@ -341,16 +338,16 @@ export const updateCustomer = catchAsync(
 
         if (!fetchCustomer) throw new AppError(CUSTOMER_E_0001)
         else {
-            const aadharExists = await prisma.customer.findFirst({
+            const phoneExists = await prisma.customer.findFirst({
                 where: {
-                    aadharNo,
+                    phone1,
                     NOT: {
                         customerId,
                     },
                 },
             })
 
-            if (aadharExists) {
+            if (phoneExists) {
                 throw new AppError(CUSTOMER_E_0002)
             } else {
                 const updatedCustomer = await prisma.customer.update({
@@ -358,7 +355,6 @@ export const updateCustomer = catchAsync(
                         customerId,
                     },
                     data: {
-                        aadharNo,
                         address,
                         city,
                         name,

@@ -3,7 +3,6 @@ import { TQueryRequest } from '../../types/global.types'
 
 export type TCustomer = {
     name: string
-    aadharNo: string
     email: string
     phone1: string
     phone2?: string
@@ -16,14 +15,14 @@ export type TCustomer = {
 export type TBasicListWhereClause = {
     OR: (
         | {
-              aadharNo: {
+              phone1: {
                   startsWith: string
                   mode: 'insensitive'
                   contains?: undefined
               }
           }
         | {
-              aadharNo: {
+              phone1: {
                   contains: string
                   mode: 'insensitive'
                   startsWith?: undefined

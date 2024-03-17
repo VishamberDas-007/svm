@@ -12,7 +12,7 @@ export const CUSTOMER_E_0002 = {
     type: RESPONSE_TYPE.ERROR,
     code: 'CUSTOMER_E_0002',
     isNotify: false,
-    message: 'This Aadhar number is already associated with another customer',
+    message: 'This Phone number is already associated with another customer',
     statusCode: 409,
 }
 

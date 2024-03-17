@@ -89,8 +89,7 @@ model Customer {
     customerId    String          @id @default(uuid())
     booking       Booking[]       @relation(name: "BookingToCustomer")
     name          String
-    aadharNo      String          @unique
-    phone1        String
+    phone1        String          @unique
     phone2        String?
     email         String?
     address       String?
