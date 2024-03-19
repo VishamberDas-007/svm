@@ -363,6 +363,21 @@ exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
     if (!bookingExists)
         throw new AppError_1.default(booking_1.BOOKING_E_0001);
     else {
+        if (area) {
+            const projectData = yield db_1.default.project.findFirst({
+                where: {
+                    projectId,
+                },
+                include: {
+                    booking: true,
+                },
+            });
+            if (!projectData)
+                throw new AppError_1.default(booking_1.BOOKING_E_0002);
+            const areaExists = (0, booking_service_1.checkIfProjectAreaExists)(projectData, area);
+            if (!areaExists)
+                throw new AppError_1.default(booking_1.BOOKING_E_0003);
+        }
         let paymentDetails = {};
         yield db_1.default.$transaction((prisma) => __awaiter(void 0, void 0, void 0, function* () {
             if (paymentType === bookingExists.paymentType) {

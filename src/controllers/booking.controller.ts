@@ -469,6 +469,23 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
 
     if (!bookingExists) throw new AppError(BOOKING_E_0001)
     else {
+        if (area) {
+            const projectData = await prisma.project.findFirst({
+                where: {
+                    projectId,
+                },
+                include: {
+                    booking: true,
+                },
+            })
+
+            if (!projectData) throw new AppError(BOOKING_E_0002)
+
+            const areaExists = checkIfProjectAreaExists(projectData, area)
+
+            if (!areaExists) throw new AppError(BOOKING_E_0003)
+        }
+
         let paymentDetails = {}
         await prisma.$transaction(async (prisma) => {
             if (paymentType === bookingExists.paymentType) {
