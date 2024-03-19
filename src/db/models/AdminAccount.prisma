@@ -4,6 +4,7 @@ model AdminAccount {
     bankName       String
     balance        Float
     accNo          String   @unique
+    isDelete       Boolean  @default(false)
     createdAt      DateTime @default(now())
     updatedAt      DateTime @updatedAt
 }

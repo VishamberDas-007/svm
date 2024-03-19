@@ -8,7 +8,7 @@ const paymentType = ['CHEQUE', 'UPI', 'CASH', 'BANK_TRANSFER']
 export const createBookingValidator = Joi.object<TBooking>({
     adminAccountId: Joi.number().required(),
     area: Joi.number().required(),
-    customerId: Joi.string().required(),
+    customerIds: Joi.array().items(Joi.string().required()).required(),
     installmentAmt: Joi.number().required(),
     installmentCount: Joi.number().required(),
     paidAmt: Joi.number().required(),
@@ -48,7 +48,7 @@ export const bookingIdValidator = Joi.object<{ bookingId: string }>({
 export const updateBookingValidator = Joi.object<TBookingUpdate>({
     adminAccountId: Joi.number().optional(),
     area: Joi.number().optional(),
-    customerId: Joi.string().optional(),
+    customerIds: Joi.array().items(Joi.string().required()).optional(),
     installmentAmt: Joi.number().optional(),
     installmentCount: Joi.number().optional(),
     paidAmt: Joi.number().optional(),

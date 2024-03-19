@@ -51,11 +51,10 @@ const validation = __importStar(require("../validations/booking.validator"));
 const booking_1 = require("../config/responseCodes/booking");
 const AppError_1 = __importDefault(require("../utils/AppError"));
 // import { getValueInRedis, setValueInRedis } from '../redis/config'
-const _general_service_1 = require("../services/_general.service");
 const booking_service_1 = require("../services/booking.service");
 exports.createBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, validations_1.default)(validation.createBookingValidator, req.body);
-    const { adminAccountId, area, customerId, installmentAmt, installmentCount, paidAmt, paymentStatus, paymentType, plotNo, projectId, remainAmt, totalAmt, accountNo, bankName, chequeNo, upiId, referralId, } = req.body;
+    const { adminAccountId, area, customerIds, installmentAmt, installmentCount, paidAmt, paymentStatus, paymentType, plotNo, projectId, remainAmt, totalAmt, accountNo, bankName, chequeNo, upiId, referralId, } = req.body;
     const projectData = yield db_1.default.project.findFirst({
         where: {
             projectId,
@@ -82,7 +81,9 @@ exports.createBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
                 installmentAmt: +installmentAmt,
                 paymentType,
                 paymentStatus,
-                customerId,
+                customer: {
+                    connect: customerIds.map((customerId) => ({ customerId })),
+                },
                 adminAccountId,
                 installmentCount: +installmentCount,
                 referralId,
@@ -127,7 +128,7 @@ exports.createBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
         }
     }));
     if (newBooking) {
-        const customerDetails = yield (0, _general_service_1.fetchCustomerDetails)(customerId);
+        // const customerDetails = await fetchCustomerDetails(customerId)
         const date = newBooking.createdAt.getDate();
         // uncomment on remote redis
         // let redisDetails: TRedisData[] = JSON.parse(
@@ -264,7 +265,7 @@ exports.getAllBookings = (0, catchAsync_1.default)((req, res) => __awaiter(void 
                             bookingId: booking.bookingId,
                         },
                     });
-                result.push(Object.assign(Object.assign(Object.assign(Object.assign({}, booking), { projectName: booking.project.name, customerName: booking.customer.name, adminBankName: booking.adminAccount.bankName }), paymentDetails), { adminAccount: undefined, project: undefined, customer: undefined, amount: undefined }));
+                result.push(Object.assign(Object.assign(Object.assign(Object.assign({}, booking), { projectName: booking.project.name, customerName: booking.customer.map((customer) => customer.name), adminBankName: booking.adminAccount.bankName }), paymentDetails), { adminAccount: undefined, project: undefined, customer: undefined, amount: undefined }));
             }
             finally {
                 _d = true;
@@ -334,13 +335,19 @@ exports.getBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
                 bookingId: fetchBooking.bookingId,
             },
         });
-    return (0, responseHandler_1.default)(res, booking_1.BOOKING_S_0003, Object.assign(Object.assign(Object.assign(Object.assign({}, fetchBooking), { adminBankName: fetchBooking.adminAccount.bankName, projectName: fetchBooking.project.name, customerName: fetchBooking.customer.name, customerImage: fetchBooking.customer.customerImage, phone1: fetchBooking.customer.phone1, phone2: fetchBooking.customer.phone2, description: fetchBooking.project.description }), paymentDetails), { adminAccount: undefined, project: undefined, customer: undefined }));
+    const formatCustomerData = fetchBooking.customer.map((obj) => ({
+        name: obj.name,
+        phone1: obj.phone1,
+        phone2: obj.phone2,
+        images: obj.customerImage,
+    }));
+    return (0, responseHandler_1.default)(res, booking_1.BOOKING_S_0003, Object.assign(Object.assign(Object.assign(Object.assign({}, fetchBooking), { adminBankName: fetchBooking.adminAccount.bankName, projectName: fetchBooking.project.name, description: fetchBooking.project.description, customer: formatCustomerData }), paymentDetails), { adminAccount: undefined, project: undefined }));
 }));
 exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, validations_1.default)(validation.bookingIdValidator, req.params);
     yield (0, validations_1.default)(validation.updateBookingValidator, req.body);
     const { bookingId } = req.params;
-    const { adminAccountId, area, customerId, installmentAmt, installmentCount, paymentStatus, paymentType, projectId, plotNo, remainAmt, totalAmt, accountNo, bankName, chequeNo, upiId, paymentId, referralId, } = req.body;
+    const { adminAccountId, area, customerIds, installmentAmt, installmentCount, paymentStatus, paymentType, projectId, plotNo, remainAmt, totalAmt, accountNo, bankName, chequeNo, upiId, paymentId, referralId, } = req.body;
     let { paidAmt } = req.body;
     paidAmt = !isNaN(+paidAmt) ? +paidAmt : undefined;
     let updatedBookingDetails;
@@ -348,6 +355,9 @@ exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
         where: {
             bookingId,
             isDelete: false,
+        },
+        include: {
+            customer: true,
         },
     });
     if (!bookingExists)
@@ -448,11 +458,29 @@ exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
                     };
                 }
             }
+            if (customerIds.length) {
+                yield prisma.booking.update({
+                    where: {
+                        bookingId,
+                    },
+                    data: {
+                        customer: {
+                            disconnect: bookingExists.customer.map((customer) => ({
+                                customerId: customer.customerId,
+                            })),
+                        },
+                    },
+                });
+            }
             updatedBookingDetails = yield prisma.booking.update({
                 where: {
                     bookingId,
                 },
-                data: Object.assign({ adminAccountId, area: +area, customerId, installmentAmt: +installmentAmt, installmentCount: +installmentCount, paidAmt: paidAmt, paymentStatus,
+                data: Object.assign({ adminAccountId, area: +area, customer: {
+                        connect: customerIds.map((customerId) => ({
+                            customerId,
+                        })),
+                    }, installmentAmt: +installmentAmt, installmentCount: +installmentCount, paidAmt: paidAmt, paymentStatus,
                     paymentType,
                     plotNo,
                     projectId, remainAmt: +remainAmt, totalAmt: +totalAmt, referralId }, paymentDetails),

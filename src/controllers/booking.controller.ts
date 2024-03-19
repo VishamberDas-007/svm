@@ -33,7 +33,6 @@ import {
 } from '@prisma/client'
 import { TListData } from '../types/global.types'
 // import { getValueInRedis, setValueInRedis } from '../redis/config'
-import { fetchCustomerDetails } from '../services/_general.service'
 import { checkIfProjectAreaExists } from '../services/booking.service'
 
 export const createBooking = catchAsync(async (req: Request, res: Response) => {
@@ -42,7 +41,7 @@ export const createBooking = catchAsync(async (req: Request, res: Response) => {
     const {
         adminAccountId,
         area,
-        customerId,
+        customerIds,
         installmentAmt,
         installmentCount,
         paidAmt,
@@ -94,7 +93,9 @@ export const createBooking = catchAsync(async (req: Request, res: Response) => {
                 installmentAmt: +installmentAmt,
                 paymentType,
                 paymentStatus,
-                customerId,
+                customer: {
+                    connect: customerIds.map((customerId) => ({ customerId })),
+                },
                 adminAccountId,
                 installmentCount: +installmentCount,
                 referralId,
@@ -138,7 +139,7 @@ export const createBooking = catchAsync(async (req: Request, res: Response) => {
     })
 
     if (newBooking) {
-        const customerDetails = await fetchCustomerDetails(customerId)
+        // const customerDetails = await fetchCustomerDetails(customerId)
 
         const date = newBooking.createdAt.getDate()
 
@@ -261,7 +262,7 @@ export const getAllBookings = catchAsync(
             totalQueryCount = 0,
             bookingList: (Booking & {
                 project: Project
-                customer: Customer
+                customer: Customer[]
                 adminAccount: AdminAccount
             })[] = []
 
@@ -327,7 +328,7 @@ export const getAllBookings = catchAsync(
             result.push({
                 ...booking,
                 projectName: booking.project.name,
-                customerName: booking.customer.name,
+                customerName: booking.customer.map((customer) => customer.name),
                 adminBankName: booking.adminAccount.bankName,
                 ...paymentDetails,
                 adminAccount: undefined,
@@ -407,19 +408,22 @@ export const getBooking = catchAsync(async (req: Request, res: Response) => {
             },
         })
 
+    const formatCustomerData = fetchBooking.customer.map((obj) => ({
+        name: obj.name,
+        phone1: obj.phone1,
+        phone2: obj.phone2,
+        images: obj.customerImage,
+    }))
+
     return responseHandler(res, BOOKING_S_0003, {
         ...fetchBooking,
         adminBankName: fetchBooking.adminAccount.bankName,
         projectName: fetchBooking.project.name,
-        customerName: fetchBooking.customer.name,
-        customerImage: fetchBooking.customer.customerImage,
-        phone1: fetchBooking.customer.phone1,
-        phone2: fetchBooking.customer.phone2,
         description: fetchBooking.project.description,
+        customer: formatCustomerData,
         ...paymentDetails,
         adminAccount: undefined,
         project: undefined,
-        customer: undefined,
     })
 })
 
@@ -431,7 +435,7 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
     const {
         adminAccountId,
         area,
-        customerId,
+        customerIds,
         installmentAmt,
         installmentCount,
         paymentStatus,
@@ -457,6 +461,9 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
         where: {
             bookingId,
             isDelete: false,
+        },
+        include: {
+            customer: true,
         },
     })
 
@@ -551,6 +558,23 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
                 }
             }
 
+            if (customerIds.length) {
+                await prisma.booking.update({
+                    where: {
+                        bookingId,
+                    },
+                    data: {
+                        customer: {
+                            disconnect: bookingExists.customer.map(
+                                (customer) => ({
+                                    customerId: customer.customerId,
+                                })
+                            ),
+                        },
+                    },
+                })
+            }
+
             updatedBookingDetails = await prisma.booking.update({
                 where: {
                     bookingId,
@@ -558,7 +582,11 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
                 data: {
                     adminAccountId,
                     area: +area,
-                    customerId,
+                    customer: {
+                        connect: customerIds.map((customerId) => ({
+                            customerId,
+                        })),
+                    },
                     installmentAmt: +installmentAmt,
                     installmentCount: +installmentCount,
                     paidAmt: paidAmt,

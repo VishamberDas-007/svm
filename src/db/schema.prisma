@@ -15,6 +15,7 @@ model AdminAccount {
     bankName       String
     balance        Float
     accNo          String    @unique
+    isDelete       Boolean   @default(false)
     createdAt      DateTime  @default(now())
     updatedAt      DateTime  @updatedAt
     booking        Booking[] @relation(name: "AdminAccountToBooking")
@@ -44,8 +45,6 @@ model Booking {
     installmentAmt   Float
     paymentType      PaymentType     @default(CASH)
     paymentStatus    PaymentStatus   @default(PARTIAL)
-    customerId       String
-    customer         Customer        @relation(name: "BookingToCustomer", fields: [customerId], references: [customerId])
     adminAccountId   Int
     adminAccount     AdminAccount    @relation(name: "AdminAccountToBooking", fields: [adminAccountId], references: [adminAccountId])
     installmentCount Int
@@ -56,6 +55,7 @@ model Booking {
     updatedAt        DateTime        @updatedAt
     cashPayment      CashPayment[]   @relation(name: "BookingToCashPayment")
     chequePayment    ChequePayment[] @relation(name: "BookingToChequePayment")
+    customer         Customer[]      @relation(name: "BookingToCustomer")
     installment      Installment[]   @relation(name: "BookingToInstallment")
     upiPayment       UpiPayment[]    @relation(name: "BookingToUpiPayment")
 }
@@ -83,23 +83,6 @@ model Project {
     createdAt     DateTime        @default(now())
     updatedAt     DateTime        @updatedAt
     projectImages ProjectImages[] @relation(name: "ProjectToProjectImages")
-}
-
-model Customer {
-    customerId    String          @id @default(uuid())
-    booking       Booking[]       @relation(name: "BookingToCustomer")
-    name          String
-    phone1        String          @unique
-    phone2        String?
-    email         String?
-    address       String?
-    pincode       String
-    city          String
-    state         String
-    isDelete      Boolean         @default(false)
-    createdAt     DateTime        @default(now())
-    updatedAt     DateTime        @updatedAt
-    customerImage CustomerImage[] @relation(name: "CustomerToCustomerImage")
 }
 
 model Referral {
@@ -144,6 +127,23 @@ model ContactUs {
     status      ContactUsStatus @default(PENDING)
     createdAt   DateTime        @default(now())
     updatedAt   DateTime        @updatedAt
+}
+
+model Customer {
+    customerId    String          @id @default(uuid())
+    name          String
+    phone1        String          @unique
+    phone2        String?
+    email         String?
+    address       String?
+    pincode       String
+    city          String
+    state         String
+    booking       Booking[]       @relation(name: "BookingToCustomer")
+    isDelete      Boolean         @default(false)
+    createdAt     DateTime        @default(now())
+    updatedAt     DateTime        @updatedAt
+    customerImage CustomerImage[] @relation(name: "CustomerToCustomerImage")
 }
 
 model CustomerImage {

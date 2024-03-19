@@ -11,7 +11,7 @@ const paymentType = ['CHEQUE', 'UPI', 'CASH', 'BANK_TRANSFER'];
 exports.createBookingValidator = joi_1.default.object({
     adminAccountId: joi_1.default.number().required(),
     area: joi_1.default.number().required(),
-    customerId: joi_1.default.string().required(),
+    customerIds: joi_1.default.array().items(joi_1.default.string().required()).required(),
     installmentAmt: joi_1.default.number().required(),
     installmentCount: joi_1.default.number().required(),
     paidAmt: joi_1.default.number().required(),
@@ -49,7 +49,7 @@ exports.bookingIdValidator = joi_1.default.object({
 exports.updateBookingValidator = joi_1.default.object({
     adminAccountId: joi_1.default.number().optional(),
     area: joi_1.default.number().optional(),
-    customerId: joi_1.default.string().optional(),
+    customerIds: joi_1.default.array().items(joi_1.default.string().required()).optional(),
     installmentAmt: joi_1.default.number().optional(),
     installmentCount: joi_1.default.number().optional(),
     paidAmt: joi_1.default.number().optional(),

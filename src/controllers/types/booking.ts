@@ -11,7 +11,7 @@ export type TBooking = {
     installmentAmt: number
     paymentType: PaymentType
     paymentStatus: PaymentStatus
-    customerId: string
+    customerIds: string[]
     adminAccountId: number
     installmentCount: number
     accountNo: string

@@ -5,7 +5,7 @@ import AppError from '../utils/AppError'
 
 export const getBookingDetails = async (
     bookingId: string
-): Promise<Booking & { customer: Customer }> => {
+): Promise<Booking & { customer: Customer[] }> => {
     const bookingDetails = await prisma.booking.findFirst({
         where: {
             bookingId,

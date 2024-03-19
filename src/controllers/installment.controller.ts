@@ -8,6 +8,7 @@ import {
     INSTALLMENT_E_0001,
     INSTALLMENT_E_0002,
     INSTALLMENT_E_0003,
+    INSTALLMENT_E_0004,
     INSTALLMENT_S_0001,
     INSTALLMENT_S_0002,
     INSTALLMENT_S_0003,
@@ -210,16 +211,33 @@ export const fetchBookingInstallmentDetails = catchAsync(
         const { bookingId } = req.params
 
         const installmentNo = await getInstallmentCount(bookingId)
-        const bookingDetails = await getBookingDetails(bookingId)
+
+        const bookingDetails = await prisma.booking.findFirst({
+            where: {
+                bookingId,
+                isDelete: false,
+            },
+            include: {
+                customer: true,
+                project: true,
+            },
+        })
+
+        if (!bookingDetails) throw new AppError(INSTALLMENT_E_0004)
+
+        const formatCustomerData = bookingDetails.customer.map((customer) => ({
+            name: customer.name,
+            customerId: customer.customerId,
+        }))
+
         // TODO: Add the address of project and plot no of the booking in response
         return responseHandler(res, INSTALLMENT_S_0002, {
-            customerName: bookingDetails.customer.name,
             installmentAmt: bookingDetails.installmentAmt,
-            // pincode: bookingDetails.pincode,
             installmentNo,
+            address1: bookingDetails.project.address1 || '',
+            address2: bookingDetails.project.address2 || '',
             plotNo: bookingDetails.plotNo,
-            // address1: bookingDetails.address1,
-            // address2: bookingDetails.address2,
+            customer: formatCustomerData,
         })
     }
 )

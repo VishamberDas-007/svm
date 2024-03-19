@@ -24,6 +24,14 @@ export const INSTALLMENT_E_0003: TResponseCode = {
     statusCode: 400,
 }
 
+export const INSTALLMENT_E_0004: TResponseCode = {
+    type: RESPONSE_TYPE.ERROR,
+    code: 'INSTALLMENT_E_0004',
+    isNotify: true,
+    message: 'Failed to fetch booking',
+    statusCode: 400,
+}
+
 export const INSTALLMENT_S_0001: TResponseCode = {
     type: RESPONSE_TYPE.ERROR,
     code: 'INSTALLMENT_S_0001',

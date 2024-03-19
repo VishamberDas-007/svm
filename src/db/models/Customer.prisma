@@ -1,14 +1,20 @@
 model Customer {
-    customerId String   @id @default(uuid())
+    customerId String    @id @default(uuid())
     name       String
-    phone1     String   @unique
+    phone1     String    @unique
     phone2     String?
     email      String?
     address    String?
     pincode    String
     city       String
     state      String
-    isDelete   Boolean  @default(false)
-    createdAt  DateTime @default(now())
-    updatedAt  DateTime @updatedAt
+    booking    Booking[]
+    isDelete   Boolean   @default(false)
+    createdAt  DateTime  @default(now())
+    updatedAt  DateTime  @updatedAt
+}
+
+model Booking {
+    bookingId String     @id
+    customer  Customer[]
 }

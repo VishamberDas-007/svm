@@ -207,16 +207,30 @@ exports.fetchBookingInstallmentDetails = (0, catchAsync_1.default)((req, res) =>
     yield (0, validations_1.default)(generalValidation.bookingIdValidator, req.params);
     const { bookingId } = req.params;
     const installmentNo = yield (0, installment_service_1.getInstallmentCount)(bookingId);
-    const bookingDetails = yield (0, booking_service_1.getBookingDetails)(bookingId);
+    const bookingDetails = yield db_1.default.booking.findFirst({
+        where: {
+            bookingId,
+            isDelete: false,
+        },
+        include: {
+            customer: true,
+            project: true,
+        },
+    });
+    if (!bookingDetails)
+        throw new AppError_1.default(installment_1.INSTALLMENT_E_0004);
+    const formatCustomerData = bookingDetails.customer.map((customer) => ({
+        name: customer.name,
+        customerId: customer.customerId,
+    }));
     // TODO: Add the address of project and plot no of the booking in response
     return (0, responseHandler_1.default)(res, installment_1.INSTALLMENT_S_0002, {
-        customerName: bookingDetails.customer.name,
         installmentAmt: bookingDetails.installmentAmt,
-        // pincode: bookingDetails.pincode,
         installmentNo,
+        address1: bookingDetails.project.address1 || '',
+        address2: bookingDetails.project.address2 || '',
         plotNo: bookingDetails.plotNo,
-        // address1: bookingDetails.address1,
-        // address2: bookingDetails.address2,
+        customer: formatCustomerData,
     });
 }));
 exports.deleteInstallment = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
