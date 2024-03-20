@@ -69,9 +69,9 @@ customerController.updateCustomer);
 customerRouter.get('/get/:customerId', 
 // authMiddleware(['CUSTOMER_READ', 'CUSTOMER_WRITE']),
 customerController.getCustomer);
-customerRouter.delete('/delete-image/:customerImageId', 
+customerRouter.get('/get-images/:customerId', 
 // authMiddleware(['CUSTOMER_READ', 'CUSTOMER_WRITE']),
-customerController.deleteCustomerImage);
+customerController.getCustomerImages);
 customerRouter.delete('/delete/:customerId', 
 // authMiddleware(['CUSTOMER_READ', 'CUSTOMER_WRITE']),
 customerController.deleteCustomer);
