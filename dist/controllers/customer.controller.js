@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteCustomer = exports.deleteCustomerImage = exports.updateCustomer = exports.getCustomer = exports.getAdvanceCustomerList = exports.getBasicCustomerList = exports.uploadCustomerImage = exports.uploadAadharImage = exports.uploadPanImage = exports.newCustomer = void 0;
+exports.getCustomerImages = exports.deleteCustomer = exports.updateCustomer = exports.getCustomer = exports.getAdvanceCustomerList = exports.getBasicCustomerList = exports.uploadCustomerImage = exports.uploadAadharImage = exports.uploadPanImage = exports.newCustomer = void 0;
 const catchAsync_1 = __importDefault(require("../utils/catchAsync"));
 const db_1 = __importDefault(require("../db"));
 const responseHandler_1 = __importDefault(require("../utils/responseHandler"));
@@ -75,46 +75,95 @@ exports.uploadPanImage = (0, catchAsync_1.default)((req, res) => __awaiter(void 
     yield (0, validations_1.default)(validation.customerIdValidator, req.params);
     const { customerId } = req.params;
     const imageUrl = (_a = req.file) === null || _a === void 0 ? void 0 : _a.location;
-    const panImage = yield db_1.default.customerImage.create({
-        data: {
-            type: 'PAN',
-            imageUrl,
+    let panImage;
+    const fetchPanImage = yield db_1.default.customerImage.findFirst({
+        where: {
             customerId,
+            type: 'PAN',
         },
     });
+    yield db_1.default.$transaction((prisma) => __awaiter(void 0, void 0, void 0, function* () {
+        if (fetchPanImage) {
+            const key = fetchPanImage.imageUrl.split('/').pop() || '';
+            yield (0, s3_1.deleteImage)(key);
+        }
+        panImage = yield prisma.customerImage.create({
+            data: {
+                type: 'PAN',
+                imageUrl,
+                customerId,
+            },
+        });
+    }));
     return (0, responseHandler_1.default)(res, customer_1.CUSTOMER_S_0005, panImage);
 }));
 exports.uploadAadharImage = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _b, _c, _d, _e;
     yield (0, validations_1.default)(validation.customerIdValidator, req.params);
     const { customerId } = req.params;
-    const aadharFrontImageUrl = (_c = (_b = req.files) === null || _b === void 0 ? void 0 : _b['aadharImageFront']) === null || _c === void 0 ? void 0 : _c.map((image) => ({
+    const aadharFrontImageUrl = ((_c = (_b = req.files) === null || _b === void 0 ? void 0 : _b['aadharImageFront']) === null || _c === void 0 ? void 0 : _c.map((image) => ({
         imageUrl: image.location,
         type: 'AADHAR_FRONT',
         customerId,
-    }));
-    const aadharRearImageUrl = (_e = (_d = req.files) === null || _d === void 0 ? void 0 : _d['aadharImageRear']) === null || _e === void 0 ? void 0 : _e.map((image) => ({
+    }))) || [];
+    const aadharRearImageUrl = ((_e = (_d = req.files) === null || _d === void 0 ? void 0 : _d['aadharImageRear']) === null || _e === void 0 ? void 0 : _e.map((image) => ({
         imageUrl: image.location,
         type: 'AADHAR_REAR',
         customerId,
-    }));
-    const aadharImages = yield db_1.default.customerImage.createMany({
-        data: [...aadharFrontImageUrl, ...aadharRearImageUrl],
+    }))) || [];
+    const aadharImages = yield db_1.default.customerImage.findMany({
+        where: {
+            imageUrl: {
+                in: ['AADHAR_REAR', 'AADHAR_FRONT'],
+            },
+        },
     });
-    return (0, responseHandler_1.default)(res, customer_1.CUSTOMER_S_0006, aadharImages);
+    yield db_1.default.$transaction((prisma) => __awaiter(void 0, void 0, void 0, function* () {
+        if (aadharFrontImageUrl === null || aadharFrontImageUrl === void 0 ? void 0 : aadharFrontImageUrl.length) {
+            const aadharFront = aadharImages.find((obj) => obj.type === 'AADHAR_FRONT');
+            if (aadharFront) {
+                const key = aadharFront.imageUrl.split('/').pop() || '';
+                yield (0, s3_1.deleteImage)(key);
+            }
+        }
+        if (aadharRearImageUrl === null || aadharRearImageUrl === void 0 ? void 0 : aadharRearImageUrl.length) {
+            const aadharRear = aadharImages.find((obj) => obj.type === 'AADHAR_REAR');
+            if (aadharRear) {
+                const key = aadharRear.imageUrl.split('/').pop() || '';
+                yield (0, s3_1.deleteImage)(key);
+            }
+        }
+        yield prisma.customerImage.createMany({
+            data: [...aadharFrontImageUrl, ...aadharRearImageUrl],
+        });
+    }));
+    return (0, responseHandler_1.default)(res, customer_1.CUSTOMER_S_0006);
 }));
 exports.uploadCustomerImage = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _f, _g;
     yield (0, validations_1.default)(validation.customerIdValidator, req.params);
     const { customerId } = req.params;
+    let customerImages;
     const customerImageUrls = (_g = (_f = req.files) === null || _f === void 0 ? void 0 : _f['customerImage']) === null || _g === void 0 ? void 0 : _g.map((image) => ({
         imageUrl: image.location,
         type: 'PHOTO',
         customerId,
     }));
-    const customerImages = yield db_1.default.customerImage.createMany({
-        data: customerImageUrls,
+    const fetchCustomerImages = yield db_1.default.customerImage.findFirst({
+        where: {
+            customerId,
+            type: 'PHOTO',
+        },
     });
+    yield db_1.default.$transaction((prisma) => __awaiter(void 0, void 0, void 0, function* () {
+        if (fetchCustomerImages) {
+            const key = fetchCustomerImages.imageUrl.split('/').pop() || '';
+            yield (0, s3_1.deleteImage)(key);
+        }
+        customerImages = yield prisma.customerImage.createMany({
+            data: customerImageUrls,
+        });
+    }));
     return (0, responseHandler_1.default)(res, customer_1.CUSTOMER_S_0007, customerImages);
 }));
 exports.getBasicCustomerList = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -300,27 +349,6 @@ exports.updateCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 
         }
     }
 }));
-exports.deleteCustomerImage = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    yield (0, validations_1.default)(validation.customerImageIdValidator, req.params);
-    const { customerImageId } = req.params;
-    const customerImageExist = yield db_1.default.customerImage.findFirst({
-        where: {
-            customerImageId,
-        },
-    });
-    if (!customerImageExist)
-        throw new AppError_1.default(customer_1.CUSTOMER_E_0003);
-    yield db_1.default.$transaction((prisma) => __awaiter(void 0, void 0, void 0, function* () {
-        var _j, _k;
-        yield (0, s3_1.deleteImage)(((_k = (_j = customerImageExist.imageUrl) === null || _j === void 0 ? void 0 : _j.split('/')) === null || _k === void 0 ? void 0 : _k.pop()) || '');
-        yield prisma.customerImage.delete({
-            where: {
-                customerImageId,
-            },
-        });
-    }));
-    return (0, responseHandler_1.default)(res, customer_1.CUSTOMER_S_0008);
-}));
 exports.deleteCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, validations_1.default)(validation.customerIdValidator, req.params);
     const { customerId } = req.params;
@@ -341,4 +369,14 @@ exports.deleteCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 
         },
     });
     return (0, responseHandler_1.default)(res, customer_1.CUSTOMER_S_0009);
+}));
+exports.getCustomerImages = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, validations_1.default)(validation.customerIdValidator, req.params);
+    const { customerId } = req.params;
+    const customerImages = yield db_1.default.customerImage.findMany({
+        where: {
+            customerId,
+        },
+    });
+    return (0, responseHandler_1.default)(res, customer_1.CUSTOMER_S_0010, customerImages);
 }));
