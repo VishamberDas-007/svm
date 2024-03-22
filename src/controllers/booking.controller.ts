@@ -409,10 +409,15 @@ export const getBooking = catchAsync(async (req: Request, res: Response) => {
         })
 
     const formatCustomerData = fetchBooking.customer.map((obj) => ({
+        customerId: obj.customerId,
         name: obj.name,
         phone1: obj.phone1,
         phone2: obj.phone2,
         images: obj.customerImage,
+        address: obj.address,
+        pincode: obj.pincode,
+        state: obj.state,
+        city: obj.city,
     }))
 
     return responseHandler(res, BOOKING_S_0003, {
