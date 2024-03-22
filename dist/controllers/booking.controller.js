@@ -336,10 +336,15 @@ exports.getBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
             },
         });
     const formatCustomerData = fetchBooking.customer.map((obj) => ({
+        customerId: obj.customerId,
         name: obj.name,
         phone1: obj.phone1,
         phone2: obj.phone2,
         images: obj.customerImage,
+        address: obj.address,
+        pincode: obj.pincode,
+        state: obj.state,
+        city: obj.city,
     }));
     return (0, responseHandler_1.default)(res, booking_1.BOOKING_S_0003, Object.assign(Object.assign(Object.assign(Object.assign({}, fetchBooking), { adminBankName: fetchBooking.adminAccount.bankName, projectName: fetchBooking.project.name, description: fetchBooking.project.description, customer: formatCustomerData }), paymentDetails), { adminAccount: undefined, project: undefined }));
 }));
