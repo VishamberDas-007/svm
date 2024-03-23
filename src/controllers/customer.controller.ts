@@ -26,7 +26,7 @@ import {
     CUSTOMER_S_0009,
     CUSTOMER_S_0010,
 } from '../config/responseCodes/customer'
-import { Customer, CustomerImage } from '@prisma/client'
+import { Customer, CustomerImage, CustomerImageType } from '@prisma/client'
 import { TListData } from '../types/global.types'
 import { TImageUpload } from './types/project'
 import { deleteImage } from '../aws/s3'
@@ -92,7 +92,14 @@ export const uploadPanImage = catchAsync(
             if (fetchPanImage) {
                 const key = fetchPanImage.imageUrl.split('/').pop() || ''
                 await deleteImage(key)
+                await prisma.customerImage.deleteMany({
+                    where: {
+                        customerId,
+                        type: 'PAN',
+                    },
+                })
             }
+
             panImage = await prisma.customerImage.create({
                 data: {
                     type: 'PAN',
@@ -127,13 +134,24 @@ export const uploadAadharImage = catchAsync(
 
         const aadharImages = await prisma.customerImage.findMany({
             where: {
-                imageUrl: {
+                customerId,
+                type: {
                     in: ['AADHAR_REAR', 'AADHAR_FRONT'],
                 },
             },
         })
 
         await prisma.$transaction(async (prisma) => {
+            const deleteWhereClause: {
+                customerId: string
+                type: { in: CustomerImageType[] }
+            } = {
+                customerId: '',
+                type: {
+                    in: [],
+                },
+            }
+
             if (aadharFrontImageUrl?.length) {
                 const aadharFront = aadharImages.find(
                     (obj) => obj.type === 'AADHAR_FRONT'
@@ -142,6 +160,8 @@ export const uploadAadharImage = catchAsync(
                 if (aadharFront) {
                     const key = aadharFront.imageUrl.split('/').pop() || ''
                     await deleteImage(key)
+                    deleteWhereClause.customerId = customerId
+                    deleteWhereClause.type?.in.push('AADHAR_FRONT')
                 }
             }
 
@@ -153,14 +173,25 @@ export const uploadAadharImage = catchAsync(
                 if (aadharRear) {
                     const key = aadharRear.imageUrl.split('/').pop() || ''
                     await deleteImage(key)
+                    deleteWhereClause.customerId = customerId
+                    deleteWhereClause.type?.in.push('AADHAR_REAR')
                 }
+            }
+
+            if (deleteWhereClause.customerId) {
+                await prisma.customerImage.deleteMany({
+                    where: deleteWhereClause,
+                })
             }
 
             await prisma.customerImage.createMany({
                 data: [...aadharFrontImageUrl, ...aadharRearImageUrl],
             })
         })
-        return responseHandler(res, CUSTOMER_S_0006)
+        return responseHandler(res, CUSTOMER_S_0006, [
+            ...aadharFrontImageUrl,
+            ...aadharRearImageUrl,
+        ])
     }
 )
 
@@ -171,13 +202,13 @@ export const uploadCustomerImage = catchAsync(
         const { customerId } = req.params
         let customerImages
 
-        const customerImageUrls = req.files?.['customerImage']?.map(
+        const customerImage = req.files?.['customerImage']?.map(
             (image: TImageUpload) => ({
                 imageUrl: image.location,
                 type: 'PHOTO',
                 customerId,
             })
-        )
+        )?.[0]
 
         const fetchCustomerImages = await prisma.customerImage.findFirst({
             where: {
@@ -189,11 +220,19 @@ export const uploadCustomerImage = catchAsync(
         await prisma.$transaction(async (prisma) => {
             if (fetchCustomerImages) {
                 const key = fetchCustomerImages.imageUrl.split('/').pop() || ''
+
                 await deleteImage(key)
+
+                await prisma.customerImage.deleteMany({
+                    where: {
+                        customerId,
+                        type: 'PHOTO',
+                    },
+                })
             }
 
-            customerImages = await prisma.customerImage.createMany({
-                data: customerImageUrls,
+            customerImages = await prisma.customerImage.create({
+                data: customerImage,
             })
         })
 

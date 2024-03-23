@@ -36,9 +36,9 @@ exports.upload = (0, multer_1.default)({
         },
         key: function (req, file, cb) {
             const fileName = file.originalname.split('.')[0];
-            const extName = file.originalname.split('.')[1];
+            const extName = file.originalname.split('.')[file.originalname.split('.').length - 1];
             const timeStamp = Date.now().toString();
-            const fullPath = 'svm/' + fileName + timeStamp + '.' + extName;
+            const fullPath = 'svm/' + timeStamp + '.' + extName;
             cb(null, fullPath);
         },
     }),
@@ -53,7 +53,6 @@ const deleteImage = (key) => __awaiter(void 0, void 0, void 0, function* () {
             });
             yield s3Config.send(deleteCommand);
         }
-        // console.log('Deleted:', result)
     }
     catch (error) {
         console.error('Error deleting image:', error);
