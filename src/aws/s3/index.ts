@@ -23,9 +23,12 @@ export const upload = multer({
         },
         key: function (req, file, cb) {
             const fileName = file.originalname.split('.')[0]
-            const extName = file.originalname.split('.')[1]
+            const extName =
+                file.originalname.split('.')[
+                    file.originalname.split('.').length - 1
+                ]
             const timeStamp = Date.now().toString()
-            const fullPath = 'svm/' + fileName + timeStamp + '.' + extName
+            const fullPath = 'svm/' + timeStamp + '.' + extName
 
             cb(null, fullPath)
         },
@@ -42,7 +45,6 @@ export const deleteImage = async (key: string) => {
             })
             await s3Config.send(deleteCommand)
         }
-        // console.log('Deleted:', result)
     } catch (error) {
         console.error('Error deleting image:', error)
     }

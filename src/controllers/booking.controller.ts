@@ -426,6 +426,7 @@ export const getBooking = catchAsync(async (req: Request, res: Response) => {
         projectName: fetchBooking.project.name,
         description: fetchBooking.project.description,
         customer: formatCustomerData,
+        projectLogo: fetchBooking.project.logoUrl,
         ...paymentDetails,
         adminAccount: undefined,
         project: undefined,
