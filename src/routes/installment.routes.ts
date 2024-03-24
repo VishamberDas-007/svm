@@ -33,4 +33,6 @@ installmentRouter.delete(
     installmentController.deleteInstallment
 )
 
+installmentRouter.get('/list', installmentController.installmentList)
+
 export { installmentRouter }
