@@ -11,11 +11,11 @@ exports.createInstallmentValidator = joi_1.default.object({
     data: joi_1.default.array()
         .items({
         paymentType: joi_1.default.valid('CHEQUE', 'UPI', 'CASH', 'BANK_TRANSFER').required(),
-        accountNumber: joi_1.default.string().optional(),
-        bankName: joi_1.default.string().optional(),
-        chequeNumber: joi_1.default.string().optional(),
-        upiId: joi_1.default.string().optional(),
-        penalty: joi_1.default.number().optional(),
+        accountNumber: joi_1.default.string().allow('', null).optional(),
+        bankName: joi_1.default.string().allow('', null).optional(),
+        chequeNumber: joi_1.default.string().allow('', null).optional(),
+        upiId: joi_1.default.string().allow('', null).optional(),
+        penalty: joi_1.default.number().allow('', null).optional(),
         installmentNo: joi_1.default.number().required(),
     })
         .required(),
