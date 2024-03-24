@@ -13,6 +13,7 @@ import {
     INSTALLMENT_S_0002,
     INSTALLMENT_S_0003,
     INSTALLMENT_S_0004,
+    INSTALLMENT_S_0005,
 } from '../config/responseCodes/installment'
 import { TCreateInstallment } from './types/installment'
 import responseHandler from '../utils/responseHandler'
@@ -27,6 +28,7 @@ import {
 import validator from '../validations'
 import * as validation from '../validations/installment.validator'
 import * as generalValidation from '../validations/_general.validator'
+import { TListData } from '../types/global.types'
 // import { TRedisData } from './types/booking'
 // import { getValueInRedis, setValueInRedis } from '../redis/config'
 
@@ -267,5 +269,30 @@ export const deleteInstallment = catchAsync(
         })
 
         return responseHandler(res, INSTALLMENT_S_0004)
+    }
+)
+
+export const installmentList = catchAsync(
+    async (req: Request, res: Response) => {
+        const { page = 1, pageSize = 10 } = req.query
+        let totalCount = 0,
+            totalQueryCount = 0
+        const list = await prisma.installment.findMany()
+
+        totalCount = await prisma.installment.count()
+
+        totalQueryCount = await prisma.installment.count()
+
+        const result: TListData<Installment> = {
+            list: list,
+            meta: {
+                page: +page,
+                pageSize: +pageSize,
+                totalCount,
+                totalQueryCount,
+            },
+        }
+
+        return responseHandler(res, INSTALLMENT_S_0005, result)
     }
 )

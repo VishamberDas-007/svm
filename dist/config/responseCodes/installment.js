@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.INSTALLMENT_S_0004 = exports.INSTALLMENT_S_0003 = exports.INSTALLMENT_S_0002 = exports.INSTALLMENT_S_0001 = exports.INSTALLMENT_E_0004 = exports.INSTALLMENT_E_0003 = exports.INSTALLMENT_E_0002 = exports.INSTALLMENT_E_0001 = void 0;
+exports.INSTALLMENT_S_0005 = exports.INSTALLMENT_S_0004 = exports.INSTALLMENT_S_0003 = exports.INSTALLMENT_S_0002 = exports.INSTALLMENT_S_0001 = exports.INSTALLMENT_E_0004 = exports.INSTALLMENT_E_0003 = exports.INSTALLMENT_E_0002 = exports.INSTALLMENT_E_0001 = void 0;
 const global_types_1 = require("../../types/global.types");
 exports.INSTALLMENT_E_0001 = {
     type: global_types_1.RESPONSE_TYPE.ERROR,
@@ -56,5 +56,12 @@ exports.INSTALLMENT_S_0004 = {
     code: 'INSTALLMENT_S_0004',
     isNotify: true,
     message: 'Installment deleted successfully',
+    statusCode: 200,
+};
+exports.INSTALLMENT_S_0005 = {
+    type: global_types_1.RESPONSE_TYPE.ERROR,
+    code: 'INSTALLMENT_S_0005',
+    isNotify: true,
+    message: 'Installment list fetched successfully',
     statusCode: 200,
 };

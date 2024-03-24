@@ -42,7 +42,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteInstallment = exports.fetchBookingInstallmentDetails = exports.updateInstallmentDetails = exports.fetchInstallmentDetails = exports.createInstallment = void 0;
+exports.installmentList = exports.deleteInstallment = exports.fetchBookingInstallmentDetails = exports.updateInstallmentDetails = exports.fetchInstallmentDetails = exports.createInstallment = void 0;
 const catchAsync_1 = __importDefault(require("../utils/catchAsync"));
 const installment_service_1 = require("../services/installment.service");
 const db_1 = __importDefault(require("../db"));
@@ -253,4 +253,21 @@ exports.deleteInstallment = (0, catchAsync_1.default)((req, res) => __awaiter(vo
         },
     });
     return (0, responseHandler_1.default)(res, installment_1.INSTALLMENT_S_0004);
+}));
+exports.installmentList = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { page = 1, pageSize = 10 } = req.query;
+    let totalCount = 0, totalQueryCount = 0;
+    const list = yield db_1.default.installment.findMany();
+    totalCount = yield db_1.default.installment.count();
+    totalQueryCount = yield db_1.default.installment.count();
+    const result = {
+        list: list,
+        meta: {
+            page: +page,
+            pageSize: +pageSize,
+            totalCount,
+            totalQueryCount,
+        },
+    };
+    return (0, responseHandler_1.default)(res, installment_1.INSTALLMENT_S_0005, result);
 }));
