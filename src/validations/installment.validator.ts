@@ -17,7 +17,7 @@ export const createInstallmentValidator = Joi.object<TCreateInstallment>({
             chequeNumber: Joi.string().allow('', null).optional(),
             upiId: Joi.string().allow('', null).optional(),
             penalty: Joi.number().allow('', null).optional(),
-            installmentNo: Joi.number().required(),
+            // installmentNo: Joi.number().required(),
         })
         .required(),
     bookingId: util.uuid.required(),
@@ -29,5 +29,12 @@ export const installmentIdValidator = Joi.object({
 
 export const updateInstallmentValidator = Joi.object({
     amount: Joi.number().required(),
-    installmentNo: Joi.number().required(),
+    paymentType: Joi.valid('CHEQUE', 'UPI', 'CASH', 'BANK_TRANSFER').required(),
+    accountNumber: Joi.string().allow('', null).optional(),
+    bankName: Joi.string().allow('', null).optional(),
+    chequeNumber: Joi.string().allow('', null).optional(),
+    upiId: Joi.string().allow('', null).optional(),
+    penalty: Joi.number().allow('', null).optional(),
+    // installmentNo: Joi.number().required(),
+    bookingId: util.uuid.required(),
 })

@@ -15,7 +15,7 @@ import {
     INSTALLMENT_S_0004,
     INSTALLMENT_S_0005,
 } from '../config/responseCodes/installment'
-import { TCreateInstallment } from './types/installment'
+import { TCreateInstallment, TUpdateInstallment } from './types/installment'
 import responseHandler from '../utils/responseHandler'
 import {
     IBankPayment,
@@ -194,24 +194,122 @@ export const updateInstallmentDetails = catchAsync(
 
         const { installmentId } = req.params
 
-        const { amount, installmentNo }: Installment = req.body
+        const {
+            amount,
+            bookingId,
+            paymentType: updatePaymentType,
+            accountNumber,
+            bankName,
+            chequeNumber,
+            penalty,
+            upiId,
+        }: TUpdateInstallment = req.body
+        let paymentId: string | undefined, updateInstallment
 
         const installmentDetailExists = await prisma.installment.findFirst({
             where: { installmentId, isDelete: false },
+            include: {
+                bankPayment: true,
+                cashPayment: true,
+                chequePayment: true,
+                upiPayment: true,
+            },
         })
 
         if (!installmentDetailExists) throw new AppError(INSTALLMENT_E_0002)
 
-        const updateInstallment = await prisma.installment.update({
-            where: {
-                installmentId,
-            },
-            data: {
-                amount: +amount,
-                installmentNo: +installmentNo,
-            },
-        })
+        const {
+            bankPayment,
+            cashPayment,
+            chequePayment,
+            upiPayment,
+            paymentType: existPaymentType,
+        } = installmentDetailExists
 
+        await prisma.$transaction(async (prisma) => {
+            if (existPaymentType !== updatePaymentType) {
+                if (existPaymentType === 'BANK_TRANSFER') {
+                    paymentId = bankPayment[0].paymentId
+
+                    await prisma.iBankPayment.delete({
+                        where: {
+                            paymentId,
+                        },
+                    })
+                } else if (existPaymentType === 'CASH') {
+                    paymentId = cashPayment[0].paymentId
+
+                    await prisma.iCashPayment.delete({
+                        where: {
+                            paymentId,
+                        },
+                    })
+                } else if (existPaymentType === 'CHEQUE') {
+                    paymentId = chequePayment[0].paymentId
+
+                    await prisma.iChequePayment.delete({
+                        where: {
+                            paymentId,
+                        },
+                    })
+                } else if (existPaymentType === 'UPI') {
+                    paymentId = upiPayment[0].paymentId
+
+                    await prisma.iUpiPayment.delete({
+                        where: {
+                            paymentId,
+                        },
+                    })
+                }
+
+                if (updatePaymentType === 'BANK_TRANSFER') {
+                    await prisma.iBankPayment.create({
+                        data: {
+                            accountNumber,
+                            amount,
+                            bankName,
+                            installmentId,
+                        },
+                    })
+                } else if (updatePaymentType === 'CASH') {
+                    await prisma.iCashPayment.create({
+                        data: {
+                            amount,
+                            installmentId,
+                        },
+                    })
+                } else if (updatePaymentType === 'CHEQUE') {
+                    await prisma.iChequePayment.create({
+                        data: {
+                            amount,
+                            bankName,
+                            chequeNumber,
+                            installmentId,
+                        },
+                    })
+                } else if (updatePaymentType === 'UPI') {
+                    await prisma.iUpiPayment.create({
+                        data: {
+                            amount,
+                            upiId,
+                            installmentId,
+                        },
+                    })
+                }
+            }
+
+            updateInstallment = await prisma.installment.update({
+                where: {
+                    installmentId,
+                },
+                data: {
+                    amount: +amount,
+                    bookingId,
+                    penalty,
+                    paymentType: updatePaymentType,
+                },
+            })
+        })
         return responseHandler(res, INSTALLMENT_S_0003, updateInstallment)
     }
 )
