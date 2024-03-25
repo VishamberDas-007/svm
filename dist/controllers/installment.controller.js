@@ -175,32 +175,121 @@ exports.fetchInstallmentDetails = (0, catchAsync_1.default)((req, res) => __awai
             cashPayment: true,
             chequePayment: true,
             upiPayment: true,
+            booking: {
+                include: {
+                    customer: true,
+                    project: true,
+                },
+            },
         },
     });
     if (!getInstallmentDetails)
         throw new AppError_1.default(installment_1.INSTALLMENT_E_0002);
-    else
-        return (0, responseHandler_1.default)(res, installment_1.INSTALLMENT_S_0002, getInstallmentDetails);
+    const result = Object.assign(Object.assign({}, getInstallmentDetails), { customer: getInstallmentDetails.booking.customer, plotNo: getInstallmentDetails.booking.plotNo, projectLogo: getInstallmentDetails.booking.project.logoUrl, booking: undefined });
+    return (0, responseHandler_1.default)(res, installment_1.INSTALLMENT_S_0002, result);
 }));
 exports.updateInstallmentDetails = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, validations_1.default)(validation.installmentIdValidator, req.params);
     yield (0, validations_1.default)(validation.updateInstallmentValidator, req.body);
     const { installmentId } = req.params;
-    const { amount, installmentNo } = req.body;
+    const { amount, bookingId, paymentType: updatePaymentType, accountNumber, bankName, chequeNumber, penalty, upiId, } = req.body;
+    let paymentId, updateInstallment;
     const installmentDetailExists = yield db_1.default.installment.findFirst({
         where: { installmentId, isDelete: false },
+        include: {
+            bankPayment: true,
+            cashPayment: true,
+            chequePayment: true,
+            upiPayment: true,
+        },
     });
     if (!installmentDetailExists)
         throw new AppError_1.default(installment_1.INSTALLMENT_E_0002);
-    const updateInstallment = yield db_1.default.installment.update({
-        where: {
-            installmentId,
-        },
-        data: {
-            amount: +amount,
-            installmentNo: +installmentNo,
-        },
-    });
+    const { bankPayment, cashPayment, chequePayment, upiPayment, paymentType: existPaymentType, } = installmentDetailExists;
+    yield db_1.default.$transaction((prisma) => __awaiter(void 0, void 0, void 0, function* () {
+        if (existPaymentType !== updatePaymentType) {
+            if (existPaymentType === 'BANK_TRANSFER') {
+                paymentId = bankPayment[0].paymentId;
+                yield prisma.iBankPayment.delete({
+                    where: {
+                        paymentId,
+                    },
+                });
+            }
+            else if (existPaymentType === 'CASH') {
+                paymentId = cashPayment[0].paymentId;
+                yield prisma.iCashPayment.delete({
+                    where: {
+                        paymentId,
+                    },
+                });
+            }
+            else if (existPaymentType === 'CHEQUE') {
+                paymentId = chequePayment[0].paymentId;
+                yield prisma.iChequePayment.delete({
+                    where: {
+                        paymentId,
+                    },
+                });
+            }
+            else if (existPaymentType === 'UPI') {
+                paymentId = upiPayment[0].paymentId;
+                yield prisma.iUpiPayment.delete({
+                    where: {
+                        paymentId,
+                    },
+                });
+            }
+            if (updatePaymentType === 'BANK_TRANSFER') {
+                yield prisma.iBankPayment.create({
+                    data: {
+                        accountNumber,
+                        amount,
+                        bankName,
+                        installmentId,
+                    },
+                });
+            }
+            else if (updatePaymentType === 'CASH') {
+                yield prisma.iCashPayment.create({
+                    data: {
+                        amount,
+                        installmentId,
+                    },
+                });
+            }
+            else if (updatePaymentType === 'CHEQUE') {
+                yield prisma.iChequePayment.create({
+                    data: {
+                        amount,
+                        bankName,
+                        chequeNumber,
+                        installmentId,
+                    },
+                });
+            }
+            else if (updatePaymentType === 'UPI') {
+                yield prisma.iUpiPayment.create({
+                    data: {
+                        amount,
+                        upiId,
+                        installmentId,
+                    },
+                });
+            }
+        }
+        updateInstallment = yield prisma.installment.update({
+            where: {
+                installmentId,
+            },
+            data: {
+                amount: +amount,
+                bookingId,
+                penalty,
+                paymentType: updatePaymentType,
+            },
+        });
+    }));
     return (0, responseHandler_1.default)(res, installment_1.INSTALLMENT_S_0003, updateInstallment);
 }));
 exports.fetchBookingInstallmentDetails = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {

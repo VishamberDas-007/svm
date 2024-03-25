@@ -16,7 +16,7 @@ exports.createInstallmentValidator = joi_1.default.object({
         chequeNumber: joi_1.default.string().allow('', null).optional(),
         upiId: joi_1.default.string().allow('', null).optional(),
         penalty: joi_1.default.number().allow('', null).optional(),
-        installmentNo: joi_1.default.number().required(),
+        // installmentNo: Joi.number().required(),
     })
         .required(),
     bookingId: helper_1.default.uuid.required(),
@@ -26,5 +26,12 @@ exports.installmentIdValidator = joi_1.default.object({
 });
 exports.updateInstallmentValidator = joi_1.default.object({
     amount: joi_1.default.number().required(),
-    installmentNo: joi_1.default.number().required(),
+    paymentType: joi_1.default.valid('CHEQUE', 'UPI', 'CASH', 'BANK_TRANSFER').required(),
+    accountNumber: joi_1.default.string().allow('', null).optional(),
+    bankName: joi_1.default.string().allow('', null).optional(),
+    chequeNumber: joi_1.default.string().allow('', null).optional(),
+    upiId: joi_1.default.string().allow('', null).optional(),
+    penalty: joi_1.default.number().allow('', null).optional(),
+    // installmentNo: Joi.number().required(),
+    bookingId: helper_1.default.uuid.required(),
 });
