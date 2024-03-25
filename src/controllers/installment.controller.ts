@@ -165,16 +165,25 @@ export const fetchInstallmentDetails = catchAsync(
                 cashPayment: true,
                 chequePayment: true,
                 upiPayment: true,
+                booking: {
+                    include: {
+                        customer: true,
+                        project: true,
+                    },
+                },
             },
         })
 
         if (!getInstallmentDetails) throw new AppError(INSTALLMENT_E_0002)
-        else
-            return responseHandler(
-                res,
-                INSTALLMENT_S_0002,
-                getInstallmentDetails
-            )
+
+        const result = {
+            ...getInstallmentDetails,
+            customer: getInstallmentDetails.booking.customer,
+            plotNo: getInstallmentDetails.booking.plotNo,
+            projectLogo: getInstallmentDetails.booking.project.logoUrl,
+            booking: undefined,
+        }
+        return responseHandler(res, INSTALLMENT_S_0002, result)
     }
 )
 

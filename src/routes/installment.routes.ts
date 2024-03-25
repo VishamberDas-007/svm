@@ -12,7 +12,7 @@ installmentRouter.post(
 
 installmentRouter.get(
     '/get/:installmentId',
-    authMiddleware(['INSTALLMENT_WRITE', 'INSTALLMENT_READ']),
+    // authMiddleware(['INSTALLMENT_WRITE', 'INSTALLMENT_READ']),
     installmentController.fetchInstallmentDetails
 )
 
@@ -24,7 +24,7 @@ installmentRouter.get(
 
 installmentRouter.put(
     '/update/:installmentId',
-    authMiddleware(['INSTALLMENT_WRITE']),
+    // authMiddleware(['INSTALLMENT_WRITE']),
     installmentController.updateInstallmentDetails
 )
 
