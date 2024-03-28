@@ -346,7 +346,15 @@ exports.deleteInstallment = (0, catchAsync_1.default)((req, res) => __awaiter(vo
 exports.installmentList = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { page = 1, pageSize = 10 } = req.query;
     let totalCount = 0, totalQueryCount = 0;
-    const list = yield db_1.default.installment.findMany();
+    const list = (yield db_1.default.installment.findMany({
+        include: {
+            booking: {
+                include: {
+                    customer: true,
+                },
+            },
+        },
+    })).map((obj) => (Object.assign(Object.assign({}, obj), { customer: obj.booking.customer, booking: undefined })));
     totalCount = yield db_1.default.installment.count();
     totalQueryCount = yield db_1.default.installment.count();
     const result = {

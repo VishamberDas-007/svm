@@ -384,7 +384,21 @@ export const installmentList = catchAsync(
         const { page = 1, pageSize = 10 } = req.query
         let totalCount = 0,
             totalQueryCount = 0
-        const list = await prisma.installment.findMany()
+        const list = (
+            await prisma.installment.findMany({
+                include: {
+                    booking: {
+                        include: {
+                            customer: true,
+                        },
+                    },
+                },
+            })
+        ).map((obj) => ({
+            ...obj,
+            customer: obj.booking.customer,
+            booking: undefined,
+        }))
 
         totalCount = await prisma.installment.count()
 
