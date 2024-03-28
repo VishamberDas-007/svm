@@ -386,6 +386,9 @@ export const installmentList = catchAsync(
             totalQueryCount = 0
         const list = (
             await prisma.installment.findMany({
+                where: {
+                    isDelete: false,
+                },
                 include: {
                     booking: {
                         include: {

@@ -347,6 +347,9 @@ exports.installmentList = (0, catchAsync_1.default)((req, res) => __awaiter(void
     const { page = 1, pageSize = 10 } = req.query;
     let totalCount = 0, totalQueryCount = 0;
     const list = (yield db_1.default.installment.findMany({
+        where: {
+            isDelete: false,
+        },
         include: {
             booking: {
                 include: {
