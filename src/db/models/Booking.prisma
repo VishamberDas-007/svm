@@ -12,8 +12,9 @@ model Booking {
     paymentStatus    PaymentStatus @default(PARTIAL)
     // customerId       String
     // customer         Customer      @relation(fields: [customerId], references: [customerId])
-    adminAccountId   Int
-    adminAccount     AdminAccount  @relation(fields: [adminAccountId], references: [adminAccountId])
+    adminAccountId   Int?
+    adminAccount     AdminAccount? @relation(fields: [adminAccountId], references: [adminAccountId])
+    installmentDate  DateTime
     installmentCount Int
     referralId       String?
     referral         Referral?     @relation(fields: [referralId], references: [referralId])
@@ -45,6 +46,7 @@ model Referral {
 enum PaymentStatus {
     PENDING
     PARTIAL
+    CANCEL
     COMPLETED
 }
 

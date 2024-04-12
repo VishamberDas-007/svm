@@ -54,7 +54,7 @@ const AppError_1 = __importDefault(require("../utils/AppError"));
 const booking_service_1 = require("../services/booking.service");
 exports.createBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, validations_1.default)(validation.createBookingValidator, req.body);
-    const { adminAccountId, area, customerIds, installmentAmt, installmentCount, paidAmt, paymentStatus, paymentType, plotNo, projectId, remainAmt, totalAmt, accountNo, bankName, chequeNo, upiId, referralId, } = req.body;
+    const { adminAccountId, area, customerIds, installmentAmt, installmentCount, paidAmt, paymentStatus, paymentType, plotNo, projectId, remainAmt, installmentDate, totalAmt, accountNo, bankName, chequeNo, upiId, referralId, } = req.body;
     const projectData = yield db_1.default.project.findFirst({
         where: {
             projectId,
@@ -76,6 +76,7 @@ exports.createBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
                 plotNo,
                 area: +area,
                 totalAmt: +totalAmt,
+                installmentDate,
                 paidAmt: +paidAmt,
                 remainAmt: +remainAmt,
                 installmentAmt: +installmentAmt,
@@ -156,6 +157,7 @@ exports.createBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
 }));
 exports.getAllBookings = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, e_1, _b, _c;
+    var _d;
     const { page = 1, pageSize = 20, searchString, paymentStatus, paymentType, projectIds, } = req.query;
     const result = [];
     let whereClause = {};
@@ -235,9 +237,9 @@ exports.getAllBookings = (0, catchAsync_1.default)((req, res) => __awaiter(void 
         where: whereClause,
     });
     try {
-        for (var _d = true, bookingList_1 = __asyncValues(bookingList), bookingList_1_1; bookingList_1_1 = yield bookingList_1.next(), _a = bookingList_1_1.done, !_a;) {
+        for (var _e = true, bookingList_1 = __asyncValues(bookingList), bookingList_1_1; bookingList_1_1 = yield bookingList_1.next(), _a = bookingList_1_1.done, !_a;) {
             _c = bookingList_1_1.value;
-            _d = false;
+            _e = false;
             try {
                 const booking = _c;
                 let paymentDetails;
@@ -265,17 +267,17 @@ exports.getAllBookings = (0, catchAsync_1.default)((req, res) => __awaiter(void 
                             bookingId: booking.bookingId,
                         },
                     });
-                result.push(Object.assign(Object.assign(Object.assign(Object.assign({}, booking), { projectName: booking.project.name, customerName: booking.customer.map((customer) => customer.name), adminBankName: booking.adminAccount.bankName }), paymentDetails), { adminAccount: undefined, project: undefined, customer: undefined, amount: undefined }));
+                result.push(Object.assign(Object.assign(Object.assign(Object.assign({}, booking), { projectName: booking.project.name, customerName: booking.customer.map((customer) => customer.name), adminBankName: ((_d = booking.adminAccount) === null || _d === void 0 ? void 0 : _d.bankName) || null }), paymentDetails), { adminAccount: undefined, project: undefined, customer: undefined, amount: undefined }));
             }
             finally {
-                _d = true;
+                _e = true;
             }
         }
     }
     catch (e_1_1) { e_1 = { error: e_1_1 }; }
     finally {
         try {
-            if (!_d && !_a && (_b = bookingList_1.return)) yield _b.call(bookingList_1);
+            if (!_e && !_a && (_b = bookingList_1.return)) yield _b.call(bookingList_1);
         }
         finally { if (e_1) throw e_1.error; }
     }
@@ -291,6 +293,7 @@ exports.getAllBookings = (0, catchAsync_1.default)((req, res) => __awaiter(void 
     return (0, responseHandler_1.default)(res, booking_1.BOOKING_S_0002, response);
 }));
 exports.getBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _f;
     yield (0, validations_1.default)(validation.bookingIdValidator, req.params);
     const bookingId = req.params.bookingId;
     const fetchBooking = yield db_1.default.booking.findFirst({
@@ -346,13 +349,13 @@ exports.getBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
         state: obj.state,
         city: obj.city,
     }));
-    return (0, responseHandler_1.default)(res, booking_1.BOOKING_S_0003, Object.assign(Object.assign(Object.assign(Object.assign({}, fetchBooking), { adminBankName: fetchBooking.adminAccount.bankName, projectName: fetchBooking.project.name, description: fetchBooking.project.description, customer: formatCustomerData, projectLogo: fetchBooking.project.logoUrl }), paymentDetails), { adminAccount: undefined, project: undefined }));
+    return (0, responseHandler_1.default)(res, booking_1.BOOKING_S_0003, Object.assign(Object.assign(Object.assign(Object.assign({}, fetchBooking), { adminBankName: ((_f = fetchBooking.adminAccount) === null || _f === void 0 ? void 0 : _f.bankName) || null, projectName: fetchBooking.project.name, description: fetchBooking.project.description, customer: formatCustomerData, projectLogo: fetchBooking.project.logoUrl }), paymentDetails), { adminAccount: undefined, project: undefined }));
 }));
 exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, validations_1.default)(validation.bookingIdValidator, req.params);
     yield (0, validations_1.default)(validation.updateBookingValidator, req.body);
     const { bookingId } = req.params;
-    const { adminAccountId, area, customerIds, installmentAmt, installmentCount, paymentStatus, paymentType, projectId, plotNo, remainAmt, totalAmt, accountNo, bankName, chequeNo, upiId, paymentId, referralId, } = req.body;
+    const { adminAccountId, area, customerIds, installmentAmt, installmentCount, paymentStatus, paymentType, projectId, plotNo, remainAmt, totalAmt, accountNo, bankName, chequeNo, installmentDate, upiId, paymentId, referralId, } = req.body;
     let { paidAmt } = req.body;
     paidAmt = !isNaN(+paidAmt) ? +paidAmt : undefined;
     let updatedBookingDetails;
@@ -500,7 +503,8 @@ exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
                         connect: customerIds.map((customerId) => ({
                             customerId,
                         })),
-                    }, installmentAmt: +installmentAmt, installmentCount: +installmentCount, paidAmt: paidAmt, paymentStatus,
+                    }, installmentAmt: +installmentAmt, installmentCount: +installmentCount, paidAmt: paidAmt, installmentDate,
+                    paymentStatus,
                     paymentType,
                     plotNo,
                     projectId, remainAmt: +remainAmt, totalAmt: +totalAmt, referralId }, paymentDetails),

@@ -9,6 +9,8 @@ export const createCustomerValidator = Joi.object<TCustomer>({
     phone2: util.phoneValidator.allow('', null).optional(),
     city: Joi.string().allow('', null).optional(),
     pincode: Joi.string().length(6).optional(),
+    dob: Joi.string().optional(),
+    isMarried: Joi.boolean().required(),
     state: Joi.string().allow('', null).optional(),
     address: Joi.string().allow('', null).optional(),
 })
@@ -20,6 +22,8 @@ export const updateCustomerValidator = Joi.object<TCustomer>({
     phone2: util.phoneValidator.allow('', null).optional(),
     city: Joi.string().allow('').optional(),
     pincode: Joi.string().length(6).allow('').optional(),
+    dob: Joi.string().optional(),
+    isMarried: Joi.boolean().optional(),
     state: Joi.string().allow('').optional(),
     address: Joi.string().allow('').optional(),
 })

@@ -7,6 +7,7 @@ export type TIBankDetails = {
     chequeNumber: string
     upiId: string
     penalty: number
+    adminAccountId: number | null
     // installmentNo: number
 }
 
