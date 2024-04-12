@@ -13,6 +13,8 @@ exports.createCustomerValidator = joi_1.default.object({
     phone2: helper_1.default.phoneValidator.allow('', null).optional(),
     city: joi_1.default.string().allow('', null).optional(),
     pincode: joi_1.default.string().length(6).optional(),
+    dob: joi_1.default.string().optional(),
+    isMarried: joi_1.default.boolean().required(),
     state: joi_1.default.string().allow('', null).optional(),
     address: joi_1.default.string().allow('', null).optional(),
 });
@@ -23,6 +25,8 @@ exports.updateCustomerValidator = joi_1.default.object({
     phone2: helper_1.default.phoneValidator.allow('', null).optional(),
     city: joi_1.default.string().allow('').optional(),
     pincode: joi_1.default.string().length(6).allow('').optional(),
+    dob: joi_1.default.string().optional(),
+    isMarried: joi_1.default.boolean().optional(),
     state: joi_1.default.string().allow('').optional(),
     address: joi_1.default.string().allow('').optional(),
 });

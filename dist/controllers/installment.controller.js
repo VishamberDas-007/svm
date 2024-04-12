@@ -78,6 +78,7 @@ exports.createInstallment = (0, catchAsync_1.default)((req, res) => __awaiter(vo
                     const iterator = _c;
                     newInstallment = yield prisma.installment.create({
                         data: {
+                            adminAccountId: iterator.adminAccountId,
                             amount: +amount,
                             bookingId,
                             installmentNo,
@@ -192,7 +193,7 @@ exports.updateInstallmentDetails = (0, catchAsync_1.default)((req, res) => __awa
     yield (0, validations_1.default)(validation.installmentIdValidator, req.params);
     yield (0, validations_1.default)(validation.updateInstallmentValidator, req.body);
     const { installmentId } = req.params;
-    const { amount, bookingId, paymentType: updatePaymentType, accountNumber, bankName, chequeNumber, penalty, upiId, } = req.body;
+    const { amount, bookingId, paymentType: updatePaymentType, accountNumber, bankName, chequeNumber, penalty, upiId, adminAccountId, } = req.body;
     let paymentId, updateInstallment;
     const installmentDetailExists = yield db_1.default.installment.findFirst({
         where: { installmentId, isDelete: false },
@@ -287,6 +288,7 @@ exports.updateInstallmentDetails = (0, catchAsync_1.default)((req, res) => __awa
                 bookingId,
                 penalty,
                 paymentType: updatePaymentType,
+                adminAccountId,
             },
         });
     }));

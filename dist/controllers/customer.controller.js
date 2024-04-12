@@ -46,7 +46,7 @@ const customer_1 = require("../config/responseCodes/customer");
 const s3_1 = require("../aws/s3");
 exports.newCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, validations_1.default)(validation.createCustomerValidator, req.body);
-    const { name, email, phone1, phone2, city, pincode, state, address, } = req.body;
+    const { name, email, phone1, phone2, city, pincode, isMarried, dob, state, address, } = req.body;
     const phoneExists = yield db_1.default.customer.findFirst({
         where: {
             phone1,
@@ -64,6 +64,8 @@ exports.newCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
                 name,
                 phone1,
                 phone2,
+                dob,
+                isMarried,
                 email,
             },
         });
@@ -334,7 +336,7 @@ exports.updateCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 
     yield (0, validations_1.default)(validation.customerIdValidator, req.params);
     yield (0, validations_1.default)(validation.updateCustomerValidator, req.body);
     const customerId = req.params.customerId;
-    const { name, email, phone1, address, city, phone2, pincode, state, } = req.body;
+    const { name, email, phone1, address, isMarried, dob, city, phone2, pincode, state, } = req.body;
     const fetchCustomer = yield db_1.default.customer.findFirst({
         where: {
             customerId,
@@ -372,6 +374,8 @@ exports.updateCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 
                     pincode,
                     state,
                     email,
+                    dob,
+                    isMarried,
                 },
                 include: {
                     customerImage: true,
