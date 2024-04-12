@@ -10,6 +10,8 @@ export type TCustomer = {
     pincode?: string
     state?: string
     address?: string
+    isMarried: boolean
+    dob?: string
 }
 
 export type TBasicListWhereClause = {

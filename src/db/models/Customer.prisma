@@ -9,6 +9,8 @@ model Customer {
     city       String
     state      String
     booking    Booking[]
+    dob        DateTime?
+    isMarried  Boolean   @default(false)
     isDelete   Boolean   @default(false)
     createdAt  DateTime  @default(now())
     updatedAt  DateTime  @updatedAt

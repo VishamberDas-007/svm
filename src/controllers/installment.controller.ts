@@ -64,6 +64,7 @@ export const createInstallment = catchAsync(
             for await (const iterator of data) {
                 newInstallment = await prisma.installment.create({
                     data: {
+                        adminAccountId: iterator.adminAccountId,
                         amount: +amount,
                         bookingId,
                         installmentNo,
@@ -203,6 +204,7 @@ export const updateInstallmentDetails = catchAsync(
             chequeNumber,
             penalty,
             upiId,
+            adminAccountId,
         }: TUpdateInstallment = req.body
         let paymentId: string | undefined, updateInstallment
 
@@ -307,6 +309,7 @@ export const updateInstallmentDetails = catchAsync(
                     bookingId,
                     penalty,
                     paymentType: updatePaymentType,
+                    adminAccountId,
                 },
             })
         })

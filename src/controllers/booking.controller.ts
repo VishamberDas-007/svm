@@ -50,6 +50,7 @@ export const createBooking = catchAsync(async (req: Request, res: Response) => {
         plotNo,
         projectId,
         remainAmt,
+        installmentDate,
         totalAmt,
         accountNo,
         bankName,
@@ -88,6 +89,7 @@ export const createBooking = catchAsync(async (req: Request, res: Response) => {
                 plotNo,
                 area: +area,
                 totalAmt: +totalAmt,
+                installmentDate,
                 paidAmt: +paidAmt,
                 remainAmt: +remainAmt,
                 installmentAmt: +installmentAmt,
@@ -263,7 +265,7 @@ export const getAllBookings = catchAsync(
             bookingList: (Booking & {
                 project: Project
                 customer: Customer[]
-                adminAccount: AdminAccount
+                adminAccount: AdminAccount | null
             })[] = []
 
         bookingList = await prisma.booking.findMany({
@@ -329,7 +331,7 @@ export const getAllBookings = catchAsync(
                 ...booking,
                 projectName: booking.project.name,
                 customerName: booking.customer.map((customer) => customer.name),
-                adminBankName: booking.adminAccount.bankName,
+                adminBankName: booking.adminAccount?.bankName || null,
                 ...paymentDetails,
                 adminAccount: undefined,
                 project: undefined,
@@ -422,7 +424,7 @@ export const getBooking = catchAsync(async (req: Request, res: Response) => {
 
     return responseHandler(res, BOOKING_S_0003, {
         ...fetchBooking,
-        adminBankName: fetchBooking.adminAccount.bankName,
+        adminBankName: fetchBooking.adminAccount?.bankName || null,
         projectName: fetchBooking.project.name,
         description: fetchBooking.project.description,
         customer: formatCustomerData,
@@ -453,6 +455,7 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
         accountNo,
         bankName,
         chequeNo,
+        installmentDate,
         upiId,
         paymentId,
         referralId,
@@ -613,6 +616,7 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
                     installmentAmt: +installmentAmt,
                     installmentCount: +installmentCount,
                     paidAmt: paidAmt,
+                    installmentDate,
                     paymentStatus,
                     paymentType,
                     plotNo,

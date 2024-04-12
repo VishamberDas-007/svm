@@ -42,6 +42,8 @@ export const newCustomer = catchAsync(
             phone2,
             city,
             pincode,
+            isMarried,
+            dob,
             state,
             address,
         }: TCustomer = req.body
@@ -63,6 +65,8 @@ export const newCustomer = catchAsync(
                     name,
                     phone1,
                     phone2,
+                    dob,
+                    isMarried,
                     email,
                 },
             })
@@ -417,6 +421,8 @@ export const updateCustomer = catchAsync(
             email,
             phone1,
             address,
+            isMarried,
+            dob,
             city,
             phone2,
             pincode,
@@ -460,6 +466,8 @@ export const updateCustomer = catchAsync(
                         pincode,
                         state,
                         email,
+                        dob,
+                        isMarried,
                     },
                     include: {
                         customerImage: true,

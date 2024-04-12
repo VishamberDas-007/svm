@@ -6,7 +6,6 @@ const paymentStatus = ['PENDING', 'PARTIAL', 'COMPLETED']
 const paymentType = ['CHEQUE', 'UPI', 'CASH', 'BANK_TRANSFER']
 
 export const createBookingValidator = Joi.object<TBooking>({
-    adminAccountId: Joi.number().required(),
     area: Joi.number().required(),
     customerIds: Joi.array().items(Joi.string().required()).required(),
     installmentAmt: Joi.number().required(),
@@ -14,6 +13,11 @@ export const createBookingValidator = Joi.object<TBooking>({
     paidAmt: Joi.number().required(),
     paymentStatus: Joi.valid(...paymentStatus).required(),
     paymentType: Joi.valid(...paymentType).required(),
+    adminAccountId: Joi.number().when('paymentType', {
+        is: Joi.valid('CASH'),
+        then: Joi.number().allow(null, '').optional(),
+        otherwise: Joi.number().required(),
+    }),
     plotNo: Joi.string().required(),
     projectId: Joi.string().required(),
     remainAmt: Joi.number().required(),
@@ -46,7 +50,6 @@ export const bookingIdValidator = Joi.object<{ bookingId: string }>({
 })
 
 export const updateBookingValidator = Joi.object<TBookingUpdate>({
-    adminAccountId: Joi.number().optional(),
     area: Joi.number().optional(),
     customerIds: Joi.array().items(Joi.string().required()).optional(),
     installmentAmt: Joi.number().optional(),
@@ -54,6 +57,11 @@ export const updateBookingValidator = Joi.object<TBookingUpdate>({
     paidAmt: Joi.number().optional(),
     paymentStatus: Joi.valid(...paymentStatus).optional(),
     paymentType: Joi.string().optional(),
+    adminAccountId: Joi.number().when('paymentType', {
+        is: Joi.valid('CASH'),
+        then: Joi.number().allow(null, '').optional(),
+        otherwise: Joi.number().optional(),
+    }),
     plotNo: Joi.string().optional(),
     projectId: Joi.string().optional(),
     remainAmt: Joi.number().optional(),

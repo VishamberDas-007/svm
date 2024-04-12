@@ -10,15 +10,16 @@ generator client {
 }
 
 model AdminAccount {
-    adminAccountId Int       @id @default(autoincrement())
+    adminAccountId Int           @id @default(autoincrement())
     name           String
     bankName       String
     balance        Float
-    accNo          String    @unique
-    isDelete       Boolean   @default(false)
-    createdAt      DateTime  @default(now())
-    updatedAt      DateTime  @updatedAt
-    booking        Booking[] @relation(name: "AdminAccountToBooking")
+    accNo          String        @unique
+    isDelete       Boolean       @default(false)
+    createdAt      DateTime      @default(now())
+    updatedAt      DateTime      @updatedAt
+    booking        Booking[]     @relation(name: "AdminAccountToBooking")
+    installment    Installment[] @relation(name: "AdminAccountToInstallment")
 }
 
 model BankPayment {
@@ -45,8 +46,9 @@ model Booking {
     installmentAmt   Float
     paymentType      PaymentType     @default(CASH)
     paymentStatus    PaymentStatus   @default(PARTIAL)
-    adminAccountId   Int
-    adminAccount     AdminAccount    @relation(name: "AdminAccountToBooking", fields: [adminAccountId], references: [adminAccountId])
+    adminAccountId   Int?
+    adminAccount     AdminAccount?   @relation(name: "AdminAccountToBooking", fields: [adminAccountId], references: [adminAccountId])
+    installmentDate  DateTime
     installmentCount Int
     referralId       String?
     referral         Referral?       @relation(name: "BookingToReferral", fields: [referralId], references: [referralId])
@@ -140,6 +142,8 @@ model Customer {
     city          String
     state         String
     booking       Booking[]       @relation(name: "BookingToCustomer")
+    dob           DateTime?
+    isMarried     Boolean         @default(false)
     isDelete      Boolean         @default(false)
     createdAt     DateTime        @default(now())
     updatedAt     DateTime        @updatedAt
@@ -193,20 +197,22 @@ model IBankPayment {
 }
 
 model Installment {
-    installmentId String           @id @default(uuid())
-    bankPayment   IBankPayment[]   @relation(name: "IBankPaymentToInstallment")
-    cashPayment   ICashPayment[]   @relation(name: "ICashPaymentToInstallment")
-    chequePayment IChequePayment[] @relation(name: "IChequePaymentToInstallment")
-    bookingId     String
-    booking       Booking          @relation(name: "BookingToInstallment", fields: [bookingId], references: [bookingId])
-    amount        Int
-    paymentType   IPaymentType
-    installmentNo Int
-    penalty       Int?
-    isDelete      Boolean          @default(false)
-    createdAt     DateTime         @default(now())
-    updatedAt     DateTime         @updatedAt
-    upiPayment    IUpiPayment[]    @relation(name: "IUpiPaymentToInstallment")
+    installmentId  String           @id @default(uuid())
+    bankPayment    IBankPayment[]   @relation(name: "IBankPaymentToInstallment")
+    cashPayment    ICashPayment[]   @relation(name: "ICashPaymentToInstallment")
+    chequePayment  IChequePayment[] @relation(name: "IChequePaymentToInstallment")
+    bookingId      String
+    booking        Booking          @relation(name: "BookingToInstallment", fields: [bookingId], references: [bookingId])
+    amount         Int
+    paymentType    IPaymentType
+    installmentNo  Int
+    adminAccountId Int?
+    adminAccount   AdminAccount?    @relation(name: "AdminAccountToInstallment", fields: [adminAccountId], references: [adminAccountId])
+    penalty        Int?
+    isDelete       Boolean          @default(false)
+    createdAt      DateTime         @default(now())
+    updatedAt      DateTime         @updatedAt
+    upiPayment     IUpiPayment[]    @relation(name: "IUpiPaymentToInstallment")
 
     @@unique([bookingId, installmentNo])
 }
@@ -317,6 +323,7 @@ model User {
 enum PaymentStatus {
     PENDING
     PARTIAL
+    CANCEL
     COMPLETED
 }
 
