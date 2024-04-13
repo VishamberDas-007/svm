@@ -1,0 +1,52 @@
+name: Deploy to Digital Ocean
+
+on:
+  push:
+    branches:
+      - production
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      PRIVATE_KEY: ${{ secrets.DEPLOYMENT_SSH_KEY }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Install Dependencies
+        run: yarn install
+      
+      - name: Print Current Working Directory
+        run: |
+          pwd
+          ls
+
+      - name: Deploy to Digital Ocean
+        run: |
+          mkdir -p ~/.ssh
+          echo "$PRIVATE_KEY" > ~/.ssh/next
+          chmod 600 ~/.ssh/next
+          ssh-keyscan 128.199.20.118 >> ~/.ssh/known_hosts
+
+          # Build your project
+          echo "Build init"
+          yarn run build
+      
+          # Create a compressed archive (tar.gz) of the build files
+          echo "Start process to compress files"
+          tar -czf build.tar.gz ./*
+      
+          # Transfer the compressed archive to the remote server
+          echo "Start transfer process of compressed files"
+          scp -v -i ~/.ssh/next build.tar.gz root@128.199.20.118:~/test/
+      
+          # Connect to the remote server and extract the archive
+          echo "Start extraction process of compress files"
+          ssh -i ~/.ssh/next root@128.199.20.118 'cd ~/test/ && tar -xzf build.tar.gz && yarn prisma generate'
+      
+          # Remove the compressed archive on the remote server
+          echo "Start process to remove compressed file"
+          ssh -i ~/.ssh/next root@128.199.20.118 'rm ~/test/build.tar.gz'
+
