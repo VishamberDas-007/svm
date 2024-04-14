@@ -116,9 +116,9 @@ export const getAdvanceAccountList = catchAsync(
                 },
             })
 
-            totalCount = await prisma.customer.count({ where: whereClause })
+            totalCount = await prisma.adminAccount.count({ where: whereClause })
 
-            totalQueryCount = await prisma.customer.count()
+            totalQueryCount = await prisma.adminAccount.count()
         })
 
         const result: TListData<AdminAccount> = {
