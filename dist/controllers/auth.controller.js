@@ -74,6 +74,7 @@ exports.register = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, voi
                 email,
                 password: encryptedPassword,
                 phone,
+                isAdmin: true,
                 role: {
                     create: {
                         label: const_1.ADMIN,

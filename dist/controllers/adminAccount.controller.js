@@ -121,8 +121,8 @@ exports.getAdvanceAccountList = (0, catchAsync_1.default)((req, res) => __awaite
                 createdAt: 'desc',
             },
         });
-        totalCount = yield prisma.customer.count({ where: whereClause });
-        totalQueryCount = yield prisma.customer.count();
+        totalCount = yield prisma.adminAccount.count({ where: whereClause });
+        totalQueryCount = yield prisma.adminAccount.count();
     }));
     const result = {
         list: fetchAccountList,

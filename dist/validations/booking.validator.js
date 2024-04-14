@@ -16,6 +16,7 @@ exports.createBookingValidator = joi_1.default.object({
     paidAmt: joi_1.default.number().required(),
     paymentStatus: joi_1.default.valid(...paymentStatus).required(),
     paymentType: joi_1.default.valid(...paymentType).required(),
+    installmentDate: joi_1.default.date().required(),
     adminAccountId: joi_1.default.number().when('paymentType', {
         is: joi_1.default.valid('CASH'),
         then: joi_1.default.number().allow(null, '').optional(),
@@ -57,6 +58,7 @@ exports.updateBookingValidator = joi_1.default.object({
     installmentCount: joi_1.default.number().optional(),
     paidAmt: joi_1.default.number().optional(),
     paymentStatus: joi_1.default.valid(...paymentStatus).optional(),
+    installmentDate: joi_1.default.string().optional(),
     paymentType: joi_1.default.string().optional(),
     adminAccountId: joi_1.default.number().when('paymentType', {
         is: joi_1.default.valid('CASH'),

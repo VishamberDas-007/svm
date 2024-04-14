@@ -277,13 +277,13 @@ exports.getAdvanceCustomerList = (0, catchAsync_1.default)((req, res) => __await
                     },
                 },
                 {
-                    phone: {
+                    phone2: {
                         startsWith: searchString,
                         mode: 'insensitive',
                     },
                 },
                 {
-                    phone: {
+                    phone2: {
                         contains: searchString,
                         mode: 'insensitive',
                     },

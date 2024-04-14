@@ -166,32 +166,32 @@ exports.getAllBookings = (0, catchAsync_1.default)((req, res) => __awaiter(void 
             OR: [
                 {
                     customer: {
-                        firstName: {
-                            startsWith: searchString,
-                            mode: 'insensitive',
+                        some: {
+                            name: {
+                                startsWith: searchString,
+                                mode: 'insensitive',
+                            },
                         },
                     },
                 },
                 {
                     customer: {
-                        firstName: {
-                            contains: searchString,
-                            mode: 'insensitive',
+                        some: {
+                            name: {
+                                contains: searchString,
+                                mode: 'insensitive',
+                            },
                         },
                     },
                 },
                 {
                     customer: {
-                        lastName: {
-                            contains: searchString,
-                            mode: 'insensitive',
+                        some: {
+                            address: {
+                                contains: searchString,
+                                mode: 'insensitive',
+                            },
                         },
-                    },
-                },
-                {
-                    address2: {
-                        contains: searchString,
-                        mode: 'insensitive',
                     },
                 },
             ],
