@@ -197,32 +197,32 @@ export const getAllBookings = catchAsync(
                 OR: [
                     {
                         customer: {
-                            firstName: {
-                                startsWith: searchString,
-                                mode: 'insensitive',
+                            some: {
+                                name: {
+                                    startsWith: searchString,
+                                    mode: 'insensitive',
+                                },
                             },
                         },
                     },
                     {
                         customer: {
-                            firstName: {
-                                contains: searchString,
-                                mode: 'insensitive',
+                            some: {
+                                name: {
+                                    contains: searchString,
+                                    mode: 'insensitive',
+                                },
                             },
                         },
                     },
                     {
                         customer: {
-                            lastName: {
-                                contains: searchString,
-                                mode: 'insensitive',
+                            some: {
+                                address: {
+                                    contains: searchString,
+                                    mode: 'insensitive',
+                                },
                             },
-                        },
-                    },
-                    {
-                        address2: {
-                            contains: searchString,
-                            mode: 'insensitive',
                         },
                     },
                 ],

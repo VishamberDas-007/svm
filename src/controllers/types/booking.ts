@@ -18,7 +18,7 @@ export type TBooking = {
     bankName: string
     chequeNo: string
     upiId: string
-    installmentDate: string
+    installmentDate: Date
     referralId: string
 }
 

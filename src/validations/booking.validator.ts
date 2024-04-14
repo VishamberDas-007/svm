@@ -13,6 +13,7 @@ export const createBookingValidator = Joi.object<TBooking>({
     paidAmt: Joi.number().required(),
     paymentStatus: Joi.valid(...paymentStatus).required(),
     paymentType: Joi.valid(...paymentType).required(),
+    installmentDate: Joi.date().required(),
     adminAccountId: Joi.number().when('paymentType', {
         is: Joi.valid('CASH'),
         then: Joi.number().allow(null, '').optional(),
@@ -56,6 +57,7 @@ export const updateBookingValidator = Joi.object<TBookingUpdate>({
     installmentCount: Joi.number().optional(),
     paidAmt: Joi.number().optional(),
     paymentStatus: Joi.valid(...paymentStatus).optional(),
+    installmentDate: Joi.string().optional(),
     paymentType: Joi.string().optional(),
     adminAccountId: Joi.number().when('paymentType', {
         is: Joi.valid('CASH'),
