@@ -62,6 +62,7 @@ export const register = catchAsync(async (req: Request, res: Response) => {
                 email,
                 password: encryptedPassword,
                 phone,
+                isAdmin: true,
                 role: {
                     create: {
                         label: ADMIN,

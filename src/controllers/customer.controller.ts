@@ -343,13 +343,13 @@ export const getAdvanceCustomerList = catchAsync(
                         },
                     },
                     {
-                        phone: {
+                        phone2: {
                             startsWith: searchString,
                             mode: 'insensitive',
                         },
                     },
                     {
-                        phone: {
+                        phone2: {
                             contains: searchString,
                             mode: 'insensitive',
                         },
