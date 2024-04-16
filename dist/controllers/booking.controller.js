@@ -345,11 +345,19 @@ exports.getBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
         phone2: obj.phone2,
         images: obj.customerImage,
         address: obj.address,
+        dob: obj.dob,
+        isMarried: obj.isMarried,
         pincode: obj.pincode,
         state: obj.state,
         city: obj.city,
     }));
-    return (0, responseHandler_1.default)(res, booking_1.BOOKING_S_0003, Object.assign(Object.assign(Object.assign(Object.assign({}, fetchBooking), { adminBankName: ((_f = fetchBooking.adminAccount) === null || _f === void 0 ? void 0 : _f.bankName) || null, projectName: fetchBooking.project.name, description: fetchBooking.project.description, customer: formatCustomerData, projectLogo: fetchBooking.project.logoUrl }), paymentDetails), { adminAccount: undefined, project: undefined }));
+    return (0, responseHandler_1.default)(res, booking_1.BOOKING_S_0003, Object.assign(Object.assign(Object.assign(Object.assign({}, fetchBooking), { adminBankName: ((_f = fetchBooking.adminAccount) === null || _f === void 0 ? void 0 : _f.bankName) || null, customer: formatCustomerData }), paymentDetails), { project: {
+            name: fetchBooking.project.name,
+            description: fetchBooking.project.description,
+            logo: fetchBooking.project.logoUrl,
+            address1: fetchBooking.project.address1,
+            address2: fetchBooking.project.address2,
+        }, adminAccount: undefined }));
 }));
 exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, validations_1.default)(validation.bookingIdValidator, req.params);
