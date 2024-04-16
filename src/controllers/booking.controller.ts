@@ -417,6 +417,8 @@ export const getBooking = catchAsync(async (req: Request, res: Response) => {
         phone2: obj.phone2,
         images: obj.customerImage,
         address: obj.address,
+        dob: obj.dob,
+        isMarried: obj.isMarried,
         pincode: obj.pincode,
         state: obj.state,
         city: obj.city,
@@ -425,13 +427,16 @@ export const getBooking = catchAsync(async (req: Request, res: Response) => {
     return responseHandler(res, BOOKING_S_0003, {
         ...fetchBooking,
         adminBankName: fetchBooking.adminAccount?.bankName || null,
-        projectName: fetchBooking.project.name,
-        description: fetchBooking.project.description,
         customer: formatCustomerData,
-        projectLogo: fetchBooking.project.logoUrl,
         ...paymentDetails,
+        project: {
+            name: fetchBooking.project.name,
+            description: fetchBooking.project.description,
+            logo: fetchBooking.project.logoUrl,
+            address1: fetchBooking.project.address1,
+            address2: fetchBooking.project.address2,
+        },
         adminAccount: undefined,
-        project: undefined,
     })
 })
 
