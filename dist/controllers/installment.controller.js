@@ -186,7 +186,10 @@ exports.fetchInstallmentDetails = (0, catchAsync_1.default)((req, res) => __awai
     });
     if (!getInstallmentDetails)
         throw new AppError_1.default(installment_1.INSTALLMENT_E_0002);
-    const result = Object.assign(Object.assign({}, getInstallmentDetails), { customer: getInstallmentDetails.booking.customer, plotNo: getInstallmentDetails.booking.plotNo, projectLogo: getInstallmentDetails.booking.project.logoUrl, booking: undefined });
+    const result = Object.assign(Object.assign({}, getInstallmentDetails), { customer: getInstallmentDetails.booking.customer, plotNo: getInstallmentDetails.booking.plotNo, project: {
+            address2: getInstallmentDetails.booking.project.address2,
+            logo: getInstallmentDetails.booking.project.logoUrl,
+        }, booking: undefined });
     return (0, responseHandler_1.default)(res, installment_1.INSTALLMENT_S_0002, result);
 }));
 exports.updateInstallmentDetails = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -346,12 +349,18 @@ exports.deleteInstallment = (0, catchAsync_1.default)((req, res) => __awaiter(vo
     return (0, responseHandler_1.default)(res, installment_1.INSTALLMENT_S_0004);
 }));
 exports.installmentList = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { page = 1, pageSize = 10 } = req.query;
-    let totalCount = 0, totalQueryCount = 0;
+    const { page = 1, pageSize = 10, bookingId } = req.query;
+    let totalCount = 0, totalQueryCount = 0, whereClause = {};
+    whereClause = {
+        isDelete: false,
+    };
+    if (bookingId) {
+        whereClause = {
+            bookingId,
+        };
+    }
     const list = (yield db_1.default.installment.findMany({
-        where: {
-            isDelete: false,
-        },
+        where: whereClause,
         include: {
             booking: {
                 include: {
@@ -360,8 +369,12 @@ exports.installmentList = (0, catchAsync_1.default)((req, res) => __awaiter(void
             },
         },
     })).map((obj) => (Object.assign(Object.assign({}, obj), { customer: obj.booking.customer, booking: undefined })));
-    totalCount = yield db_1.default.installment.count();
-    totalQueryCount = yield db_1.default.installment.count();
+    totalCount = yield db_1.default.installment.count({
+        where: whereClause,
+    });
+    totalQueryCount = yield db_1.default.installment.count({
+        where: whereClause,
+    });
     const result = {
         list: list,
         meta: {
