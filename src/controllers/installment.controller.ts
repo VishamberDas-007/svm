@@ -181,7 +181,10 @@ export const fetchInstallmentDetails = catchAsync(
             ...getInstallmentDetails,
             customer: getInstallmentDetails.booking.customer,
             plotNo: getInstallmentDetails.booking.plotNo,
-            projectLogo: getInstallmentDetails.booking.project.logoUrl,
+            project: {
+                address2: getInstallmentDetails.booking.project.address2,
+                logo: getInstallmentDetails.booking.project.logoUrl,
+            },
             booking: undefined,
         }
         return responseHandler(res, INSTALLMENT_S_0002, result)
@@ -384,14 +387,24 @@ export const deleteInstallment = catchAsync(
 
 export const installmentList = catchAsync(
     async (req: Request, res: Response) => {
-        const { page = 1, pageSize = 10 } = req.query
+        const { page = 1, pageSize = 10, bookingId } = req.query
         let totalCount = 0,
-            totalQueryCount = 0
+            totalQueryCount = 0,
+            whereClause = {}
+
+        whereClause = {
+            isDelete: false,
+        }
+
+        if (bookingId) {
+            whereClause = {
+                bookingId,
+            }
+        }
+
         const list = (
             await prisma.installment.findMany({
-                where: {
-                    isDelete: false,
-                },
+                where: whereClause,
                 include: {
                     booking: {
                         include: {
@@ -406,9 +419,13 @@ export const installmentList = catchAsync(
             booking: undefined,
         }))
 
-        totalCount = await prisma.installment.count()
+        totalCount = await prisma.installment.count({
+            where: whereClause,
+        })
 
-        totalQueryCount = await prisma.installment.count()
+        totalQueryCount = await prisma.installment.count({
+            where: whereClause,
+        })
 
         const result: TListData<Installment> = {
             list: list,
