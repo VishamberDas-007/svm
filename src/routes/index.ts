@@ -24,10 +24,6 @@ mainRouter.get('/test', (req, res) => {
     })
 })
 
-// mainRouter.use('/twilio', (req: Request, res: Response) => {
-//     sendMessage()
-// })
-
 mainRouter.use('/website', websiteRouter)
 
 mainRouter.use('/installment', installmentRouter)

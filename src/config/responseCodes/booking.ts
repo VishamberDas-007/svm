@@ -24,6 +24,14 @@ export const BOOKING_E_0003: TResponseCode = {
     statusCode: 400,
 }
 
+export const BOOKING_E_0004: TResponseCode = {
+    type: RESPONSE_TYPE.ERROR,
+    code: 'BOOKING_E_0004',
+    isNotify: true,
+    message: 'Failed to update the penalty data',
+    statusCode: 400,
+}
+
 export const BOOKING_S_0001: TResponseCode = {
     type: RESPONSE_TYPE.SUCCESS,
     code: 'BOOKING_S_0001',
@@ -61,5 +69,21 @@ export const BOOKING_S_0005: TResponseCode = {
     code: 'BOOKING_S_0005',
     isNotify: true,
     message: 'Booking deleted successfully',
+    statusCode: 200,
+}
+
+export const BOOKING_S_0006: TResponseCode = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'BOOKING_S_0006',
+    isNotify: true,
+    message: 'Penalty added successfully',
+    statusCode: 200,
+}
+
+export const BOOKING_S_0007: TResponseCode = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'BOOKING_S_0007',
+    isNotify: true,
+    message: 'Penalty updated successfully',
     statusCode: 200,
 }

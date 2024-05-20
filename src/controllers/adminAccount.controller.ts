@@ -12,6 +12,7 @@ import {
     AD_ACCOUNT_S_0002,
     AD_ACCOUNT_S_0003,
     AD_ACCOUNT_S_0004,
+    AD_ACCOUNT_S_0005,
 } from '../config/responseCodes/adminAccount'
 import AppError from '../utils/AppError'
 import { AdminAccount } from '@prisma/client'
@@ -180,3 +181,27 @@ export const getAccountBasicList = catchAsync(
         return responseHandler(res, AD_ACCOUNT_S_0003, fetchAccountList)
     }
 )
+
+export const deleteAccount = catchAsync(async (req: Request, res: Response) => {
+    await validator(validation.accountIdValidator, req.params)
+    const { accountId } = req.params
+
+    const fetchAccount = await prisma.adminAccount.findFirst({
+        where: {
+            adminAccountId: +accountId,
+        },
+    })
+
+    if (!fetchAccount) throw new AppError(AD_ACCOUNT_E_0001)
+
+    await prisma.adminAccount.update({
+        where: {
+            adminAccountId: +accountId,
+        },
+        data: {
+            isDelete: true,
+        },
+    })
+
+    return responseHandler(res, AD_ACCOUNT_S_0005)
+})

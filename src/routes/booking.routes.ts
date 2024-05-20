@@ -13,4 +13,11 @@ bookingRouter.put('/update/:bookingId', bookingController.updateBooking)
 
 bookingRouter.delete('/delete/:bookingId', bookingController.deleteBooking)
 
+bookingRouter.post('/add-penalty', bookingController.addPenalty)
+
+bookingRouter.patch(
+    '/update-penalty/:penaltyId',
+    bookingController.updatePenalty
+)
+
 export { bookingRouter }

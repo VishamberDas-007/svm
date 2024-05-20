@@ -29,6 +29,7 @@ import validator from '../validations'
 import * as validation from '../validations/installment.validator'
 import * as generalValidation from '../validations/_general.validator'
 import { TListData } from '../types/global.types'
+import util from '../utils/helper'
 // import { TRedisData } from './types/booking'
 // import { getValueInRedis, setValueInRedis } from '../redis/config'
 
@@ -150,6 +151,38 @@ export const createInstallment = catchAsync(
             ...newInstallment,
             ...paymentDetails,
         })
+    }
+)
+
+export const fetchCurrentMonthInstallmentList = catchAsync(
+    async (req: Request, res: Response) => {
+        const bookingList = await prisma.booking.findMany({
+            where: {
+                isDelete: false,
+                paymentStatus: {
+                    notIn: ['CANCEL', 'COMPLETED'],
+                },
+            },
+            include: {
+                customer: true,
+            },
+        })
+
+        const currMonthTotalDays = util.currMonthDays()
+
+        // conditions
+        // if the month date is less than 31 then need to include 31 too and vice versa
+
+        await prisma.$transaction(async (prisma) => {
+            
+        })
+
+        // get current date
+        // fetch the booking list conditionally on status and date
+        // filter the booking list as per the current month
+        // append the list data into a db
+        // send the list by fetching it from db by formatting the data
+        // send the message in bulk manner to all the clients
     }
 )
 

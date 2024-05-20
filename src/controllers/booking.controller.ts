@@ -6,6 +6,7 @@ import {
     TBooking,
     TBookingList,
     TBookingUpdate,
+    TPenalty,
     TRedisData,
 } from './types/booking'
 import validator from '../validations'
@@ -14,11 +15,14 @@ import {
     BOOKING_E_0001,
     BOOKING_E_0002,
     BOOKING_E_0003,
+    BOOKING_E_0004,
     BOOKING_S_0001,
     BOOKING_S_0002,
     BOOKING_S_0003,
     BOOKING_S_0004,
     BOOKING_S_0005,
+    BOOKING_S_0006,
+    BOOKING_S_0007,
 } from '../config/responseCodes/booking'
 import AppError from '../utils/AppError'
 import {
@@ -57,6 +61,8 @@ export const createBooking = catchAsync(async (req: Request, res: Response) => {
         chequeNo,
         upiId,
         referralId,
+        reminderDate,
+        dastavejAmt,
     }: TBooking = req.body
 
     const projectData = await prisma.project.findFirst({
@@ -89,8 +95,10 @@ export const createBooking = catchAsync(async (req: Request, res: Response) => {
                 plotNo,
                 area: +area,
                 totalAmt: +totalAmt,
+                dastavejAmt,
                 installmentDate,
                 paidAmt: +paidAmt,
+                reminderDate,
                 remainAmt: +remainAmt,
                 installmentAmt: +installmentAmt,
                 paymentType,
@@ -455,6 +463,7 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
         paymentType,
         projectId,
         plotNo,
+        dastavejAmt,
         remainAmt,
         totalAmt,
         accountNo,
@@ -462,6 +471,7 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
         chequeNo,
         installmentDate,
         upiId,
+        reminderDate,
         paymentId,
         referralId,
     }: TBookingUpdate = req.body
@@ -613,6 +623,8 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
                 data: {
                     adminAccountId,
                     area: +area,
+                    reminderDate,
+                    dastavejAmt,
                     customer: {
                         connect: customerIds.map((customerId) => ({
                             customerId,
@@ -699,4 +711,45 @@ export const deleteBooking = catchAsync(async (req: Request, res: Response) => {
     })
 
     return responseHandler(res, BOOKING_S_0005)
+})
+
+export const addPenalty = catchAsync(async (req: Request, res: Response) => {
+    await validator(validation.addPenaltyValidator, req.body)
+
+    const { amount, bookingId, description, isComplete }: TPenalty = req.body
+
+    const penaltyData = await prisma.bookingPenalty.create({
+        data: {
+            amount,
+            description,
+            bookingId,
+            isComplete,
+        },
+    })
+
+    return responseHandler(res, BOOKING_S_0006, penaltyData)
+})
+
+export const updatePenalty = catchAsync(async (req: Request, res: Response) => {
+    await validator(validation.updatePenaltyValidator, req.body)
+    await validator(validation.penaltyIdValidator, req.params)
+
+    const { penaltyId } = req.params
+
+    const { amount, description, isComplete }: TPenalty = req.body
+
+    const penaltyData = await prisma.bookingPenalty.update({
+        where: {
+            penaltyId,
+        },
+        data: {
+            amount,
+            description,
+            isComplete,
+        },
+    })
+
+    if (!penaltyData) throw new AppError(BOOKING_E_0004)
+
+    return responseHandler(res, BOOKING_S_0007, penaltyData)
 })
