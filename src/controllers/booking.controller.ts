@@ -32,6 +32,7 @@ import {
     CashPayment,
     ChequePayment,
     Customer,
+    Installment,
     Project,
     UpiPayment,
 } from '@prisma/client'
@@ -198,7 +199,9 @@ export const getAllBookings = catchAsync(
         } = req.query
 
         const result: any[] = []
-        let whereClause = {}
+        let whereClause = {},
+            totalAmt = 0,
+            paidAmt = 0
 
         if (searchString) {
             whereClause = {
@@ -274,6 +277,7 @@ export const getAllBookings = catchAsync(
                 project: Project
                 customer: Customer[]
                 adminAccount: AdminAccount | null
+                installment: Installment[] | null
             })[] = []
 
         bookingList = await prisma.booking.findMany({
@@ -281,12 +285,12 @@ export const getAllBookings = catchAsync(
             skip,
             where: {
                 ...whereClause,
-                isDelete: false,
             },
             include: {
                 project: true,
                 customer: true,
                 adminAccount: true,
+                installment: true,
             },
             // TODO: pass where clause in the below query
             // where:,
@@ -302,45 +306,22 @@ export const getAllBookings = catchAsync(
         })
 
         for await (const booking of bookingList) {
-            let paymentDetails:
-                | ChequePayment
-                | UpiPayment
-                | BankPayment
-                | CashPayment
-                | null
-                | undefined
-
-            if (booking.paymentType === 'BANK_TRANSFER')
-                paymentDetails = await prisma.bankPayment.findFirst({
-                    where: {
-                        bookingId: booking.bookingId,
-                    },
-                })
-            else if (booking.paymentType === 'CASH')
-                paymentDetails = await prisma.cashPayment.findFirst({
-                    where: {
-                        bookingId: booking.bookingId,
-                    },
-                })
-            else if (booking.paymentType === 'UPI')
-                paymentDetails = await prisma.upiPayment.findFirst({
-                    where: {
-                        bookingId: booking.bookingId,
-                    },
-                })
-            else if (booking.paymentType === 'CHEQUE')
-                paymentDetails = await prisma.chequePayment.findFirst({
-                    where: {
-                        bookingId: booking.bookingId,
-                    },
-                })
+            totalAmt = booking.totalAmt
+            paidAmt =
+                booking.paidAmt +
+                (booking.installment?.reduce((prev, curr) => {
+                    return curr.isDelete ? prev : prev + curr.amount
+                }, 0) || 0)
 
             result.push({
-                ...booking,
+                area: booking.area,
                 projectName: booking.project.name,
                 customerName: booking.customer.map((customer) => customer.name),
                 adminBankName: booking.adminAccount?.bankName || null,
-                ...paymentDetails,
+                totalAmt,
+                paidAmt,
+                remainAmt: booking.remainAmt,
+                installment: undefined,
                 adminAccount: undefined,
                 project: undefined,
                 customer: undefined,
@@ -370,7 +351,6 @@ export const getBooking = catchAsync(async (req: Request, res: Response) => {
     const fetchBooking = await prisma.booking.findFirst({
         where: {
             bookingId,
-            isDelete: false,
         },
         include: {
             adminAccount: true,
@@ -484,7 +464,6 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
     const bookingExists = await prisma.booking.findFirst({
         where: {
             bookingId,
-            isDelete: false,
         },
         include: {
             customer: true,
@@ -695,18 +674,14 @@ export const deleteBooking = catchAsync(async (req: Request, res: Response) => {
     const bookingData = await prisma.booking.findFirst({
         where: {
             bookingId,
-            isDelete: false,
         },
     })
 
     if (!bookingData) throw new AppError(BOOKING_E_0001)
 
-    await prisma.booking.update({
+    await prisma.booking.delete({
         where: {
             bookingId,
-        },
-        data: {
-            isDelete: true,
         },
     })
 

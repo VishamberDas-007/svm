@@ -158,7 +158,6 @@ export const fetchCurrentMonthInstallmentList = catchAsync(
     async (req: Request, res: Response) => {
         const bookingList = await prisma.booking.findMany({
             where: {
-                isDelete: false,
                 paymentStatus: {
                     notIn: ['CANCEL', 'COMPLETED'],
                 },
@@ -173,9 +172,7 @@ export const fetchCurrentMonthInstallmentList = catchAsync(
         // conditions
         // if the month date is less than 31 then need to include 31 too and vice versa
 
-        await prisma.$transaction(async (prisma) => {
-            
-        })
+        // await prisma.$transaction(async (prisma) => {})
 
         // get current date
         // fetch the booking list conditionally on status and date
@@ -193,7 +190,7 @@ export const fetchInstallmentDetails = catchAsync(
         const { installmentId } = req.params
 
         const getInstallmentDetails = await prisma.installment.findFirst({
-            where: { installmentId, isDelete: false },
+            where: { installmentId },
             include: {
                 bankPayment: true,
                 cashPayment: true,
@@ -245,7 +242,7 @@ export const updateInstallmentDetails = catchAsync(
         let paymentId: string | undefined, updateInstallment
 
         const installmentDetailExists = await prisma.installment.findFirst({
-            where: { installmentId, isDelete: false },
+            where: { installmentId },
             include: {
                 bankPayment: true,
                 cashPayment: true,
@@ -363,7 +360,6 @@ export const fetchBookingInstallmentDetails = catchAsync(
         const bookingDetails = await prisma.booking.findFirst({
             where: {
                 bookingId,
-                isDelete: false,
             },
             include: {
                 customer: true,
@@ -399,18 +395,14 @@ export const deleteInstallment = catchAsync(
         const installmentDetails = await prisma.installment.findFirst({
             where: {
                 installmentId,
-                isDelete: false,
             },
         })
 
         if (!installmentDetails) throw new AppError(INSTALLMENT_E_0001)
 
-        await prisma.installment.update({
+        await prisma.installment.delete({
             where: {
                 installmentId,
-            },
-            data: {
-                isDelete: true,
             },
         })
 
@@ -424,10 +416,6 @@ export const installmentList = catchAsync(
         let totalCount = 0,
             totalQueryCount = 0,
             whereClause = {}
-
-        whereClause = {
-            isDelete: false,
-        }
 
         if (bookingId) {
             whereClause = {

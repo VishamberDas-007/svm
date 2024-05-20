@@ -273,7 +273,6 @@ export const getBasicCustomerList = catchAsync(
             await prisma.customer.findMany({
                 where: {
                     ...whereClause,
-                    isDelete: false,
                 },
             })
         )?.map((customer) => {
@@ -364,7 +363,6 @@ export const getAdvanceCustomerList = catchAsync(
                 skip,
                 where: {
                     ...whereClause,
-                    isDelete: false,
                 },
                 orderBy: {
                     createdAt: 'desc',
@@ -398,7 +396,6 @@ export const getCustomer = catchAsync(async (req: Request, res: Response) => {
     const fetchCustomer = await prisma.customer.findFirst({
         where: {
             customerId,
-            isDelete: false,
         },
         include: {
             customerImage: true,
@@ -432,7 +429,6 @@ export const updateCustomer = catchAsync(
         const fetchCustomer = await prisma.customer.findFirst({
             where: {
                 customerId,
-                isDelete: false,
             },
             include: {
                 customerImage: true,
@@ -489,18 +485,14 @@ export const deleteCustomer = catchAsync(
         const customerData = await prisma.customer.findFirst({
             where: {
                 customerId,
-                isDelete: false,
             },
         })
 
         if (!customerData) throw new AppError(CUSTOMER_E_0001)
 
-        await prisma.customer.update({
+        await prisma.customer.delete({
             where: {
                 customerId,
-            },
-            data: {
-                isDelete: true,
             },
         })
 
