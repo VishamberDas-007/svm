@@ -54,12 +54,21 @@ exports.addExpense = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
     });
     if (expenseExists)
         throw new AppError_1.default(expense_1.EXPENSE_E_0002);
+    let data = {};
+    if (miscExpense) {
+        data = {
+            miscExpense: {
+                createMany: {
+                    data: miscExpense,
+                },
+            },
+        };
+    }
     const createExpense = yield db_1.default.project.update({
         where: {
             projectId,
         },
-        data: {
-            expense: {
+        data: Object.assign({ expense: {
                 create: {
                     landPurchase,
                     nonAgricultural,
@@ -68,13 +77,7 @@ exports.addExpense = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
                     brokerage,
                     landVisitCharge,
                 },
-            },
-            miscExpense: {
-                createMany: {
-                    data: miscExpense,
-                },
-            },
-        },
+            } }, data),
     });
     return (0, responseHandler_1.default)(res, expense_1.EXPENSE_S_0001, createExpense);
 }));
@@ -147,6 +150,16 @@ exports.updateProjectExpense = (0, catchAsync_1.default)((req, res) => __awaiter
                 landVisitCharge,
                 nonAgricultural,
                 planningAndLayout,
+                // project: {
+                //     update: {
+                //         miscExpense: {
+                //             createMany: {
+                //                 data: miscExpense || [],
+                //                 skipDuplicates: true,
+                //             },
+                //         },
+                //     },
+                // },
             },
         });
         if (miscExpense === null || miscExpense === void 0 ? void 0 : miscExpense.length) {

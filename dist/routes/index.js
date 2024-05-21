@@ -26,9 +26,6 @@ mainRouter.get('/test', (req, res) => {
         // server: APP_ENV,
     });
 });
-// mainRouter.use('/twilio', (req: Request, res: Response) => {
-//     sendMessage()
-// })
 mainRouter.use('/website', website_routes_1.websiteRouter);
 mainRouter.use('/installment', installment_routes_1.installmentRouter);
 mainRouter.use('/role', role_routes_1.roleRouter);

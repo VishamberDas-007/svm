@@ -36,3 +36,4 @@ accountRouter.get('/get/:accountId', accountController.getAccountDetails);
 accountRouter.get('/advance-list', accountController.getAdvanceAccountList);
 accountRouter.put('/update/:accountId', accountController.updateAccountDetails);
 accountRouter.get('/basic-list', accountController.getAccountBasicList);
+accountRouter.delete('/delete/:accountId', accountController.deleteAccount);

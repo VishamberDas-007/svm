@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateBookingValidator = exports.bookingIdValidator = exports.createBookingValidator = void 0;
+exports.penaltyIdValidator = exports.updatePenaltyValidator = exports.addPenaltyValidator = exports.updateBookingValidator = exports.bookingIdValidator = exports.createBookingValidator = void 0;
 const joi_1 = __importDefault(require("joi"));
 const helper_1 = __importDefault(require("../utils/helper"));
 const paymentStatus = ['PENDING', 'PARTIAL', 'COMPLETED'];
@@ -15,6 +15,8 @@ exports.createBookingValidator = joi_1.default.object({
     installmentCount: joi_1.default.number().required(),
     paidAmt: joi_1.default.number().required(),
     paymentStatus: joi_1.default.valid(...paymentStatus).required(),
+    reminderDate: joi_1.default.date().required(),
+    dastavejAmt: joi_1.default.number().allow(null).optional(),
     paymentType: joi_1.default.valid(...paymentType).required(),
     installmentDate: joi_1.default.date().required(),
     adminAccountId: joi_1.default.number().when('paymentType', {
@@ -58,12 +60,14 @@ exports.updateBookingValidator = joi_1.default.object({
     installmentCount: joi_1.default.number().optional(),
     paidAmt: joi_1.default.number().optional(),
     paymentStatus: joi_1.default.valid(...paymentStatus).optional(),
+    reminderDate: joi_1.default.string().optional(),
+    dastavejAmt: joi_1.default.number().allow(null).optional(),
     installmentDate: joi_1.default.string().optional(),
     paymentType: joi_1.default.string().optional(),
     adminAccountId: joi_1.default.number().when('paymentType', {
         is: joi_1.default.valid('CASH'),
         then: joi_1.default.number().allow(null, '').optional(),
-        otherwise: joi_1.default.number().optional(),
+        otherwise: joi_1.default.number().required(),
     }),
     plotNo: joi_1.default.string().optional(),
     projectId: joi_1.default.string().optional(),
@@ -95,4 +99,18 @@ exports.updateBookingValidator = joi_1.default.object({
         then: joi_1.default.required(),
         otherwise: joi_1.default.allow('', null).optional(),
     }),
+});
+exports.addPenaltyValidator = joi_1.default.object({
+    amount: joi_1.default.number().required(),
+    bookingId: helper_1.default.uuid.required(),
+    description: joi_1.default.string().required(),
+    isComplete: joi_1.default.boolean().required(),
+});
+exports.updatePenaltyValidator = joi_1.default.object({
+    amount: joi_1.default.number().required(),
+    description: joi_1.default.string().required(),
+    isComplete: joi_1.default.boolean().required(),
+});
+exports.penaltyIdValidator = joi_1.default.object({
+    penaltyId: helper_1.default.uuid.required(),
 });

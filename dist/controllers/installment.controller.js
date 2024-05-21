@@ -42,7 +42,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.installmentList = exports.deleteInstallment = exports.fetchBookingInstallmentDetails = exports.updateInstallmentDetails = exports.fetchInstallmentDetails = exports.createInstallment = void 0;
+exports.installmentList = exports.deleteInstallment = exports.fetchBookingInstallmentDetails = exports.updateInstallmentDetails = exports.fetchInstallmentDetails = exports.fetchCurrentMonthInstallmentList = exports.createInstallment = void 0;
 const catchAsync_1 = __importDefault(require("../utils/catchAsync"));
 const installment_service_1 = require("../services/installment.service");
 const db_1 = __importDefault(require("../db"));
@@ -53,6 +53,7 @@ const responseHandler_1 = __importDefault(require("../utils/responseHandler"));
 const validations_1 = __importDefault(require("../validations"));
 const validation = __importStar(require("../validations/installment.validator"));
 const generalValidation = __importStar(require("../validations/_general.validator"));
+const helper_1 = __importDefault(require("../utils/helper"));
 // import { TRedisData } from './types/booking'
 // import { getValueInRedis, setValueInRedis } from '../redis/config'
 exports.createInstallment = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -166,11 +167,33 @@ exports.createInstallment = (0, catchAsync_1.default)((req, res) => __awaiter(vo
     }));
     return (0, responseHandler_1.default)(res, installment_1.INSTALLMENT_S_0001, Object.assign(Object.assign({}, newInstallment), paymentDetails));
 }));
+exports.fetchCurrentMonthInstallmentList = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const bookingList = yield db_1.default.booking.findMany({
+        where: {
+            paymentStatus: {
+                notIn: ['CANCEL', 'COMPLETED'],
+            },
+        },
+        include: {
+            customer: true,
+        },
+    });
+    const currMonthTotalDays = helper_1.default.currMonthDays();
+    // conditions
+    // if the month date is less than 31 then need to include 31 too and vice versa
+    // await prisma.$transaction(async (prisma) => {})
+    // get current date
+    // fetch the booking list conditionally on status and date
+    // filter the booking list as per the current month
+    // append the list data into a db
+    // send the list by fetching it from db by formatting the data
+    // send the message in bulk manner to all the clients
+}));
 exports.fetchInstallmentDetails = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, validations_1.default)(validation.installmentIdValidator, req.params);
     const { installmentId } = req.params;
     const getInstallmentDetails = yield db_1.default.installment.findFirst({
-        where: { installmentId, isDelete: false },
+        where: { installmentId },
         include: {
             bankPayment: true,
             cashPayment: true,
@@ -199,7 +222,7 @@ exports.updateInstallmentDetails = (0, catchAsync_1.default)((req, res) => __awa
     const { amount, bookingId, paymentType: updatePaymentType, accountNumber, bankName, chequeNumber, penalty, upiId, adminAccountId, } = req.body;
     let paymentId, updateInstallment;
     const installmentDetailExists = yield db_1.default.installment.findFirst({
-        where: { installmentId, isDelete: false },
+        where: { installmentId },
         include: {
             bankPayment: true,
             cashPayment: true,
@@ -304,7 +327,6 @@ exports.fetchBookingInstallmentDetails = (0, catchAsync_1.default)((req, res) =>
     const bookingDetails = yield db_1.default.booking.findFirst({
         where: {
             bookingId,
-            isDelete: false,
         },
         include: {
             customer: true,
@@ -333,17 +355,13 @@ exports.deleteInstallment = (0, catchAsync_1.default)((req, res) => __awaiter(vo
     const installmentDetails = yield db_1.default.installment.findFirst({
         where: {
             installmentId,
-            isDelete: false,
         },
     });
     if (!installmentDetails)
         throw new AppError_1.default(installment_1.INSTALLMENT_E_0001);
-    yield db_1.default.installment.update({
+    yield db_1.default.installment.delete({
         where: {
             installmentId,
-        },
-        data: {
-            isDelete: true,
         },
     });
     return (0, responseHandler_1.default)(res, installment_1.INSTALLMENT_S_0004);
@@ -351,9 +369,6 @@ exports.deleteInstallment = (0, catchAsync_1.default)((req, res) => __awaiter(vo
 exports.installmentList = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { page = 1, pageSize = 10, bookingId } = req.query;
     let totalCount = 0, totalQueryCount = 0, whereClause = {};
-    whereClause = {
-        isDelete: false,
-    };
     if (bookingId) {
         whereClause = {
             bookingId,
