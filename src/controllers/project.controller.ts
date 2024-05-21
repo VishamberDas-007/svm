@@ -144,10 +144,7 @@ export const getAllProjects = catchAsync(
         projectList = await prisma.project.findMany({
             take: +pageSize,
             skip: skip,
-            where: {
-                ...whereClause,
-                isDelete: false,
-            },
+            where: whereClause,
             orderBy: {
                 createdAt: 'desc',
             },
@@ -201,7 +198,6 @@ export const updateProject = catchAsync(
         const projectData = await prisma.project.findFirst({
             where: {
                 projectId,
-                isDelete: false,
             },
         })
 
@@ -240,7 +236,6 @@ export const getProjectDetails = catchAsync(
         const fetchProject = await prisma.project.findFirst({
             where: {
                 projectId,
-                isDelete: false,
             },
         })
 
@@ -260,7 +255,6 @@ export const getProjectImages = catchAsync(
         const fetchProject = await prisma.project.findFirst({
             where: {
                 projectId,
-                isDelete: false,
             },
             include: {
                 projectImages: true,
@@ -298,9 +292,6 @@ export const getProjectImages = catchAsync(
 export const getProjectBasicList = catchAsync(
     async (req: Request, res: Response) => {
         const fetchProjects = await prisma.project.findMany({
-            where: {
-                isDelete: false,
-            },
             select: {
                 projectId: true,
                 name: true,
@@ -345,7 +336,7 @@ export const uploadLogoImage = catchAsync(
 
         const projectData = await prisma.project.findFirst({
             where: {
-                isDelete: false,
+                projectId,
             },
         })
 

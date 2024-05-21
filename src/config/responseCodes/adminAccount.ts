@@ -47,3 +47,11 @@ export const AD_ACCOUNT_S_0004: TResponseCode = {
     message: 'Bank account updated successfully',
     statusCode: 200,
 }
+
+export const AD_ACCOUNT_S_0005: TResponseCode = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'AD_ACCOUNT_S_0005',
+    isNotify: true,
+    message: 'Bank account deleted successfully',
+    statusCode: 200,
+}

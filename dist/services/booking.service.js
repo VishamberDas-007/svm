@@ -20,7 +20,6 @@ const getBookingDetails = (bookingId) => __awaiter(void 0, void 0, void 0, funct
     const bookingDetails = yield db_1.default.booking.findFirst({
         where: {
             bookingId,
-            isDelete: false,
         },
         include: {
             customer: true,

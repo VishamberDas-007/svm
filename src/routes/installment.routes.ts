@@ -10,6 +10,12 @@ installmentRouter.post(
     installmentController.createInstallment
 )
 
+installmentRouter.post(
+    '/fetch-current-month/installment-list',
+    // authMiddleware(['INSTALLMENT_WRITE']),
+    installmentController.fetchCurrentMonthInstallmentList
+)
+
 installmentRouter.get(
     '/get/:installmentId',
     // authMiddleware(['INSTALLMENT_WRITE', 'INSTALLMENT_READ']),

@@ -17,9 +17,11 @@ export type TBooking = {
     accountNo: string
     bankName: string
     chequeNo: string
+    reminderDate: Date
     upiId: string
     installmentDate: Date
     referralId: string
+    dastavejAmt: number
 }
 
 export type TBookingUpdate = TBooking & {
@@ -41,4 +43,11 @@ export type TRedisData = {
     email: string
     phone: string
     amount: number
+}
+
+export type TPenalty = {
+    amount: number
+    description: string
+    bookingId: string
+    isComplete: boolean
 }

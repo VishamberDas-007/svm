@@ -1,6 +1,10 @@
 import Joi from 'joi'
 import util from '../utils/helper'
-import { TBooking, TBookingUpdate } from '../controllers/types/booking'
+import {
+    TBooking,
+    TBookingUpdate,
+    TPenalty,
+} from '../controllers/types/booking'
 const paymentStatus = ['PENDING', 'PARTIAL', 'COMPLETED']
 
 const paymentType = ['CHEQUE', 'UPI', 'CASH', 'BANK_TRANSFER']
@@ -12,6 +16,8 @@ export const createBookingValidator = Joi.object<TBooking>({
     installmentCount: Joi.number().required(),
     paidAmt: Joi.number().required(),
     paymentStatus: Joi.valid(...paymentStatus).required(),
+    reminderDate: Joi.date().required(),
+    dastavejAmt: Joi.number().allow(null).optional(),
     paymentType: Joi.valid(...paymentType).required(),
     installmentDate: Joi.date().required(),
     adminAccountId: Joi.number().when('paymentType', {
@@ -57,12 +63,14 @@ export const updateBookingValidator = Joi.object<TBookingUpdate>({
     installmentCount: Joi.number().optional(),
     paidAmt: Joi.number().optional(),
     paymentStatus: Joi.valid(...paymentStatus).optional(),
+    reminderDate: Joi.string().optional(),
+    dastavejAmt: Joi.number().allow(null).optional(),
     installmentDate: Joi.string().optional(),
     paymentType: Joi.string().optional(),
     adminAccountId: Joi.number().when('paymentType', {
         is: Joi.valid('CASH'),
         then: Joi.number().allow(null, '').optional(),
-        otherwise: Joi.number().optional(),
+        otherwise: Joi.number().required(),
     }),
     plotNo: Joi.string().optional(),
     projectId: Joi.string().optional(),
@@ -94,4 +102,21 @@ export const updateBookingValidator = Joi.object<TBookingUpdate>({
         then: Joi.required(),
         otherwise: Joi.allow('', null).optional(),
     }),
+})
+
+export const addPenaltyValidator = Joi.object<TPenalty>({
+    amount: Joi.number().required(),
+    bookingId: util.uuid.required(),
+    description: Joi.string().required(),
+    isComplete: Joi.boolean().required(),
+})
+
+export const updatePenaltyValidator = Joi.object<TPenalty>({
+    amount: Joi.number().required(),
+    description: Joi.string().required(),
+    isComplete: Joi.boolean().required(),
+})
+
+export const penaltyIdValidator = Joi.object({
+    penaltyId: util.uuid.required(),
 })

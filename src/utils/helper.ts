@@ -81,6 +81,16 @@ const refreshToken = (userDetails: object, expiresIn?: string) =>
         expiresIn: expiresIn || jwtRefreshToken.EXPIRE,
     })
 
+function daysInMonth(month: number, year: number) {
+    return new Date(year, month, 0).getDate()
+}
+const currMonthDays = () => {
+    const today = new Date()
+
+    const month = today.getMonth()
+    return daysInMonth(month + 1, today.getFullYear())
+}
+
 export default {
     otpGenerator,
     emailValidator,
@@ -95,4 +105,5 @@ export default {
     passwordGenerator,
     accessToken,
     refreshToken,
+    currMonthDays,
 }

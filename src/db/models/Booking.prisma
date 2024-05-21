@@ -14,8 +14,10 @@ model Booking {
     // customer         Customer      @relation(fields: [customerId], references: [customerId])
     adminAccountId   Int?
     adminAccount     AdminAccount? @relation(fields: [adminAccountId], references: [adminAccountId])
+    reminderDate     DateTime
     installmentDate  DateTime
     installmentCount Int
+    dastavejAmt      Float
     referralId       String?
     referral         Referral?     @relation(fields: [referralId], references: [referralId])
     isDelete         Boolean       @default(false)

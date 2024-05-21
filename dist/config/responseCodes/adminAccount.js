@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AD_ACCOUNT_S_0004 = exports.AD_ACCOUNT_S_0003 = exports.AD_ACCOUNT_S_0002 = exports.AD_ACCOUNT_S_0001 = exports.AD_ACCOUNT_E_0002 = exports.AD_ACCOUNT_E_0001 = void 0;
+exports.AD_ACCOUNT_S_0005 = exports.AD_ACCOUNT_S_0004 = exports.AD_ACCOUNT_S_0003 = exports.AD_ACCOUNT_S_0002 = exports.AD_ACCOUNT_S_0001 = exports.AD_ACCOUNT_E_0002 = exports.AD_ACCOUNT_E_0001 = void 0;
 const global_types_1 = require("../../types/global.types");
 exports.AD_ACCOUNT_E_0001 = {
     type: global_types_1.RESPONSE_TYPE.ERROR,
@@ -42,5 +42,12 @@ exports.AD_ACCOUNT_S_0004 = {
     code: 'AD_ACCOUNT_S_0004',
     isNotify: true,
     message: 'Bank account updated successfully',
+    statusCode: 200,
+};
+exports.AD_ACCOUNT_S_0005 = {
+    type: global_types_1.RESPONSE_TYPE.SUCCESS,
+    code: 'AD_ACCOUNT_S_0005',
+    isNotify: true,
+    message: 'Bank account deleted successfully',
     statusCode: 200,
 };

@@ -39,6 +39,18 @@ export const addExpense = catchAsync(async (req: Request, res: Response) => {
 
     if (expenseExists) throw new AppError(EXPENSE_E_0002)
 
+    let data = {}
+
+    if (miscExpense) {
+        data = {
+            miscExpense: {
+                createMany: {
+                    data: miscExpense,
+                },
+            },
+        }
+    }
+
     const createExpense = await prisma.project.update({
         where: {
             projectId,
@@ -54,11 +66,7 @@ export const addExpense = catchAsync(async (req: Request, res: Response) => {
                     landVisitCharge,
                 },
             },
-            miscExpense: {
-                createMany: {
-                    data: miscExpense,
-                },
-            },
+            ...data,
         },
     })
 
@@ -166,6 +174,16 @@ export const updateProjectExpense = catchAsync(
                     landVisitCharge,
                     nonAgricultural,
                     planningAndLayout,
+                    // project: {
+                    //     update: {
+                    //         miscExpense: {
+                    //             createMany: {
+                    //                 data: miscExpense || [],
+                    //                 skipDuplicates: true,
+                    //             },
+                    //         },
+                    //     },
+                    // },
                 },
             })
 

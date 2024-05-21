@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAccountBasicList = exports.updateAccountDetails = exports.getAdvanceAccountList = exports.getAccountDetails = exports.newAccount = void 0;
+exports.deleteAccount = exports.getAccountBasicList = exports.updateAccountDetails = exports.getAdvanceAccountList = exports.getAccountDetails = exports.newAccount = void 0;
 const db_1 = __importDefault(require("../db"));
 const catchAsync_1 = __importDefault(require("../utils/catchAsync"));
 const responseHandler_1 = __importDefault(require("../utils/responseHandler"));
@@ -165,4 +165,24 @@ exports.getAccountBasicList = (0, catchAsync_1.default)((req, res) => __awaiter(
         return Object.assign(Object.assign({}, obj), { balance: undefined, createdAt: undefined, updatedAt: undefined });
     });
     return (0, responseHandler_1.default)(res, adminAccount_1.AD_ACCOUNT_S_0003, fetchAccountList);
+}));
+exports.deleteAccount = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, validations_1.default)(validation.accountIdValidator, req.params);
+    const { accountId } = req.params;
+    const fetchAccount = yield db_1.default.adminAccount.findFirst({
+        where: {
+            adminAccountId: +accountId,
+        },
+    });
+    if (!fetchAccount)
+        throw new AppError_1.default(adminAccount_1.AD_ACCOUNT_E_0001);
+    yield db_1.default.adminAccount.update({
+        where: {
+            adminAccountId: +accountId,
+        },
+        data: {
+            isDelete: true,
+        },
+    });
+    return (0, responseHandler_1.default)(res, adminAccount_1.AD_ACCOUNT_S_0005);
 }));

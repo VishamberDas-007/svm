@@ -18,7 +18,6 @@ const fetchCustomerDetails = (customerId) => __awaiter(void 0, void 0, void 0, f
     const customerDetails = yield db_1.default.customer.findFirst({
         where: {
             customerId,
-            isDelete: false,
         },
     });
     return customerDetails;

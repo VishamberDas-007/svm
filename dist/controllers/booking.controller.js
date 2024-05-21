@@ -42,7 +42,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteBooking = exports.updateBooking = exports.getBooking = exports.getAllBookings = exports.createBooking = void 0;
+exports.updatePenalty = exports.addPenalty = exports.deleteBooking = exports.updateBooking = exports.getBooking = exports.getAllBookings = exports.createBooking = void 0;
 const db_1 = __importDefault(require("../db"));
 const catchAsync_1 = __importDefault(require("../utils/catchAsync"));
 const responseHandler_1 = __importDefault(require("../utils/responseHandler"));
@@ -54,7 +54,7 @@ const AppError_1 = __importDefault(require("../utils/AppError"));
 const booking_service_1 = require("../services/booking.service");
 exports.createBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, validations_1.default)(validation.createBookingValidator, req.body);
-    const { adminAccountId, area, customerIds, installmentAmt, installmentCount, paidAmt, paymentStatus, paymentType, plotNo, projectId, remainAmt, installmentDate, totalAmt, accountNo, bankName, chequeNo, upiId, referralId, } = req.body;
+    const { adminAccountId, area, customerIds, installmentAmt, installmentCount, paidAmt, paymentStatus, paymentType, plotNo, projectId, remainAmt, installmentDate, totalAmt, accountNo, bankName, chequeNo, upiId, referralId, reminderDate, dastavejAmt, } = req.body;
     const projectData = yield db_1.default.project.findFirst({
         where: {
             projectId,
@@ -76,8 +76,10 @@ exports.createBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
                 plotNo,
                 area: +area,
                 totalAmt: +totalAmt,
+                dastavejAmt,
                 installmentDate,
                 paidAmt: +paidAmt,
+                reminderDate,
                 remainAmt: +remainAmt,
                 installmentAmt: +installmentAmt,
                 paymentType,
@@ -157,10 +159,10 @@ exports.createBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
 }));
 exports.getAllBookings = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, e_1, _b, _c;
-    var _d;
+    var _d, _e;
     const { page = 1, pageSize = 20, searchString, paymentStatus, paymentType, projectIds, } = req.query;
     const result = [];
-    let whereClause = {};
+    let whereClause = {}, totalAmt = 0, paidAmt = 0;
     if (searchString) {
         whereClause = {
             OR: [
@@ -220,11 +222,12 @@ exports.getAllBookings = (0, catchAsync_1.default)((req, res) => __awaiter(void 
     bookingList = yield db_1.default.booking.findMany({
         take: +pageSize,
         skip,
-        where: Object.assign(Object.assign({}, whereClause), { isDelete: false }),
+        where: Object.assign({}, whereClause),
         include: {
             project: true,
             customer: true,
             adminAccount: true,
+            installment: true,
         },
         // TODO: pass where clause in the below query
         // where:,
@@ -237,47 +240,42 @@ exports.getAllBookings = (0, catchAsync_1.default)((req, res) => __awaiter(void 
         where: whereClause,
     });
     try {
-        for (var _e = true, bookingList_1 = __asyncValues(bookingList), bookingList_1_1; bookingList_1_1 = yield bookingList_1.next(), _a = bookingList_1_1.done, !_a;) {
+        for (var _f = true, bookingList_1 = __asyncValues(bookingList), bookingList_1_1; bookingList_1_1 = yield bookingList_1.next(), _a = bookingList_1_1.done, !_a;) {
             _c = bookingList_1_1.value;
-            _e = false;
+            _f = false;
             try {
                 const booking = _c;
-                let paymentDetails;
-                if (booking.paymentType === 'BANK_TRANSFER')
-                    paymentDetails = yield db_1.default.bankPayment.findFirst({
-                        where: {
-                            bookingId: booking.bookingId,
-                        },
-                    });
-                else if (booking.paymentType === 'CASH')
-                    paymentDetails = yield db_1.default.cashPayment.findFirst({
-                        where: {
-                            bookingId: booking.bookingId,
-                        },
-                    });
-                else if (booking.paymentType === 'UPI')
-                    paymentDetails = yield db_1.default.upiPayment.findFirst({
-                        where: {
-                            bookingId: booking.bookingId,
-                        },
-                    });
-                else if (booking.paymentType === 'CHEQUE')
-                    paymentDetails = yield db_1.default.chequePayment.findFirst({
-                        where: {
-                            bookingId: booking.bookingId,
-                        },
-                    });
-                result.push(Object.assign(Object.assign(Object.assign(Object.assign({}, booking), { projectName: booking.project.name, customerName: booking.customer.map((customer) => customer.name), adminBankName: ((_d = booking.adminAccount) === null || _d === void 0 ? void 0 : _d.bankName) || null }), paymentDetails), { adminAccount: undefined, project: undefined, customer: undefined, amount: undefined }));
+                totalAmt = booking.totalAmt;
+                paidAmt =
+                    booking.paidAmt +
+                        (((_d = booking.installment) === null || _d === void 0 ? void 0 : _d.reduce((prev, curr) => {
+                            return curr.isDelete ? prev : prev + curr.amount;
+                        }, 0)) || 0);
+                result.push({
+                    bookingId: booking.bookingId,
+                    area: booking.area,
+                    projectName: booking.project.name,
+                    customerName: booking.customer.map((customer) => customer.name),
+                    adminBankName: ((_e = booking.adminAccount) === null || _e === void 0 ? void 0 : _e.bankName) || null,
+                    totalAmt,
+                    paidAmt,
+                    remainAmt: booking.remainAmt,
+                    installment: undefined,
+                    adminAccount: undefined,
+                    project: undefined,
+                    customer: undefined,
+                    amount: undefined,
+                });
             }
             finally {
-                _e = true;
+                _f = true;
             }
         }
     }
     catch (e_1_1) { e_1 = { error: e_1_1 }; }
     finally {
         try {
-            if (!_e && !_a && (_b = bookingList_1.return)) yield _b.call(bookingList_1);
+            if (!_f && !_a && (_b = bookingList_1.return)) yield _b.call(bookingList_1);
         }
         finally { if (e_1) throw e_1.error; }
     }
@@ -293,13 +291,12 @@ exports.getAllBookings = (0, catchAsync_1.default)((req, res) => __awaiter(void 
     return (0, responseHandler_1.default)(res, booking_1.BOOKING_S_0002, response);
 }));
 exports.getBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _f;
+    var _g;
     yield (0, validations_1.default)(validation.bookingIdValidator, req.params);
     const bookingId = req.params.bookingId;
     const fetchBooking = yield db_1.default.booking.findFirst({
         where: {
             bookingId,
-            isDelete: false,
         },
         include: {
             adminAccount: true,
@@ -351,7 +348,7 @@ exports.getBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
         state: obj.state,
         city: obj.city,
     }));
-    return (0, responseHandler_1.default)(res, booking_1.BOOKING_S_0003, Object.assign(Object.assign(Object.assign(Object.assign({}, fetchBooking), { adminBankName: ((_f = fetchBooking.adminAccount) === null || _f === void 0 ? void 0 : _f.bankName) || null, customer: formatCustomerData }), paymentDetails), { project: {
+    return (0, responseHandler_1.default)(res, booking_1.BOOKING_S_0003, Object.assign(Object.assign(Object.assign(Object.assign({}, fetchBooking), { adminBankName: ((_g = fetchBooking.adminAccount) === null || _g === void 0 ? void 0 : _g.bankName) || null, customer: formatCustomerData }), paymentDetails), { project: {
             name: fetchBooking.project.name,
             description: fetchBooking.project.description,
             logo: fetchBooking.project.logoUrl,
@@ -363,14 +360,13 @@ exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
     yield (0, validations_1.default)(validation.bookingIdValidator, req.params);
     yield (0, validations_1.default)(validation.updateBookingValidator, req.body);
     const { bookingId } = req.params;
-    const { adminAccountId, area, customerIds, installmentAmt, installmentCount, paymentStatus, paymentType, projectId, plotNo, remainAmt, totalAmt, accountNo, bankName, chequeNo, installmentDate, upiId, paymentId, referralId, } = req.body;
+    const { adminAccountId, area, customerIds, installmentAmt, installmentCount, paymentStatus, paymentType, projectId, plotNo, dastavejAmt, remainAmt, totalAmt, accountNo, bankName, chequeNo, installmentDate, upiId, reminderDate, paymentId, referralId, } = req.body;
     let { paidAmt } = req.body;
     paidAmt = !isNaN(+paidAmt) ? +paidAmt : undefined;
     let updatedBookingDetails;
     const bookingExists = yield db_1.default.booking.findFirst({
         where: {
             bookingId,
-            isDelete: false,
         },
         include: {
             customer: true,
@@ -507,7 +503,8 @@ exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
                 where: {
                     bookingId,
                 },
-                data: Object.assign({ adminAccountId, area: +area, customer: {
+                data: Object.assign({ adminAccountId, area: +area, reminderDate,
+                    dastavejAmt, customer: {
                         connect: customerIds.map((customerId) => ({
                             customerId,
                         })),
@@ -566,18 +563,46 @@ exports.deleteBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
     const bookingData = yield db_1.default.booking.findFirst({
         where: {
             bookingId,
-            isDelete: false,
         },
     });
     if (!bookingData)
         throw new AppError_1.default(booking_1.BOOKING_E_0001);
-    yield db_1.default.booking.update({
+    yield db_1.default.booking.delete({
         where: {
             bookingId,
         },
-        data: {
-            isDelete: true,
-        },
     });
     return (0, responseHandler_1.default)(res, booking_1.BOOKING_S_0005);
+}));
+exports.addPenalty = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, validations_1.default)(validation.addPenaltyValidator, req.body);
+    const { amount, bookingId, description, isComplete } = req.body;
+    const penaltyData = yield db_1.default.bookingPenalty.create({
+        data: {
+            amount,
+            description,
+            bookingId,
+            isComplete,
+        },
+    });
+    return (0, responseHandler_1.default)(res, booking_1.BOOKING_S_0006, penaltyData);
+}));
+exports.updatePenalty = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, validations_1.default)(validation.updatePenaltyValidator, req.body);
+    yield (0, validations_1.default)(validation.penaltyIdValidator, req.params);
+    const { penaltyId } = req.params;
+    const { amount, description, isComplete } = req.body;
+    const penaltyData = yield db_1.default.bookingPenalty.update({
+        where: {
+            penaltyId,
+        },
+        data: {
+            amount,
+            description,
+            isComplete,
+        },
+    });
+    if (!penaltyData)
+        throw new AppError_1.default(booking_1.BOOKING_E_0004);
+    return (0, responseHandler_1.default)(res, booking_1.BOOKING_S_0007, penaltyData);
 }));

@@ -29,6 +29,7 @@ import validator from '../validations'
 import * as validation from '../validations/installment.validator'
 import * as generalValidation from '../validations/_general.validator'
 import { TListData } from '../types/global.types'
+import util from '../utils/helper'
 // import { TRedisData } from './types/booking'
 // import { getValueInRedis, setValueInRedis } from '../redis/config'
 
@@ -153,6 +154,35 @@ export const createInstallment = catchAsync(
     }
 )
 
+export const fetchCurrentMonthInstallmentList = catchAsync(
+    async (req: Request, res: Response) => {
+        const bookingList = await prisma.booking.findMany({
+            where: {
+                paymentStatus: {
+                    notIn: ['CANCEL', 'COMPLETED'],
+                },
+            },
+            include: {
+                customer: true,
+            },
+        })
+
+        const currMonthTotalDays = util.currMonthDays()
+
+        // conditions
+        // if the month date is less than 31 then need to include 31 too and vice versa
+
+        // await prisma.$transaction(async (prisma) => {})
+
+        // get current date
+        // fetch the booking list conditionally on status and date
+        // filter the booking list as per the current month
+        // append the list data into a db
+        // send the list by fetching it from db by formatting the data
+        // send the message in bulk manner to all the clients
+    }
+)
+
 export const fetchInstallmentDetails = catchAsync(
     async (req: Request, res: Response) => {
         await validator(validation.installmentIdValidator, req.params)
@@ -160,7 +190,7 @@ export const fetchInstallmentDetails = catchAsync(
         const { installmentId } = req.params
 
         const getInstallmentDetails = await prisma.installment.findFirst({
-            where: { installmentId, isDelete: false },
+            where: { installmentId },
             include: {
                 bankPayment: true,
                 cashPayment: true,
@@ -212,7 +242,7 @@ export const updateInstallmentDetails = catchAsync(
         let paymentId: string | undefined, updateInstallment
 
         const installmentDetailExists = await prisma.installment.findFirst({
-            where: { installmentId, isDelete: false },
+            where: { installmentId },
             include: {
                 bankPayment: true,
                 cashPayment: true,
@@ -330,7 +360,6 @@ export const fetchBookingInstallmentDetails = catchAsync(
         const bookingDetails = await prisma.booking.findFirst({
             where: {
                 bookingId,
-                isDelete: false,
             },
             include: {
                 customer: true,
@@ -366,18 +395,14 @@ export const deleteInstallment = catchAsync(
         const installmentDetails = await prisma.installment.findFirst({
             where: {
                 installmentId,
-                isDelete: false,
             },
         })
 
         if (!installmentDetails) throw new AppError(INSTALLMENT_E_0001)
 
-        await prisma.installment.update({
+        await prisma.installment.delete({
             where: {
                 installmentId,
-            },
-            data: {
-                isDelete: true,
             },
         })
 
@@ -391,10 +416,6 @@ export const installmentList = catchAsync(
         let totalCount = 0,
             totalQueryCount = 0,
             whereClause = {}
-
-        whereClause = {
-            isDelete: false,
-        }
 
         if (bookingId) {
             whereClause = {

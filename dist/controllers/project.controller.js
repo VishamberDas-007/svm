@@ -125,7 +125,7 @@ exports.getAllProjects = (0, catchAsync_1.default)((req, res) => __awaiter(void 
     projectList = yield db_1.default.project.findMany({
         take: +pageSize,
         skip: skip,
-        where: Object.assign(Object.assign({}, whereClause), { isDelete: false }),
+        where: whereClause,
         orderBy: {
             createdAt: 'desc',
         },
@@ -154,7 +154,6 @@ exports.updateProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
     const projectData = yield db_1.default.project.findFirst({
         where: {
             projectId,
-            isDelete: false,
         },
     });
     if (!projectData)
@@ -187,7 +186,6 @@ exports.getProjectDetails = (0, catchAsync_1.default)((req, res) => __awaiter(vo
     const fetchProject = yield db_1.default.project.findFirst({
         where: {
             projectId,
-            isDelete: false,
         },
     });
     if (!fetchProject)
@@ -202,7 +200,6 @@ exports.getProjectImages = (0, catchAsync_1.default)((req, res) => __awaiter(voi
     const fetchProject = yield db_1.default.project.findFirst({
         where: {
             projectId,
-            isDelete: false,
         },
         include: {
             projectImages: true,
@@ -234,9 +231,6 @@ exports.getProjectImages = (0, catchAsync_1.default)((req, res) => __awaiter(voi
 }));
 exports.getProjectBasicList = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const fetchProjects = yield db_1.default.project.findMany({
-        where: {
-            isDelete: false,
-        },
         select: {
             projectId: true,
             name: true,
@@ -267,7 +261,7 @@ exports.uploadLogoImage = (0, catchAsync_1.default)((req, res) => __awaiter(void
     // const fileName = req.file.originalName
     const projectData = yield db_1.default.project.findFirst({
         where: {
-            isDelete: false,
+            projectId,
         },
     });
     if (!projectData)

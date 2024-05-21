@@ -60,6 +60,14 @@ const accessToken = (userDetails, expiresIn = null) => jsonwebtoken_1.default.si
 const refreshToken = (userDetails, expiresIn) => jsonwebtoken_1.default.sign(userDetails, const_1.jwtRefreshToken.SECRET_KEY, {
     expiresIn: expiresIn || const_1.jwtRefreshToken.EXPIRE,
 });
+function daysInMonth(month, year) {
+    return new Date(year, month, 0).getDate();
+}
+const currMonthDays = () => {
+    const today = new Date();
+    const month = today.getMonth();
+    return daysInMonth(month + 1, today.getFullYear());
+};
 exports.default = {
     otpGenerator,
     emailValidator,
@@ -74,4 +82,5 @@ exports.default = {
     passwordGenerator,
     accessToken,
     refreshToken,
+    currMonthDays,
 };
