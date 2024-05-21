@@ -314,6 +314,7 @@ export const getAllBookings = catchAsync(
                 }, 0) || 0)
 
             result.push({
+                bookingId: booking.bookingId,
                 area: booking.area,
                 projectName: booking.project.name,
                 customerName: booking.customer.map((customer) => customer.name),
