@@ -73,5 +73,8 @@ prisma
     .catch((err: any) => {
         console.log(err)
     })
+    .finally(async () => {
+        await prisma.$disconnect()
+    })
 
 export default prisma
