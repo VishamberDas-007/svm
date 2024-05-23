@@ -23,6 +23,7 @@ import {
     BOOKING_S_0005,
     BOOKING_S_0006,
     BOOKING_S_0007,
+    BOOKING_S_0008,
 } from '../config/responseCodes/booking'
 import AppError from '../utils/AppError'
 import {
@@ -39,6 +40,7 @@ import {
 import { TListData } from '../types/global.types'
 // import { getValueInRedis, setValueInRedis } from '../redis/config'
 import { checkIfProjectAreaExists } from '../services/booking.service'
+import { bookingIdValidator } from '../validations/_general.validator'
 
 export const createBooking = catchAsync(async (req: Request, res: Response) => {
     await validator(validation.createBookingValidator, req.body)
@@ -729,3 +731,19 @@ export const updatePenalty = catchAsync(async (req: Request, res: Response) => {
 
     return responseHandler(res, BOOKING_S_0007, penaltyData)
 })
+
+export const getPenaltyList = catchAsync(
+    async (req: Request, res: Response) => {
+        await validator(bookingIdValidator, req.params)
+
+        const { bookingId } = req.params
+
+        const list = await prisma.bookingPenalty.findMany({
+            where: {
+                bookingId,
+            },
+        })
+
+        return responseHandler(res, BOOKING_S_0008, list)
+    }
+)

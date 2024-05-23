@@ -42,7 +42,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updatePenalty = exports.addPenalty = exports.deleteBooking = exports.updateBooking = exports.getBooking = exports.getAllBookings = exports.createBooking = void 0;
+exports.getPenaltyList = exports.updatePenalty = exports.addPenalty = exports.deleteBooking = exports.updateBooking = exports.getBooking = exports.getAllBookings = exports.createBooking = void 0;
 const db_1 = __importDefault(require("../db"));
 const catchAsync_1 = __importDefault(require("../utils/catchAsync"));
 const responseHandler_1 = __importDefault(require("../utils/responseHandler"));
@@ -52,6 +52,7 @@ const booking_1 = require("../config/responseCodes/booking");
 const AppError_1 = __importDefault(require("../utils/AppError"));
 // import { getValueInRedis, setValueInRedis } from '../redis/config'
 const booking_service_1 = require("../services/booking.service");
+const _general_validator_1 = require("../validations/_general.validator");
 exports.createBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, validations_1.default)(validation.createBookingValidator, req.body);
     const { adminAccountId, area, customerIds, installmentAmt, installmentCount, paidAmt, paymentStatus, paymentType, plotNo, projectId, remainAmt, installmentDate, totalAmt, accountNo, bankName, chequeNo, upiId, referralId, reminderDate, dastavejAmt, } = req.body;
@@ -605,4 +606,14 @@ exports.updatePenalty = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
     if (!penaltyData)
         throw new AppError_1.default(booking_1.BOOKING_E_0004);
     return (0, responseHandler_1.default)(res, booking_1.BOOKING_S_0007, penaltyData);
+}));
+exports.getPenaltyList = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, validations_1.default)(_general_validator_1.bookingIdValidator, req.params);
+    const { bookingId } = req.params;
+    const list = yield db_1.default.bookingPenalty.findMany({
+        where: {
+            bookingId,
+        },
+    });
+    return (0, responseHandler_1.default)(res, booking_1.BOOKING_S_0008, list);
 }));

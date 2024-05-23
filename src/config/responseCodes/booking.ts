@@ -87,3 +87,11 @@ export const BOOKING_S_0007: TResponseCode = {
     message: 'Penalty updated successfully',
     statusCode: 200,
 }
+
+export const BOOKING_S_0008: TResponseCode = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'BOOKING_S_0008',
+    isNotify: true,
+    message: 'Penalty list fetched successfully',
+    statusCode: 200,
+}
