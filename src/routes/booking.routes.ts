@@ -20,4 +20,6 @@ bookingRouter.patch(
     bookingController.updatePenalty
 )
 
+bookingRouter.get('/penalty-list/:bookingId', bookingController.getPenaltyList)
+
 export { bookingRouter }

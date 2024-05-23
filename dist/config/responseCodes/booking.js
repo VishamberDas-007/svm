@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BOOKING_S_0007 = exports.BOOKING_S_0006 = exports.BOOKING_S_0005 = exports.BOOKING_S_0004 = exports.BOOKING_S_0003 = exports.BOOKING_S_0002 = exports.BOOKING_S_0001 = exports.BOOKING_E_0004 = exports.BOOKING_E_0003 = exports.BOOKING_E_0002 = exports.BOOKING_E_0001 = void 0;
+exports.BOOKING_S_0008 = exports.BOOKING_S_0007 = exports.BOOKING_S_0006 = exports.BOOKING_S_0005 = exports.BOOKING_S_0004 = exports.BOOKING_S_0003 = exports.BOOKING_S_0002 = exports.BOOKING_S_0001 = exports.BOOKING_E_0004 = exports.BOOKING_E_0003 = exports.BOOKING_E_0002 = exports.BOOKING_E_0001 = void 0;
 const global_types_1 = require("../../types/global.types");
 exports.BOOKING_E_0001 = {
     type: global_types_1.RESPONSE_TYPE.ERROR,
@@ -77,5 +77,12 @@ exports.BOOKING_S_0007 = {
     code: 'BOOKING_S_0007',
     isNotify: true,
     message: 'Penalty updated successfully',
+    statusCode: 200,
+};
+exports.BOOKING_S_0008 = {
+    type: global_types_1.RESPONSE_TYPE.SUCCESS,
+    code: 'BOOKING_S_0008',
+    isNotify: true,
+    message: 'Penalty list fetched successfully',
     statusCode: 200,
 };
