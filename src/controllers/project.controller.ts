@@ -189,11 +189,11 @@ export const updateProject = catchAsync(
             status,
             unit,
             address2,
-            downPayment,
-            emiAmt,
+            // downPayment,
+            // emiAmt,
             location,
-            totalAmt,
-        }: TUpdateProject = req.body
+        }: // totalAmt,
+        TUpdateProject = req.body
 
         const projectData = await prisma.project.findFirst({
             where: {
@@ -217,10 +217,10 @@ export const updateProject = catchAsync(
                 pincode,
                 status,
                 unit,
-                downPayment: +downPayment,
-                emiAmt: +emiAmt,
+                // downPayment: +downPayment,
+                // emiAmt: +emiAmt,
                 location,
-                totalAmt: +totalAmt,
+                // totalAmt: +totalAmt,
             },
         })
         return responseHandler(res, PROJECT_S_0004, updateProject)

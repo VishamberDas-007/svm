@@ -28,9 +28,9 @@ export const updateProjectValidator = Joi.object({
     status: Joi.valid(...projectStatus).optional(),
     unit: Joi.string().optional(),
     address2: Joi.string().allow(null, '').optional(),
-    emiAmt: Joi.number().optional(),
-    downPayment: Joi.number().optional(),
-    totalAmt: Joi.number().optional(),
+    // emiAmt: Joi.number().optional(),
+    // downPayment: Joi.number().optional(),
+    // totalAmt: Joi.number().optional(),
     location: Joi.string().optional(),
 })
 
