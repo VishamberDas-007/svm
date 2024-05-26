@@ -30,9 +30,9 @@ exports.updateProjectValidator = joi_1.default.object({
     status: joi_1.default.valid(...projectStatus).optional(),
     unit: joi_1.default.string().optional(),
     address2: joi_1.default.string().allow(null, '').optional(),
-    emiAmt: joi_1.default.number().optional(),
-    downPayment: joi_1.default.number().optional(),
-    totalAmt: joi_1.default.number().optional(),
+    // emiAmt: Joi.number().optional(),
+    // downPayment: Joi.number().optional(),
+    // totalAmt: Joi.number().optional(),
     location: joi_1.default.string().optional(),
 });
 exports.projectImageIdsValidator = joi_1.default.object({

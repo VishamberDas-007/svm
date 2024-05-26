@@ -150,7 +150,10 @@ exports.updateProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
     yield (0, validations_1.default)(generalValidation.projectIdValidator, req.params);
     yield (0, validations_1.default)(validation.updateProjectValidator, req.body);
     const { projectId } = req.params;
-    const { address1, area, name, description, ownerName, pincode, status, unit, address2, downPayment, emiAmt, location, totalAmt, } = req.body;
+    const { address1, area, name, description, ownerName, pincode, status, unit, address2, 
+    // downPayment,
+    // emiAmt,
+    location, } = req.body;
     const projectData = yield db_1.default.project.findFirst({
         where: {
             projectId,
@@ -172,10 +175,10 @@ exports.updateProject = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
             pincode,
             status,
             unit,
-            downPayment: +downPayment,
-            emiAmt: +emiAmt,
+            // downPayment: +downPayment,
+            // emiAmt: +emiAmt,
             location,
-            totalAmt: +totalAmt,
+            // totalAmt: +totalAmt,
         },
     });
     return (0, responseHandler_1.default)(res, project_1.PROJECT_S_0004, updateProject);
