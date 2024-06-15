@@ -48,31 +48,22 @@ export const newCustomer = catchAsync(
             address,
         }: TCustomer = req.body
 
-        const phoneExists = await prisma.customer.findFirst({
-            where: {
+        const createCustomer = await prisma.customer.create({
+            data: {
+                address,
+                city: city || '',
+                pincode: pincode || '',
+                state: state || '',
+                name,
                 phone1,
+                phone2,
+                dob,
+                isMarried,
+                email,
             },
         })
 
-        if (phoneExists) throw new AppError(CUSTOMER_E_0002)
-        else {
-            const createCustomer = await prisma.customer.create({
-                data: {
-                    address,
-                    city: city || '',
-                    pincode: pincode || '',
-                    state: state || '',
-                    name,
-                    phone1,
-                    phone2,
-                    dob,
-                    isMarried,
-                    email,
-                },
-            })
-
-            return responseHandler(res, CUSTOMER_S_0001, createCustomer)
-        }
+        return responseHandler(res, CUSTOMER_S_0001, createCustomer)
     }
 )
 
@@ -437,41 +428,28 @@ export const updateCustomer = catchAsync(
 
         if (!fetchCustomer) throw new AppError(CUSTOMER_E_0001)
         else {
-            const phoneExists = await prisma.customer.findFirst({
+            const updatedCustomer = await prisma.customer.update({
                 where: {
+                    customerId,
+                },
+                data: {
+                    address,
+                    city,
+                    name,
                     phone1,
-                    NOT: {
-                        customerId,
-                    },
+                    phone2,
+                    pincode,
+                    state,
+                    email,
+                    dob,
+                    isMarried,
+                },
+                include: {
+                    customerImage: true,
                 },
             })
 
-            if (phoneExists) {
-                throw new AppError(CUSTOMER_E_0002)
-            } else {
-                const updatedCustomer = await prisma.customer.update({
-                    where: {
-                        customerId,
-                    },
-                    data: {
-                        address,
-                        city,
-                        name,
-                        phone1,
-                        phone2,
-                        pincode,
-                        state,
-                        email,
-                        dob,
-                        isMarried,
-                    },
-                    include: {
-                        customerImage: true,
-                    },
-                })
-
-                return responseHandler(res, CUSTOMER_S_0004, updatedCustomer)
-            }
+            return responseHandler(res, CUSTOMER_S_0004, updatedCustomer)
         }
     }
 )
