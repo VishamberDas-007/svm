@@ -271,6 +271,14 @@ model MiscExpense {
     updatedAt     DateTime @updatedAt
 }
 
+model MonthlyExpense {
+    expenseId   String   @id @default(uuid())
+    expenseName String
+    cost        Int
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+}
+
 model Otp {
     otpId      Int      @id @default(autoincrement())
     email      String

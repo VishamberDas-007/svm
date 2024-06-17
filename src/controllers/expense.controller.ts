@@ -1,6 +1,10 @@
 import { Request, Response } from 'express'
 import catchAsync from '../utils/catchAsync'
-import { TCreateExpense, TUpdateExpense } from './types/expense'
+import {
+    TCreateExpense,
+    TMonthlyExpenseCreate,
+    TUpdateExpense,
+} from './types/expense'
 import prisma from '../db'
 import responseHandler from '../utils/responseHandler'
 import {
@@ -213,5 +217,109 @@ export const updateProjectExpense = catchAsync(
             nonAgricultural,
             planningAndLayout,
         })
+    }
+)
+
+export const createMonthlyExpense = catchAsync(
+    async (req: Request, res: Response) => {
+        await validator(validation.createMonthlyExpense, req.body)
+        const { data }: { data: TMonthlyExpenseCreate[] } = req.body
+
+        await prisma.monthlyExpense.createMany({
+            data: data.map((obj) => ({
+                cost: obj.cost,
+                expenseName: obj.expenseName,
+                createdAt: new Date(obj.createdAt),
+            })),
+            skipDuplicates: true,
+        })
+
+        return responseHandler(res, EXPENSE_S_0001)
+    }
+)
+
+export const updateMonthlyExpense = catchAsync(
+    async (req: Request, res: Response) => {
+        await validator(validation.updateMonthlyExpense, req.body)
+        await validator(validation.expenseIdValidator, req.params)
+
+        const { cost, createdAt, expenseName }: TMonthlyExpenseCreate = req.body
+        const { expenseId } = req.params
+
+        const expenseExists = await prisma.monthlyExpense.findFirst({
+            where: {
+                expenseId,
+            },
+        })
+
+        if (!expenseExists) throw new AppError(EXPENSE_E_0001)
+
+        const updatedExpense = await prisma.monthlyExpense.update({
+            where: {
+                expenseId,
+            },
+            data: {
+                cost,
+                createdAt: new Date(createdAt),
+                expenseName,
+            },
+        })
+
+        return responseHandler(res, EXPENSE_S_0001, updatedExpense)
+    }
+)
+
+export const getParticularMonthExpense = catchAsync(
+    async (req: Request, res: Response) => {
+        const { monthYear } = req.params
+        const monthYearArray = monthYear.split('-')
+
+        const lowerBound = new Date(
+            +monthYearArray[1],
+            +monthYearArray[0] - 1,
+            1
+        ).toISOString()
+
+        const upperBound = new Date(
+            +monthYearArray[0] === 12
+                ? +monthYearArray[1] + 1
+                : +monthYearArray[1],
+            +monthYearArray[0] === 12 ? 0 : +monthYearArray[0],
+            1
+        ).toISOString()
+
+        const expenseData = await prisma.monthlyExpense.findMany({
+            where: {
+                createdAt: {
+                    gte: lowerBound,
+                    lt: upperBound,
+                },
+            },
+        })
+
+        return responseHandler(res, EXPENSE_S_0002, expenseData)
+    }
+)
+
+export const getAllMonthlyExpense = catchAsync(
+    async (req: Request, res: Response) => {
+        const expenseList = await prisma.monthlyExpense.findMany()
+
+        const result = expenseList.reduce((prev: any, curr) => {
+            const monthYear =
+                curr.createdAt.getMonth() + '-' + curr.createdAt.getFullYear()
+
+            if (!prev[monthYear])
+                return {
+                    ...prev,
+                    [monthYear]: curr.cost,
+                }
+            else {
+                prev[monthYear] += curr.cost
+                return prev
+            }
+        }, {})
+
+        return responseHandler(res, EXPENSE_S_0003, result)
     }
 )

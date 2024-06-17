@@ -1,5 +1,9 @@
 import Joi from 'joi'
-import { TCreateExpense, TUpdateExpense } from '../controllers/types/expense'
+import {
+    TCreateExpense,
+    TMonthlyExpenseCreate,
+    TUpdateExpense,
+} from '../controllers/types/expense'
 
 export const createExpenseValidator = Joi.object<TCreateExpense>({
     brokerage: Joi.number().required(),
@@ -35,4 +39,20 @@ export const updateExpenseValidator = Joi.object<TUpdateExpense>({
             cost: Joi.number().required(),
         })
         .optional(),
+})
+
+export const createMonthlyExpense = Joi.object<{ data: TMonthlyExpenseCreate }>(
+    {
+        data: Joi.array().items({
+            cost: Joi.number().required(),
+            expenseName: Joi.string().required(),
+            createdAt: Joi.date().required(),
+        }),
+    }
+)
+
+export const updateMonthlyExpense = Joi.object<TMonthlyExpenseCreate>({
+    cost: Joi.number().required(),
+    expenseName: Joi.string().required(),
+    createdAt: Joi.date().required(),
 })
