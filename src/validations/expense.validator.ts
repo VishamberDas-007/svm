@@ -56,3 +56,9 @@ export const updateMonthlyExpense = Joi.object<TMonthlyExpenseCreate>({
     expenseName: Joi.string().required(),
     createdAt: Joi.date().required(),
 })
+
+export const monthYearValidator = Joi.object({
+    monthYear: Joi.string()
+        .regex(/[0-9]{1,2}-[0-9]{4}/i)
+        .required(),
+})

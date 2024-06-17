@@ -271,6 +271,7 @@ export const updateMonthlyExpense = catchAsync(
 
 export const getParticularMonthExpense = catchAsync(
     async (req: Request, res: Response) => {
+        await validator(validation.monthYearValidator, req.params)
         const { monthYear } = req.params
         const monthYearArray = monthYear.split('-')
 
