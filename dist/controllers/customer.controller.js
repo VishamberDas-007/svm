@@ -47,30 +47,21 @@ const s3_1 = require("../aws/s3");
 exports.newCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, validations_1.default)(validation.createCustomerValidator, req.body);
     const { name, email, phone1, phone2, city, pincode, isMarried, dob, state, address, } = req.body;
-    const phoneExists = yield db_1.default.customer.findFirst({
-        where: {
+    const createCustomer = yield db_1.default.customer.create({
+        data: {
+            address,
+            city: city || '',
+            pincode: pincode || '',
+            state: state || '',
+            name,
             phone1,
+            phone2,
+            dob,
+            isMarried,
+            email,
         },
     });
-    if (phoneExists)
-        throw new AppError_1.default(customer_1.CUSTOMER_E_0002);
-    else {
-        const createCustomer = yield db_1.default.customer.create({
-            data: {
-                address,
-                city: city || '',
-                pincode: pincode || '',
-                state: state || '',
-                name,
-                phone1,
-                phone2,
-                dob,
-                isMarried,
-                email,
-            },
-        });
-        return (0, responseHandler_1.default)(res, customer_1.CUSTOMER_S_0001, createCustomer);
-    }
+    return (0, responseHandler_1.default)(res, customer_1.CUSTOMER_S_0001, createCustomer);
 }));
 exports.uploadPanImage = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
@@ -347,40 +338,27 @@ exports.updateCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 
     if (!fetchCustomer)
         throw new AppError_1.default(customer_1.CUSTOMER_E_0001);
     else {
-        const phoneExists = yield db_1.default.customer.findFirst({
+        const updatedCustomer = yield db_1.default.customer.update({
             where: {
+                customerId,
+            },
+            data: {
+                address,
+                city,
+                name,
                 phone1,
-                NOT: {
-                    customerId,
-                },
+                phone2,
+                pincode,
+                state,
+                email,
+                dob,
+                isMarried,
+            },
+            include: {
+                customerImage: true,
             },
         });
-        if (phoneExists) {
-            throw new AppError_1.default(customer_1.CUSTOMER_E_0002);
-        }
-        else {
-            const updatedCustomer = yield db_1.default.customer.update({
-                where: {
-                    customerId,
-                },
-                data: {
-                    address,
-                    city,
-                    name,
-                    phone1,
-                    phone2,
-                    pincode,
-                    state,
-                    email,
-                    dob,
-                    isMarried,
-                },
-                include: {
-                    customerImage: true,
-                },
-            });
-            return (0, responseHandler_1.default)(res, customer_1.CUSTOMER_S_0004, updatedCustomer);
-        }
+        return (0, responseHandler_1.default)(res, customer_1.CUSTOMER_S_0004, updatedCustomer);
     }
 }));
 exports.deleteCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
