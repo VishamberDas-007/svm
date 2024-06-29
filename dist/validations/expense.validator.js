@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateExpenseValidator = exports.expenseIdValidator = exports.createExpenseValidator = void 0;
+exports.monthYearValidator = exports.updateMonthlyExpense = exports.createMonthlyExpense = exports.updateExpenseValidator = exports.expenseIdValidator = exports.createExpenseValidator = void 0;
 const joi_1 = __importDefault(require("joi"));
 exports.createExpenseValidator = joi_1.default.object({
     brokerage: joi_1.default.number().required(),
@@ -37,4 +37,21 @@ exports.updateExpenseValidator = joi_1.default.object({
         cost: joi_1.default.number().required(),
     })
         .optional(),
+});
+exports.createMonthlyExpense = joi_1.default.object({
+    data: joi_1.default.array().items({
+        cost: joi_1.default.number().required(),
+        expenseName: joi_1.default.string().required(),
+        createdAt: joi_1.default.date().required(),
+    }),
+});
+exports.updateMonthlyExpense = joi_1.default.object({
+    cost: joi_1.default.number().required(),
+    expenseName: joi_1.default.string().required(),
+    createdAt: joi_1.default.date().required(),
+});
+exports.monthYearValidator = joi_1.default.object({
+    monthYear: joi_1.default.string()
+        .regex(/[0-9]{1,2}-[0-9]{4}/i)
+        .required(),
 });
