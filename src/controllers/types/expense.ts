@@ -29,3 +29,9 @@ export type TUpdateExpense = {
           }[]
         | []
 }
+
+export type TMonthlyExpenseCreate = {
+    cost: number
+    expenseName: string
+    createdAt: string
+}

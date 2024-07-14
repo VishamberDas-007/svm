@@ -1,0 +1,7 @@
+model MonthlyExpense {
+    expenseId   String   @id @default(uuid())
+    expenseName String
+    cost        Int
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+}

@@ -29,22 +29,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.installmentRouter = void 0;
 const express_1 = __importDefault(require("express"));
 const installmentController = __importStar(require("../controllers/installment.controller"));
+const auth_middleware_1 = require("../middlewares/auth.middleware");
 const installmentRouter = express_1.default.Router();
 exports.installmentRouter = installmentRouter;
-installmentRouter.post('/create', 
-// authMiddleware(['INSTALLMENT_WRITE']),
-installmentController.createInstallment);
-installmentRouter.post('/fetch-current-month/installment-list', 
-// authMiddleware(['INSTALLMENT_WRITE']),
-installmentController.fetchCurrentMonthInstallmentList);
-installmentRouter.get('/get/:installmentId', 
-// authMiddleware(['INSTALLMENT_WRITE', 'INSTALLMENT_READ']),
-installmentController.fetchInstallmentDetails);
-installmentRouter.get('/get/booking/installment-details/:bookingId', 
-// authMiddleware(['INSTALLMENT_WRITE', 'INSTALLMENT_READ']),
-installmentController.fetchBookingInstallmentDetails);
-installmentRouter.put('/update/:installmentId', 
-// authMiddleware(['INSTALLMENT_WRITE']),
-installmentController.updateInstallmentDetails);
-installmentRouter.delete('/delete/:installmentId', installmentController.deleteInstallment);
-installmentRouter.get('/list', installmentController.installmentList);
+installmentRouter.post('/create', (0, auth_middleware_1.authMiddleware)(['INSTALLMENT_WRITE']), installmentController.createInstallment);
+installmentRouter.post('/fetch-current-month/installment-list', (0, auth_middleware_1.authMiddleware)(['INSTALLMENT_WRITE']), installmentController.fetchCurrentMonthInstallmentList);
+installmentRouter.get('/get/:installmentId', (0, auth_middleware_1.authMiddleware)(['INSTALLMENT_WRITE', 'INSTALLMENT_READ']), installmentController.fetchInstallmentDetails);
+installmentRouter.get('/get/booking/installment-details/:bookingId', (0, auth_middleware_1.authMiddleware)(['INSTALLMENT_WRITE', 'INSTALLMENT_READ']), installmentController.fetchBookingInstallmentDetails);
+installmentRouter.put('/update/:installmentId', (0, auth_middleware_1.authMiddleware)(['INSTALLMENT_WRITE']), installmentController.updateInstallmentDetails);
+installmentRouter.delete('/delete/:installmentId', (0, auth_middleware_1.authMiddleware)(['INSTALLMENT_WRITE']), installmentController.deleteInstallment);
+installmentRouter.get('/list', (0, auth_middleware_1.authMiddleware)(['INSTALLMENT_READ', 'INSTALLMENT_WRITE']), installmentController.installmentList);
