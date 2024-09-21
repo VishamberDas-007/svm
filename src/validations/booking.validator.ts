@@ -36,7 +36,7 @@ export const createBookingValidator = Joi.object<TBooking>({
         otherwise: Joi.allow('', null).optional(),
     }),
     bankName: Joi.string().when('paymentType', {
-        is: 'BANK_TRANSFER' || 'CHEQUE',
+        is: Joi.valid('BANK_TRANSFER', 'CHEQUE'),
         then: Joi.required(),
         otherwise: Joi.allow('', null).optional(),
     }),
@@ -83,7 +83,7 @@ export const updateBookingValidator = Joi.object<TBookingUpdate>({
         otherwise: Joi.allow('', null).optional(),
     }),
     bankName: Joi.string().when('paymentType', {
-        is: 'BANK_TRANSFER' || 'CHEQUE',
+        is: Joi.valid('BANK_TRANSFER', 'CHEQUE'),
         then: Joi.required(),
         otherwise: Joi.allow('', null).optional(),
     }),
@@ -119,4 +119,8 @@ export const updatePenaltyValidator = Joi.object<TPenalty>({
 
 export const penaltyIdValidator = Joi.object({
     penaltyId: util.uuid.required(),
+})
+
+export const bookingCancelValidator = Joi.object({
+    refundAmt: Joi.number().required(),
 })

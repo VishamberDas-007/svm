@@ -24,6 +24,7 @@ import {
     BOOKING_S_0006,
     BOOKING_S_0007,
     BOOKING_S_0008,
+    BOOKING_S_0009,
 } from '../config/responseCodes/booking'
 import AppError from '../utils/AppError'
 import {
@@ -323,6 +324,7 @@ export const getAllBookings = catchAsync(
                 adminBankName: booking.adminAccount?.bankName || null,
                 totalAmt,
                 paidAmt,
+                status: booking.paymentStatus,
                 remainAmt: booking.remainAmt,
                 installment: undefined,
                 adminAccount: undefined,
@@ -493,94 +495,93 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
         }
 
         let paymentDetails = {}
-        await prisma.$transaction(async (prisma) => {
-            if (paymentType === bookingExists.paymentType) {
-                if (paymentType === 'BANK_TRANSFER') {
-                    paymentDetails = {
-                        bankPayment: {
-                            update: {
-                                where: {
-                                    paymentId,
-                                },
-                                data: {
-                                    accountNumber: accountNo,
-                                    amount: paidAmt,
-                                    bankName,
-                                },
+        if (paymentType === bookingExists.paymentType) {
+            if (paymentType === 'BANK_TRANSFER') {
+                paymentDetails = {
+                    bankPayment: {
+                        update: {
+                            where: {
+                                paymentId,
+                            },
+                            data: {
+                                accountNumber: accountNo,
+                                amount: paidAmt,
+                                bankName,
                             },
                         },
-                    }
-                } else if (paymentType === 'CASH') {
-                    paymentDetails = {
-                        cashPayment: {
-                            update: {
-                                where: { paymentId },
-                                data: { amount: paidAmt },
+                    },
+                }
+            } else if (paymentType === 'CASH') {
+                paymentDetails = {
+                    cashPayment: {
+                        update: {
+                            where: { paymentId },
+                            data: { amount: paidAmt },
+                        },
+                    },
+                }
+            } else if (paymentType === 'CHEQUE') {
+                paymentDetails = {
+                    chequePayment: {
+                        update: {
+                            where: {
+                                paymentId,
+                            },
+                            data: {
+                                amount: paidAmt,
+                                bankName,
+                                chequeNumber: chequeNo,
                             },
                         },
-                    }
-                } else if (paymentType === 'CHEQUE') {
-                    paymentDetails = {
-                        chequePayment: {
-                            update: {
-                                where: {
-                                    paymentId,
-                                },
-                                data: {
-                                    amount: paidAmt,
-                                    bankName,
-                                    chequeNumber: chequeNo,
-                                },
-                            },
-                        },
-                    }
-                } else {
-                    paymentDetails = {
-                        where: {
-                            paymentId,
-                        },
-                        data: {
-                            amount: paidAmt,
-                            upiId,
-                        },
-                    }
+                    },
                 }
             } else {
-                if (bookingExists.paymentType === 'BANK_TRANSFER') {
-                    paymentDetails = {
-                        bankPayment: {
-                            delete: {
-                                paymentId,
-                            },
-                        },
-                    }
-                } else if (bookingExists.paymentType === 'CASH') {
-                    paymentDetails = {
-                        cashPayment: {
-                            delete: {
-                                paymentId,
-                            },
-                        },
-                    }
-                } else if (bookingExists.paymentType === 'CHEQUE') {
-                    paymentDetails = {
-                        chequePayment: {
-                            delete: {
-                                paymentId,
-                            },
-                        },
-                    }
-                } else {
-                    paymentDetails = {
-                        upiPayment: {
-                            delete: {
-                                paymentId,
-                            },
-                        },
-                    }
+                paymentDetails = {
+                    where: {
+                        paymentId,
+                    },
+                    data: {
+                        amount: paidAmt,
+                        upiId,
+                    },
                 }
             }
-
+        } else {
+            if (bookingExists.paymentType === 'BANK_TRANSFER') {
+                paymentDetails = {
+                    bankPayment: {
+                        delete: {
+                            paymentId,
+                        },
+                    },
+                }
+            } else if (bookingExists.paymentType === 'CASH') {
+                paymentDetails = {
+                    cashPayment: {
+                        delete: {
+                            paymentId,
+                        },
+                    },
+                }
+            } else if (bookingExists.paymentType === 'CHEQUE') {
+                paymentDetails = {
+                    chequePayment: {
+                        delete: {
+                            paymentId,
+                        },
+                    },
+                }
+            } else {
+                paymentDetails = {
+                    upiPayment: {
+                        delete: {
+                            paymentId,
+                        },
+                    },
+                }
+            }
+        }
+        await prisma.$transaction(async (prisma) => {
             if (customerIds.length) {
                 await prisma.booking.update({
                     where: {
@@ -667,6 +668,46 @@ export const updateBooking = catchAsync(async (req: Request, res: Response) => {
 
         return responseHandler(res, BOOKING_S_0004, updatedBookingDetails)
     }
+})
+
+export const cancelBooking = catchAsync(async (req: Request, res: Response) => {
+    await validator(bookingIdValidator, req.params)
+    await validator(validation.bookingCancelValidator, req.body)
+
+    const { bookingId } = req.params
+    const { refundAmt }: { refundAmt: number } = req.body
+    const bookingData = await prisma.booking.findFirst({
+        where: {
+            bookingId,
+        },
+        include: {
+            project: true,
+        },
+    })
+
+    if (!bookingData) throw new AppError(BOOKING_E_0001)
+
+    await prisma.$transaction(async (prisma) => {
+        await prisma.booking.update({
+            where: { bookingId },
+            data: {
+                paymentStatus: 'CANCEL',
+                refundAmt,
+            },
+        })
+
+        const totalArea = bookingData.area + bookingData.project.area
+        await prisma.project.update({
+            where: {
+                projectId: bookingData.projectId,
+            },
+            data: {
+                area: totalArea,
+            },
+        })
+    })
+
+    return responseHandler(res, BOOKING_S_0009)
 })
 
 export const deleteBooking = catchAsync(async (req: Request, res: Response) => {
