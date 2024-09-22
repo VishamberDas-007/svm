@@ -44,7 +44,7 @@ jobs:
       
           # Connect to the remote server and extract the archive
           echo "Start extraction process of compress files"
-          ssh -i ~/.ssh/next root@128.199.20.118 'cd ~/backend/svm-test/ && tar -xzf build.tar.gz && yarn prisma generate && pm2 restart ../ecosystem.config.js'
+          ssh -i ~/.ssh/next root@128.199.20.118 'cd ~/backend/svm-test/ && tar -xzf build.tar.gz && yarn prisma generate && pm2 start ../ecosystem.config.js'
       
           # Remove the compressed archive on the remote server
           echo "Start process to remove compressed file"
