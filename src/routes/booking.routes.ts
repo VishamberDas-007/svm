@@ -28,6 +28,12 @@ bookingRouter.put(
     bookingController.updateBooking
 )
 
+bookingRouter.patch(
+    '/cancel/:bookingId',
+    authMiddleware(['BOOKING_WRITE']),
+    bookingController.cancelBooking
+)
+
 bookingRouter.delete(
     '/delete/:bookingId',
     authMiddleware(['BOOKING_WRITE']),

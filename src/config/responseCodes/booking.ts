@@ -95,3 +95,11 @@ export const BOOKING_S_0008: TResponseCode = {
     message: 'Penalty list fetched successfully',
     statusCode: 200,
 }
+
+export const BOOKING_S_0009: TResponseCode = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'BOOKING_S_0009',
+    isNotify: true,
+    message: 'This booking has been cancelled successfully',
+    statusCode: 200,
+}
