@@ -25,6 +25,7 @@ import {
     BOOKING_S_0007,
     BOOKING_S_0008,
     BOOKING_S_0009,
+    BOOKING_S_0010,
 } from '../config/responseCodes/booking'
 import AppError from '../utils/AppError'
 import {
@@ -202,7 +203,7 @@ export const getAllBookings = catchAsync(
         } = req.query
 
         const result: any[] = []
-        let whereClause = {},
+        let whereClause: any = {},
             totalAmt = 0,
             paidAmt = 0
 
@@ -271,6 +272,16 @@ export const getAllBookings = catchAsync(
                     in: array,
                 },
             }
+        }
+
+        whereClause = {
+            ...whereClause,
+            paymentStatus: {
+                ...whereClause?.paymentStatus,
+                paymentStatus: {
+                    not: 'CANCEL',
+                },
+            },
         }
 
         const skip = (+page - 1) * +pageSize
@@ -345,6 +356,90 @@ export const getAllBookings = catchAsync(
         }
 
         return responseHandler(res, BOOKING_S_0002, response)
+    }
+)
+
+export const getAllCancelledBookings = catchAsync(
+    async (req: TBookingList, res: Response) => {
+        const {
+            page = 1,
+            pageSize = 20,
+            // searchString,
+            // paymentStatus,
+            // paymentType,
+            // projectIds,
+        } = req.query
+
+        let totalAmt = 0,
+            paidAmt = 0,
+            totalCount = 0,
+            totalQueryCount = 0
+
+        const skip = (+page - 1) * +pageSize
+
+        const list = await prisma.booking.findMany({
+            take: +pageSize,
+            skip,
+            where: {
+                paymentStatus: 'CANCEL',
+            },
+            include: {
+                project: true,
+                customer: true,
+                adminAccount: true,
+                installment: true,
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+        })
+
+        totalCount = await prisma.booking.count()
+        totalQueryCount = await prisma.booking.count({
+            where: {
+                paymentStatus: 'CANCEL',
+            },
+        })
+
+        const result = []
+
+        for await (const booking of list) {
+            totalAmt = booking.totalAmt
+            paidAmt =
+                booking.paidAmt +
+                (booking.installment?.reduce((prev, curr) => {
+                    return curr.isDelete ? prev : prev + curr.amount
+                }, 0) || 0)
+
+            result.push({
+                bookingId: booking.bookingId,
+                area: booking.area,
+                projectName: booking.project.name,
+                customerName: booking.customer.map((customer) => customer.name),
+                adminBankName: booking.adminAccount?.bankName || null,
+                totalAmt,
+                paidAmt,
+                status: booking.paymentStatus,
+                remainAmt: booking.remainAmt,
+                installment: undefined,
+                adminAccount: undefined,
+                project: undefined,
+                customer: undefined,
+                amount: undefined,
+            })
+        }
+
+        const response: TListData<any> = {
+            list: result,
+            meta: {
+                page: +page,
+                pageSize: +pageSize,
+                totalCount,
+                totalQueryCount,
+            },
+        }
+
+        return responseHandler(res, BOOKING_S_0010, response)
     }
 )
 

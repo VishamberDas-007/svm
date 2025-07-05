@@ -24,7 +24,7 @@ customerRouter.post(
 customerRouter.patch(
     '/upload/pan-image/:customerId',
     authMiddleware(['CUSTOMER_WRITE']),
-    upload.single('panImages'),
+    upload.single('panImages') as unknown as express.RequestHandler,
     customerController.uploadPanImage
 )
 
@@ -34,14 +34,14 @@ customerRouter.patch(
     upload.fields([
         { name: 'aadharImageFront', maxCount: 1 },
         { name: 'aadharImageRear', maxCount: 1 },
-    ]),
+    ]) as unknown as express.RequestHandler,
     customerController.uploadAadharImage
 )
 
 customerRouter.patch(
     '/upload/customer-image/:customerId',
     authMiddleware(['CUSTOMER_WRITE']),
-    upload.fields([{ name: 'customerImage', maxCount: 1 }]),
+    upload.fields([{ name: 'customerImage', maxCount: 1 }]) as unknown as express.RequestHandler,
     customerController.uploadCustomerImage
 )
 

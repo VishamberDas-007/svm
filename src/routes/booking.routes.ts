@@ -17,6 +17,12 @@ bookingRouter.get(
 )
 
 bookingRouter.get(
+    '/cancel-list',
+    authMiddleware(['BOOKING_READ', 'BOOKING_WRITE']),
+    bookingController.getAllCancelledBookings
+)
+
+bookingRouter.get(
     '/get/:bookingId',
     authMiddleware(['BOOKING_READ', 'BOOKING_WRITE']),
     bookingController.getBooking

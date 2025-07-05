@@ -42,7 +42,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPenaltyList = exports.updatePenalty = exports.addPenalty = exports.deleteBooking = exports.updateBooking = exports.getBooking = exports.getAllBookings = exports.createBooking = void 0;
+exports.getPenaltyList = exports.updatePenalty = exports.addPenalty = exports.deleteBooking = exports.cancelBooking = exports.updateBooking = exports.getBooking = exports.getAllCancelledBookings = exports.getAllBookings = exports.createBooking = void 0;
 const db_1 = __importDefault(require("../db"));
 const catchAsync_1 = __importDefault(require("../utils/catchAsync"));
 const responseHandler_1 = __importDefault(require("../utils/responseHandler"));
@@ -218,6 +218,9 @@ exports.getAllBookings = (0, catchAsync_1.default)((req, res) => __awaiter(void 
                 in: array,
             } });
     }
+    whereClause = Object.assign(Object.assign({}, whereClause), { paymentStatus: Object.assign(Object.assign({}, whereClause === null || whereClause === void 0 ? void 0 : whereClause.paymentStatus), { paymentStatus: {
+                not: 'CANCEL',
+            } }) });
     const skip = (+page - 1) * +pageSize;
     let totalCount = 0, totalQueryCount = 0, bookingList = [];
     bookingList = yield db_1.default.booking.findMany({
@@ -260,6 +263,7 @@ exports.getAllBookings = (0, catchAsync_1.default)((req, res) => __awaiter(void 
                     adminBankName: ((_e = booking.adminAccount) === null || _e === void 0 ? void 0 : _e.bankName) || null,
                     totalAmt,
                     paidAmt,
+                    status: booking.paymentStatus,
                     remainAmt: booking.remainAmt,
                     installment: undefined,
                     adminAccount: undefined,
@@ -291,8 +295,94 @@ exports.getAllBookings = (0, catchAsync_1.default)((req, res) => __awaiter(void 
     };
     return (0, responseHandler_1.default)(res, booking_1.BOOKING_S_0002, response);
 }));
+exports.getAllCancelledBookings = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _g, e_2, _h, _j;
+    var _k, _l;
+    const { page = 1, pageSize = 20,
+    // searchString,
+    // paymentStatus,
+    // paymentType,
+    // projectIds,
+     } = req.query;
+    let totalAmt = 0, paidAmt = 0, totalCount = 0, totalQueryCount = 0;
+    const skip = (+page - 1) * +pageSize;
+    const list = yield db_1.default.booking.findMany({
+        take: +pageSize,
+        skip,
+        where: {
+            paymentStatus: 'CANCEL',
+        },
+        include: {
+            project: true,
+            customer: true,
+            adminAccount: true,
+            installment: true,
+        },
+        orderBy: {
+            createdAt: 'desc',
+        },
+    });
+    totalCount = yield db_1.default.booking.count();
+    totalQueryCount = yield db_1.default.booking.count({
+        where: {
+            paymentStatus: 'CANCEL',
+        },
+    });
+    const result = [];
+    try {
+        for (var _m = true, list_1 = __asyncValues(list), list_1_1; list_1_1 = yield list_1.next(), _g = list_1_1.done, !_g;) {
+            _j = list_1_1.value;
+            _m = false;
+            try {
+                const booking = _j;
+                totalAmt = booking.totalAmt;
+                paidAmt =
+                    booking.paidAmt +
+                        (((_k = booking.installment) === null || _k === void 0 ? void 0 : _k.reduce((prev, curr) => {
+                            return curr.isDelete ? prev : prev + curr.amount;
+                        }, 0)) || 0);
+                result.push({
+                    bookingId: booking.bookingId,
+                    area: booking.area,
+                    projectName: booking.project.name,
+                    customerName: booking.customer.map((customer) => customer.name),
+                    adminBankName: ((_l = booking.adminAccount) === null || _l === void 0 ? void 0 : _l.bankName) || null,
+                    totalAmt,
+                    paidAmt,
+                    status: booking.paymentStatus,
+                    remainAmt: booking.remainAmt,
+                    installment: undefined,
+                    adminAccount: undefined,
+                    project: undefined,
+                    customer: undefined,
+                    amount: undefined,
+                });
+            }
+            finally {
+                _m = true;
+            }
+        }
+    }
+    catch (e_2_1) { e_2 = { error: e_2_1 }; }
+    finally {
+        try {
+            if (!_m && !_g && (_h = list_1.return)) yield _h.call(list_1);
+        }
+        finally { if (e_2) throw e_2.error; }
+    }
+    const response = {
+        list: result,
+        meta: {
+            page: +page,
+            pageSize: +pageSize,
+            totalCount,
+            totalQueryCount,
+        },
+    };
+    return (0, responseHandler_1.default)(res, booking_1.BOOKING_S_0010, response);
+}));
 exports.getBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _g;
+    var _o;
     yield (0, validations_1.default)(validation.bookingIdValidator, req.params);
     const bookingId = req.params.bookingId;
     const fetchBooking = yield db_1.default.booking.findFirst({
@@ -349,7 +439,7 @@ exports.getBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
         state: obj.state,
         city: obj.city,
     }));
-    return (0, responseHandler_1.default)(res, booking_1.BOOKING_S_0003, Object.assign(Object.assign(Object.assign(Object.assign({}, fetchBooking), { adminBankName: ((_g = fetchBooking.adminAccount) === null || _g === void 0 ? void 0 : _g.bankName) || null, customer: formatCustomerData }), paymentDetails), { project: {
+    return (0, responseHandler_1.default)(res, booking_1.BOOKING_S_0003, Object.assign(Object.assign(Object.assign(Object.assign({}, fetchBooking), { adminBankName: ((_o = fetchBooking.adminAccount) === null || _o === void 0 ? void 0 : _o.bankName) || null, customer: formatCustomerData }), paymentDetails), { project: {
             name: fetchBooking.project.name,
             description: fetchBooking.project.description,
             logo: fetchBooking.project.logoUrl,
@@ -376,7 +466,7 @@ exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
     if (!bookingExists)
         throw new AppError_1.default(booking_1.BOOKING_E_0001);
     else {
-        if (area) {
+        if (area > bookingExists.area) {
             const projectData = yield db_1.default.project.findFirst({
                 where: {
                     projectId,
@@ -392,100 +482,100 @@ exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
                 throw new AppError_1.default(booking_1.BOOKING_E_0003);
         }
         let paymentDetails = {};
-        yield db_1.default.$transaction((prisma) => __awaiter(void 0, void 0, void 0, function* () {
-            if (paymentType === bookingExists.paymentType) {
-                if (paymentType === 'BANK_TRANSFER') {
-                    paymentDetails = {
-                        bankPayment: {
-                            update: {
-                                where: {
-                                    paymentId,
-                                },
-                                data: {
-                                    accountNumber: accountNo,
-                                    amount: paidAmt,
-                                    bankName,
-                                },
+        if (paymentType === bookingExists.paymentType) {
+            if (paymentType === 'BANK_TRANSFER') {
+                paymentDetails = {
+                    bankPayment: {
+                        update: {
+                            where: {
+                                paymentId,
+                            },
+                            data: {
+                                accountNumber: accountNo,
+                                amount: paidAmt,
+                                bankName,
                             },
                         },
-                    };
-                }
-                else if (paymentType === 'CASH') {
-                    paymentDetails = {
-                        cashPayment: {
-                            update: {
-                                where: { paymentId },
-                                data: { amount: paidAmt },
+                    },
+                };
+            }
+            else if (paymentType === 'CASH') {
+                paymentDetails = {
+                    cashPayment: {
+                        update: {
+                            where: { paymentId },
+                            data: { amount: paidAmt },
+                        },
+                    },
+                };
+            }
+            else if (paymentType === 'CHEQUE') {
+                paymentDetails = {
+                    chequePayment: {
+                        update: {
+                            where: {
+                                paymentId,
+                            },
+                            data: {
+                                amount: paidAmt,
+                                bankName,
+                                chequeNumber: chequeNo,
                             },
                         },
-                    };
-                }
-                else if (paymentType === 'CHEQUE') {
-                    paymentDetails = {
-                        chequePayment: {
-                            update: {
-                                where: {
-                                    paymentId,
-                                },
-                                data: {
-                                    amount: paidAmt,
-                                    bankName,
-                                    chequeNumber: chequeNo,
-                                },
-                            },
-                        },
-                    };
-                }
-                else {
-                    paymentDetails = {
-                        where: {
-                            paymentId,
-                        },
-                        data: {
-                            amount: paidAmt,
-                            upiId,
-                        },
-                    };
-                }
+                    },
+                };
             }
             else {
-                if (bookingExists.paymentType === 'BANK_TRANSFER') {
-                    paymentDetails = {
-                        bankPayment: {
-                            delete: {
-                                paymentId,
-                            },
-                        },
-                    };
-                }
-                else if (bookingExists.paymentType === 'CASH') {
-                    paymentDetails = {
-                        cashPayment: {
-                            delete: {
-                                paymentId,
-                            },
-                        },
-                    };
-                }
-                else if (bookingExists.paymentType === 'CHEQUE') {
-                    paymentDetails = {
-                        chequePayment: {
-                            delete: {
-                                paymentId,
-                            },
-                        },
-                    };
-                }
-                else {
-                    paymentDetails = {
-                        upiPayment: {
-                            delete: {
-                                paymentId,
-                            },
-                        },
-                    };
-                }
+                paymentDetails = {
+                    where: {
+                        paymentId,
+                    },
+                    data: {
+                        amount: paidAmt,
+                        upiId,
+                    },
+                };
             }
+        }
+        else {
+            if (bookingExists.paymentType === 'BANK_TRANSFER') {
+                paymentDetails = {
+                    bankPayment: {
+                        delete: {
+                            paymentId,
+                        },
+                    },
+                };
+            }
+            else if (bookingExists.paymentType === 'CASH') {
+                paymentDetails = {
+                    cashPayment: {
+                        delete: {
+                            paymentId,
+                        },
+                    },
+                };
+            }
+            else if (bookingExists.paymentType === 'CHEQUE') {
+                paymentDetails = {
+                    chequePayment: {
+                        delete: {
+                            paymentId,
+                        },
+                    },
+                };
+            }
+            else {
+                paymentDetails = {
+                    upiPayment: {
+                        delete: {
+                            paymentId,
+                        },
+                    },
+                };
+            }
+        }
+        yield db_1.default.$transaction((prisma) => __awaiter(void 0, void 0, void 0, function* () {
             if (customerIds.length) {
                 yield prisma.booking.update({
                     where: {
@@ -515,7 +605,7 @@ exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
                     plotNo,
                     projectId, remainAmt: +remainAmt, totalAmt: +totalAmt, referralId }, paymentDetails),
             });
-            if (paymentType) {
+            if (paymentType !== bookingExists.paymentType) {
                 if (paymentType === 'CHEQUE') {
                     yield prisma.chequePayment.create({
                         data: {
@@ -557,6 +647,41 @@ exports.updateBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
         }));
         return (0, responseHandler_1.default)(res, booking_1.BOOKING_S_0004, updatedBookingDetails);
     }
+}));
+exports.cancelBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield (0, validations_1.default)(_general_validator_1.bookingIdValidator, req.params);
+    yield (0, validations_1.default)(validation.bookingCancelValidator, req.body);
+    const { bookingId } = req.params;
+    const { refundAmt } = req.body;
+    const bookingData = yield db_1.default.booking.findFirst({
+        where: {
+            bookingId,
+        },
+        include: {
+            project: true,
+        },
+    });
+    if (!bookingData)
+        throw new AppError_1.default(booking_1.BOOKING_E_0001);
+    yield db_1.default.$transaction((prisma) => __awaiter(void 0, void 0, void 0, function* () {
+        yield prisma.booking.update({
+            where: { bookingId },
+            data: {
+                paymentStatus: 'CANCEL',
+                refundAmt,
+            },
+        });
+        const totalArea = bookingData.area + bookingData.project.area;
+        yield prisma.project.update({
+            where: {
+                projectId: bookingData.projectId,
+            },
+            data: {
+                area: totalArea,
+            },
+        });
+    }));
+    return (0, responseHandler_1.default)(res, booking_1.BOOKING_S_0009);
 }));
 exports.deleteBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, validations_1.default)(validation.bookingIdValidator, req.params);

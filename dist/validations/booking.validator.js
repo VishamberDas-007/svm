@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.penaltyIdValidator = exports.updatePenaltyValidator = exports.addPenaltyValidator = exports.updateBookingValidator = exports.bookingIdValidator = exports.createBookingValidator = void 0;
+exports.bookingCancelValidator = exports.penaltyIdValidator = exports.updatePenaltyValidator = exports.addPenaltyValidator = exports.updateBookingValidator = exports.bookingIdValidator = exports.createBookingValidator = void 0;
 const joi_1 = __importDefault(require("joi"));
 const helper_1 = __importDefault(require("../utils/helper"));
 const paymentStatus = ['PENDING', 'PARTIAL', 'COMPLETED'];
@@ -35,7 +35,7 @@ exports.createBookingValidator = joi_1.default.object({
         otherwise: joi_1.default.allow('', null).optional(),
     }),
     bankName: joi_1.default.string().when('paymentType', {
-        is: 'BANK_TRANSFER' || 'CHEQUE',
+        is: joi_1.default.valid('BANK_TRANSFER', 'CHEQUE'),
         then: joi_1.default.required(),
         otherwise: joi_1.default.allow('', null).optional(),
     }),
@@ -80,7 +80,7 @@ exports.updateBookingValidator = joi_1.default.object({
         otherwise: joi_1.default.allow('', null).optional(),
     }),
     bankName: joi_1.default.string().when('paymentType', {
-        is: 'BANK_TRANSFER' || 'CHEQUE',
+        is: joi_1.default.valid('BANK_TRANSFER', 'CHEQUE'),
         then: joi_1.default.required(),
         otherwise: joi_1.default.allow('', null).optional(),
     }),
@@ -113,4 +113,7 @@ exports.updatePenaltyValidator = joi_1.default.object({
 });
 exports.penaltyIdValidator = joi_1.default.object({
     penaltyId: helper_1.default.uuid.required(),
+});
+exports.bookingCancelValidator = joi_1.default.object({
+    refundAmt: joi_1.default.number().required(),
 });

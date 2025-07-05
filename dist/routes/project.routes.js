@@ -30,52 +30,18 @@ exports.projectRouter = void 0;
 const express_1 = __importDefault(require("express"));
 const projectController = __importStar(require("../controllers/project.controller"));
 const s3_1 = require("../aws/s3");
+const auth_middleware_1 = require("../middlewares/auth.middleware");
 const projectRouter = express_1.default.Router();
 exports.projectRouter = projectRouter;
-projectRouter.post('/create', 
-// authMiddleware(['PROJECT_WRITE']),
-// upload.single('logo'),
-// authMiddleware(['PROJECT_WRITE']),
-// upload.single('logo'),
-projectController.newProject);
-projectRouter.get('/list', 
-// authMiddleware(['PROJECT_READ', 'PROJECT_WRITE']),
-// authMiddleware(['PROJECT_READ', 'PROJECT_WRITE']),
-projectController.getAllProjects);
-projectRouter.put('/update/:projectId', 
-// authMiddleware(['PROJECT_WRITE']),
-// upload.fields([
-//     { name: 'planningImages', maxCount: 20 },
-//     { name: 'siteImages', maxCount: 5 },
-//     { name: 'logo', maxCount: 1 },
-// ]),
-// authMiddleware(['PROJECT_WRITE']),
-// upload.fields([
-//     { name: 'planningImages', maxCount: 20 },
-//     { name: 'siteImages', maxCount: 5 },
-//     { name: 'logo', maxCount: 1 },
-// ]),
-projectController.updateProject);
-projectRouter.get('/get-details/:projectId', 
-// authMiddleware(['PROJECT_READ', 'PROJECT_WRITE']),
-projectController.getProjectDetails);
-projectRouter.get('/get-images/:projectId', 
-// authMiddleware(['PROJECT_READ', 'PROJECT_WRITE']),
-projectController.getProjectImages);
-projectRouter.get('/basic-list', 
-// authMiddleware(['PROJECT_READ', 'PROJECT_WRITE']),
-// authMiddleware(['PROJECT_READ', 'PROJECT_WRITE']),
-projectController.getProjectBasicList);
-projectRouter.put('/upload/happy-customers/:projectId', 
-// authMiddleware(['PROJECT_WRITE']),
-// authMiddleware(['PROJECT_WRITE']),
-s3_1.upload.array('customers', 10), projectController.uploadHappyCustomerImages);
-projectRouter.patch('/upload/logo/:projectId', 
-// authMiddleware(['PROJECT_WRITE']),
-s3_1.upload.single('logo'), projectController.uploadLogoImage);
-projectRouter.patch('/upload/project-images/:projectId', 
-// authMiddleware(['PROJECT_WRITE']),
-s3_1.upload.fields([
+projectRouter.post('/create', (0, auth_middleware_1.authMiddleware)(['PROJECT_WRITE']), projectController.newProject);
+projectRouter.get('/list', (0, auth_middleware_1.authMiddleware)(['PROJECT_READ', 'PROJECT_WRITE']), projectController.getAllProjects);
+projectRouter.put('/update/:projectId', (0, auth_middleware_1.authMiddleware)(['PROJECT_WRITE']), projectController.updateProject);
+projectRouter.get('/get-details/:projectId', (0, auth_middleware_1.authMiddleware)(['PROJECT_READ', 'PROJECT_WRITE']), projectController.getProjectDetails);
+projectRouter.get('/get-images/:projectId', (0, auth_middleware_1.authMiddleware)(['PROJECT_READ', 'PROJECT_WRITE']), projectController.getProjectImages);
+projectRouter.get('/basic-list', (0, auth_middleware_1.authMiddleware)(['PROJECT_READ', 'PROJECT_WRITE']), projectController.getProjectBasicList);
+projectRouter.put('/upload/happy-customers/:projectId', (0, auth_middleware_1.authMiddleware)(['PROJECT_WRITE']), s3_1.upload.array('customers', 10), projectController.uploadHappyCustomerImages);
+projectRouter.patch('/upload/logo/:projectId', (0, auth_middleware_1.authMiddleware)(['PROJECT_WRITE']), s3_1.upload.single('logo'), projectController.uploadLogoImage);
+projectRouter.patch('/upload/project-images/:projectId', (0, auth_middleware_1.authMiddleware)(['PROJECT_WRITE']), s3_1.upload.fields([
     { name: 'planningImages', maxCount: 20 },
     { name: 'siteImages', maxCount: 5 },
 ]), projectController.uploadProjectImages);
@@ -84,9 +50,5 @@ s3_1.upload.fields([
 //     // authMiddleware(['PROJECT_WRITE']),
 //     projectController.deleteProjectImages
 // )
-projectRouter.delete('/delete-image/:projectImageId', 
-// authMiddleware(['PROJECT_WRITE']),
-projectController.deleteProjectImage);
-projectRouter.delete('/delete/:projectId', 
-// authMiddleware(['PROJECT_WRITE']),
-projectController.deleteProject);
+projectRouter.delete('/delete-image/:projectImageId', (0, auth_middleware_1.authMiddleware)(['PROJECT_WRITE']), projectController.deleteProjectImage);
+projectRouter.delete('/delete/:projectId', (0, auth_middleware_1.authMiddleware)(['PROJECT_WRITE']), projectController.deleteProject);

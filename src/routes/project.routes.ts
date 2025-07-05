@@ -44,14 +44,14 @@ projectRouter.get(
 projectRouter.put(
     '/upload/happy-customers/:projectId',
     authMiddleware(['PROJECT_WRITE']),
-    upload.array('customers', 10),
+    upload.array('customers', 10) as unknown as express.RequestHandler,
     projectController.uploadHappyCustomerImages
 )
 
 projectRouter.patch(
     '/upload/logo/:projectId',
     authMiddleware(['PROJECT_WRITE']),
-    upload.single('logo'),
+    upload.single('logo') as unknown as express.RequestHandler,
     projectController.uploadLogoImage
 )
 
@@ -61,7 +61,7 @@ projectRouter.patch(
     upload.fields([
         { name: 'planningImages', maxCount: 20 },
         { name: 'siteImages', maxCount: 5 },
-    ]),
+    ]) as unknown as express.RequestHandler,
     projectController.uploadProjectImages
 )
 

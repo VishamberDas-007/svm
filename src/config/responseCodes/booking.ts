@@ -103,3 +103,11 @@ export const BOOKING_S_0009: TResponseCode = {
     message: 'This booking has been cancelled successfully',
     statusCode: 200,
 }
+
+export const BOOKING_S_0010: TResponseCode = {
+    type: RESPONSE_TYPE.SUCCESS,
+    code: 'BOOKING_S_0010',
+    isNotify: true,
+    message: 'Cancelled booking list successfully',
+    statusCode: 200,
+}
