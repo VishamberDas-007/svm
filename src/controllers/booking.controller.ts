@@ -278,9 +278,7 @@ export const getAllBookings = catchAsync(
             ...whereClause,
             paymentStatus: {
                 ...whereClause?.paymentStatus,
-                paymentStatus: {
-                    not: 'CANCEL',
-                },
+                not: 'CANCEL',
             },
         }
 
